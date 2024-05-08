@@ -4,9 +4,11 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use App\Models\Image\UserProfileImage;
 
 class User extends Authenticatable
 {
@@ -42,4 +44,19 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    public function resetPassword():HasOne
+    {
+        return $this->hasOne(UserResetPassword::class);
+    }
+
+    public function verifyEmail():HasOne
+    {
+        return $this->hasOne(UserVerifyEmail::class);
+    }
+
+    public function imageProfile():HasOne
+    {
+        return $this->hasOne(UserProfileImage::class);
+    }
 }
