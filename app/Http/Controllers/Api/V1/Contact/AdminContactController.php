@@ -10,7 +10,7 @@ class AdminContactController extends Controller
 {
     public function index()
     {
-        $contacts = Contact::orderByDesc()->paginate(25);
+        $contacts = Contact::orderBy('craeted_at', 'desc')->paginate(25);
         return ContactResource::collection($contacts);
     }
 
