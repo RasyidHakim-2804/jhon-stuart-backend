@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('first_name', 255);
             $table->string('last_name', 255);
-            $table->string('phone', 20);
+            $table->string('phone', 20)->nullable();
             $table->string('email', 30);
             $table->text('message');
             $table->timestamp('created_at');
