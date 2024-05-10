@@ -1,0 +1,21 @@
+<?php
+
+namespace App\Http\Controllers\Api\V1\Contact;
+
+use App\Http\Controllers\Controller;
+use App\Models\Contact;
+use App\Http\Resources\Api\V1\Contact\ContactResource;
+
+class AdminContactController extends Controller
+{
+    public function index()
+    {
+        $contacts = Contact::orderByDesc()->paginate(25);
+        return ContactResource::collection($contacts);
+    }
+
+    public function show(Contact $contact)
+    {
+        return new ContactResource($contact);
+    }
+}
