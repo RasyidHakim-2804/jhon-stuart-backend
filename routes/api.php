@@ -128,7 +128,7 @@ Route::prefix('v1')->group(function(){
     });
 
     //Contacts
-    Route::post('/contacts', [ContactController::class,'create']);
+    Route::post('/contacts', [ContactController::class,'store']);
 
     //Categories
     Route::get('/categories', [CategoryController::class, 'index']);
