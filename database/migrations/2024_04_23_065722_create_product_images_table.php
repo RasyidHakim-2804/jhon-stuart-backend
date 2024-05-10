@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('path');
             $table->unsignedTinyInteger('position');
+            $table->boolean('is_saved');
             $table->timestamps();
         });
     }
