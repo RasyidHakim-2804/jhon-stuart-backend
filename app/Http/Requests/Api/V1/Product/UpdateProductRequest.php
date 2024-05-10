@@ -57,7 +57,7 @@ class UpdateProductRequest extends FormRequest
                 'exclude_if:is_varied,false',
                 'nullable',
                 Rule::exists(Variant::class, 'id')->where(function($query){
-                    $query->where('product_id', $this->segment(count($this->segments())));
+                    $query->where('product_id', $this->route()->parameters()['product']->id);
                 })
             ],
         ];
