@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1\Contact;
 
 use App\Http\Requests\Api\V1\Contact\CreateRequest;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Api\V1\Common\SuccessResource;
 use App\Models\Contact;
 
 class ContactController extends Controller
@@ -18,5 +19,7 @@ class ContactController extends Controller
         $contact->message       = $request->message;
         
         $contact->save();
+
+        return new SuccessResource(code: 201);
     }
 }
