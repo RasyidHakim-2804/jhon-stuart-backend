@@ -4,9 +4,6 @@ namespace App\Http\Resources\Api\V1\Product;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use App\Http\Resources\Api\V1\Variant\VariantResource;
-use App\Http\Resources\Api\V1\Category\CategoryResource;
-use App\Http\Resources\Api\V1\Image\ProductImageResource;
 
 class ProductResource extends JsonResource
 {
