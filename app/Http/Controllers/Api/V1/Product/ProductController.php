@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api\V1\Product;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Http\Resources\Api\V1\Product\ProductResource;
-use App\Http\Resources\Api\V1\Product\ProductFullResource;
 
 class ProductController extends Controller
 {
@@ -26,6 +25,6 @@ class ProductController extends Controller
     {
         $product = Product::where('slug', $slug)->with(['variants', 'categories', 'images'])->firstOrFail();
         
-        return new ProductFullResource($product);
+        return new ProductResource($product);
     }
 }
