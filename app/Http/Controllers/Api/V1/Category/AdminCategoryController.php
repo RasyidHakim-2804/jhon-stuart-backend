@@ -28,8 +28,10 @@ class AdminCategoryController extends Controller
         return new SuccessResource(201);
     }
 
-    public function show(Category $category)
+    public function show($category)
     {
+        $category = Category::with('products')->findOrFail($category);
+
         return new CategoryResource($category);
     }
 
