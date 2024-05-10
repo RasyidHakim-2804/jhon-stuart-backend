@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api\V1\Image\Product;
+namespace App\Http\Controllers\Api\V1\Product;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\Product\Image\CreateImageRequest;

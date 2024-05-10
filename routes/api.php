@@ -7,7 +7,7 @@ use App\Http\Controllers\Api\V1\Auth\Admin\AdminPasswordController;
 use App\Http\Controllers\Api\V1\Category\AdminCategoryController;
 use App\Http\Controllers\Api\V1\Contact\AdminContactController;
 use App\Http\Controllers\Api\V1\Product\AdminProductController;
-use App\Http\Controllers\Api\V1\Image\Product\AdminProductImageController;
+use App\Http\Controllers\Api\V1\Product\AdminProductImageController;
 use App\Http\Controllers\Api\V1\Profile\AdminProfileController;
 
 use App\Http\Controllers\Api\V1\Auth\User\UserAuthController;
