@@ -14,9 +14,9 @@ class CategoryController extends Controller
         return CategoryResource::collection($categories);
     }
 
-    public function show($category)
+    public function show($slug)
     {
-        $category = Category::with('products')->findOrFail($category);
+        $category = Category::where('slug', $slug)->with('products')->firstOrFail();
 
         return new CategoryResource($category);
     }

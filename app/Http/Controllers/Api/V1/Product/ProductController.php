@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1\Product;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Http\Resources\Api\V1\Product\ProductResource;
+use App\Http\Resources\Api\V1\Product\ProductFullResource;
 
 class ProductController extends Controller
 {
@@ -13,7 +14,7 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $products = Product::with(['variants', 'categories'])->paginate(25);
+        $products = Product::with(['images'])->paginate(25);
 
         return ProductResource::collection($products);
     }
@@ -23,8 +24,8 @@ class ProductController extends Controller
      */
     public function show($slug)
     {
-        $product = Product::findBySlug($slug);
-
-        return new ProductResource($product);
+        $product = Product::where('slug', $slug)->with(['variants', 'categories', 'images'])->firstOrFail();
+        
+        return new ProductFullResource($product);
     }
 }

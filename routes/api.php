@@ -64,16 +64,16 @@ Route::prefix('v1')->group(function(){
             //Category
             Route::get('/categories', [AdminCategoryController::class, 'index']);
             Route::post('/categories', [AdminCategoryController::class, 'store']);
-            Route::get('/categories/{category}', [AdminCategoryController::class,'show']);
-            Route::put('/categories/{category}', [AdminCategoryController::class, 'update']);
-            Route::delete('/categories/{category}', [AdminCategoryController::class, 'destroy']);
+            Route::get('/categories/{slug}', [AdminCategoryController::class,'show']);
+            Route::put('/categories/{category:slug}', [AdminCategoryController::class, 'update']);
+            Route::delete('/categories/{category:slug}', [AdminCategoryController::class, 'destroy']);
             
             //Products
             Route::get('/products', [AdminProductController::class,'index']);
             Route::post('/products', [AdminProductController::class, 'store']);
-            Route::get('/products/{product}', [AdminProductController::class,'show']);
-            Route::put('/products/{product}', [AdminProductController::class,'update']);
-            Route::delete('/products/{product}', [AdminProductController::class,'destroy']);
+            Route::get('/products/{slug}', [AdminProductController::class,'show']);
+            Route::put('/products/{product:slug}', [AdminProductController::class,'update']);
+            Route::delete('/products/{product:slug}', [AdminProductController::class,'destroy']);
 
             //User
             Route::get('/users', [AdminUserController::class, 'index']);
@@ -81,9 +81,9 @@ Route::prefix('v1')->group(function(){
             Route::put('/users/{user}', [AdminUserController::class, 'update']);
             
             //ProductImage
-            Route::get('/products/{product}/images', [AdminProductImageController::class, 'index']);
-            Route::post('/products/{product}/images', [AdminProductImageController::class,'store']);
-            Route::post('/products/{product}/save-images', [AdminProductImageController::class, 'saveImages']);
+            Route::get('/products/{product:slug}/images', [AdminProductImageController::class, 'index']);
+            Route::post('/products/{product:slug}/images', [AdminProductImageController::class,'store']);
+            Route::post('/products/{product:slug}/save-images', [AdminProductImageController::class, 'saveImages']);
             
             //Admin
             Route::post('/', [AdminAdminController::class, 'store'])->middleware('ability:admin_master');
@@ -132,7 +132,7 @@ Route::prefix('v1')->group(function(){
 
     //Categories
     Route::get('/categories', [CategoryController::class, 'index']);
-    Route::get('/categories/{category}', [CategoryController::class,'show']);
+    Route::get('/categories/{slug}', [CategoryController::class,'show']);
 
     //Products
     Route::get('/products', [ProductController::class, 'index']);

@@ -18,7 +18,7 @@ class AdminProductController extends Controller
      */
     public function index()
     {
-        $products = Product::with(['variants', 'categories', 'images'])->paginate(25);
+        $products = Product::with(['images'])->paginate(25);
         
         return ProductResource::collection($products);
     }
@@ -52,10 +52,9 @@ class AdminProductController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($product)
+    public function show($slug)
     {
-        $product = Product::with(['variants', 'categories', 'images'])->findOrFail($product);
-        // dd($product->variants);
+        $product = Product::where('slug', $slug)->with(['variants', 'categories', 'images'])->firstOrFail();
         
         return new ProductFullResource($product);
     }
