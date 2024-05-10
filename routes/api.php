@@ -82,10 +82,8 @@ Route::prefix('v1')->group(function(){
             
             //ProductImage
             Route::get('/products/{product}/images', [AdminProductImageController::class, 'index']);
-            Route::get('/products/{product}/images/{image}', [AdminProductImageController::class, 'show']);
             Route::post('/products/{product}/images', [AdminProductImageController::class,'store']);
-            Route::put('/products/{product}/images/{image}', [AdminProductImageController::class, 'update']);
-            Route::delete('/products/{product}/images/{image}', [AdminProductImageController::class, 'destroy']);
+            Route::post('/products/{product}/save-images', [AdminProductImageController::class, 'saveImages']);
             
             //Admin
             Route::post('/', [AdminAdminController::class, 'store'])->middleware('ability:admin_master');
