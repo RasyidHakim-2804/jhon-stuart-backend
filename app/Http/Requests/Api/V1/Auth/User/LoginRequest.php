@@ -17,6 +17,13 @@ class LoginRequest extends FormRequest
         return true;
     }
 
+    /**
+     * Indicates if the validator should stop on the first rule failure.
+     *
+     * @var bool
+     */
+    protected $stopOnFirstFailure = true;
+    
     public function messages()
     {
         return [
