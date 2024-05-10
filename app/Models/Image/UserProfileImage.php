@@ -2,6 +2,7 @@
 
 namespace App\Models\Image;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use App\Service\Abstracts\Model\MyBaseModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -21,5 +22,12 @@ class UserProfileImage extends MyBaseModel
     public function user():BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function path(): Attribute
+    {
+        return new Attribute(
+            get: fn (string $value) => config('app.frontend_url') . 'storage/' . $value
+        );
     }
 }
