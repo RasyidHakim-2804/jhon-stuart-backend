@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Variant extends Model
+class ProductVariant extends Model
 {
     use HasFactory;
 
@@ -14,7 +14,7 @@ class Variant extends Model
         'id', 'name', 'price','stock'
     ];
 
-    protected $table = 'variants';
+    protected $table = 'product_variants';
 
     public function product(): BelongsTo
     {
