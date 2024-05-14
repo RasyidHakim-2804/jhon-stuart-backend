@@ -120,7 +120,6 @@ Route::prefix('v1')->group(function(){
             Route::post('/password/change', [UserPasswordController::class, 'changePassword']);
 
             //User Profile
-            Route::get('/', [UserProfileController::class, 'index']);
             Route::get('/profile', [UserProfileController::class,'show']);
             Route::put('/profile', [UserProfileController::class, 'update']);
             
