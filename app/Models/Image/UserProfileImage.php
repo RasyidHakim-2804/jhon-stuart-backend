@@ -17,7 +17,7 @@ class UserProfileImage extends MyBaseModel
     protected $pathColumn = 'path';
     protected $format     = '.webp';
     protected $disk       = 'public';
-    protected $dirPath    = 'upload/images/product/';
+    protected $dirPath    = 'upload/images/profile/user';
 
     public function user():BelongsTo
     {
