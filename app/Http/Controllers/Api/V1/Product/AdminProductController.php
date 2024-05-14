@@ -60,7 +60,6 @@ class AdminProductController extends Controller
             'variants',
             'categories',
             'images' => function (Builder $query) {
-                dd($query);
                 $query->where('is_saved', true)->orderBy('position', 'asc');
             }
             ])->firstOrFail();
