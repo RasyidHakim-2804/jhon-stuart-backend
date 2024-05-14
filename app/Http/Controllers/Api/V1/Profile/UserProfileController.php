@@ -39,7 +39,7 @@ class UserProfileController extends Controller
             $user->last_name  = $request->last_name;
             $user->save();
 
-            if ($user->imageProfile() === null) {
+            if ($user->imageProfile === null) {
 
                 $this->createImage($request->image, $user->id);
             } else {
@@ -55,21 +55,21 @@ class UserProfileController extends Controller
     //   private methods    //
     //////////////////////////
 
-    private function createImage(UploadedFile $uploadedImage, $admin_id)
+    private function createImage(UploadedFile $uploadedImage, $user_id)
     {
         $image          = new UserProfileImage();
         $imageService   = new ImageService($image);
 
         $result             = $imageService->upload($uploadedImage);
-        $image->admin_id    = $admin_id;
+        $image->user_id     = $user_id;
         $image->name        = $result->name;
         $image->path        = $result->path;
         $image->save();
     }
 
-    private function updateImage(UploadedFile $uploadedImage, $admin_id)
+    private function updateImage(UploadedFile $uploadedImage, $user_id)
     {
-        $image          = UserProfileImage::where('admin_id', $admin_id)->first();
+        $image          = UserProfileImage::where('user_id', $user_id)->first();
         $imageService   = new ImageService($image);
 
         $result             = $imageService->update($uploadedImage);

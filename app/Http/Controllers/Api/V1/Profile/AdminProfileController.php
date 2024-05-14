@@ -41,7 +41,7 @@ class AdminProfileController extends Controller
 
             $admin->save();
 
-            if ($admin->imageProfile() === null) {
+            if ($admin->imageProfile === null) {
 
                 $this->createImage($request->image, $admin->id);
             } else {
