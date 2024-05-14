@@ -33,7 +33,7 @@ class FirstAccountSeeder extends Seeder
             'uuid'              => Str::ulid()->toBase58(),
             'first_name'        => 'Master',
             'last_name'         => 'User',
-            'email'             => 'test@emai.com',
+            'email'             => 'test@email.com',
             'password'          => Hash::make('user#2022!'),
             'email_verified_at' => now(),
             'created_at'        => now(),
