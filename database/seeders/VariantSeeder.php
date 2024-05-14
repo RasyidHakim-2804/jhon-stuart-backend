@@ -42,7 +42,7 @@ class VariantSeeder extends Seeder
         $faker = Factory::create();
         $name  = $faker->unique()->colorName();
 
-        DB::table('variants')->insert([
+        DB::table('product_variants')->insert([
             'product_id'    => $product_id,
             'name'          => $name,
             'min_order'     => rand(1,2),
