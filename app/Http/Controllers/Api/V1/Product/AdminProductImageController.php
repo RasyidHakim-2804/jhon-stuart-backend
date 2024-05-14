@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Api\V1\Product;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Api\V1\Product\Image\CreateImageRequest;
 use App\Http\Requests\Api\V1\Product\Image\SaveImageRequest;
 use App\Http\Requests\Api\V1\Product\Image\StoreImageRequest;
 use App\Http\Resources\Api\V1\Product\ProductImageResource;
@@ -11,7 +10,6 @@ use App\Http\Resources\Api\V1\Common\SuccessResource;
 use App\Models\Product;
 use App\Models\Image\ProductImage;
 use App\Service\Services\ImageServices\ImageService;
-use Illuminate\Support\Facades\DB;
 
 class AdminProductImageController extends Controller
 {
@@ -44,29 +42,37 @@ class AdminProductImageController extends Controller
 
     public function saveImages(SaveImageRequest $request, Product $product)
     {
-        $imagesid     = $request->validated();
+        $imagesid     = $request->validated()['images_id'];
         $position     = 1;
         $undeletedIds = [];
 
-        foreach ($imagesid as $key => $id) {
-            $image           = ProductImage::findOrFail($id);
-            $image->is_saved = true;
-            $image->position = $position;
-            $image->save();
-
-            $position++;
-            $undeletedIds[] = $id;
+        if ( count($imagesid) != 0 ) {
+            foreach ( $imagesid as $key => $id ) {
+                $image           = ProductImage::findOrFail($id);
+                $image->is_saved = true;
+                $image->position = $position;
+                $image->save();
+    
+                $position++;
+                $undeletedIds[] = $id;
+            }   
         }
 
-        ProductImage::where('product_id', $product->id)
-        ->whereNotIn('id', $undeletedIds)
-        ->delete();
-
+        $this->deleteById($product->id, $undeletedIds);
+        
         return new SuccessResource();
     }
 
-    public function destroy(Product $product, ProductImage $image)
+    private function deleteById($productId, array $undeletedIds)
     {
+        $images = ProductImage::where('product_id', $productId)->get();
 
+        foreach ($images as $image ) {
+            if (in_array($image->id, $undeletedIds) == false) {
+                $imageService = new ImageService($image);
+                $imageService->delete();
+                $image->delete();
+            }
+        }
     }
 }

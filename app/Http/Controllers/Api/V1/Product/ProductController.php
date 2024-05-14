@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1\Product;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Http\Resources\Api\V1\Product\ProductResource;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 
 class ProductController extends Controller
 {
@@ -13,7 +14,9 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $products = Product::with(['images'])->paginate(25);
+        $products = Product::with(['images' => function (Builder $query) {
+            $query->where('is_saved', true)->orderBy('position', 'asc');
+        }])->paginate(25);
 
         return ProductResource::collection($products);
     }
@@ -23,7 +26,13 @@ class ProductController extends Controller
      */
     public function show($slug)
     {
-        $product = Product::where('slug', $slug)->with(['variants', 'categories', 'images'])->firstOrFail();
+        $product = Product::where('slug', $slug)->with([
+            'variants',
+            'categories',
+            'images' => function (Builder $query) {
+                $query->where('is_saved', true)->orderBy('position', 'asc');
+            }
+            ])->firstOrFail();
         
         return new ProductResource($product);
     }

@@ -3,13 +3,13 @@
 namespace App\Http\Controllers\Api\V1\Product;
 
 use App\Models\Product;
-use App\Models\Variant;
+use App\Models\ProductVariant;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\Product\CreateProductRequest;
 use App\Http\Requests\Api\V1\Product\UpdateProductRequest;
 use App\Http\Resources\Api\V1\Product\ProductResource;
 use App\Http\Resources\Api\V1\Common\SuccessResource;
-use App\Http\Resources\Api\V1\Product\ProductFullResource;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 
 class AdminProductController extends Controller
 {
@@ -18,7 +18,9 @@ class AdminProductController extends Controller
      */
     public function index()
     {
-        $products = Product::with(['images'])->paginate(25);
+        $products = Product::with(['images' => function (Builder $query) {
+            $query->where('is_saved', true)->orderBy('position', 'asc');
+        }])->paginate(25);
         
         return ProductResource::collection($products);
     }
@@ -54,9 +56,16 @@ class AdminProductController extends Controller
      */
     public function show($slug)
     {
-        $product = Product::where('slug', $slug)->with(['variants', 'categories', 'images'])->firstOrFail();
+        $product = Product::where('slug', $slug)->with([
+            'variants',
+            'categories',
+            'images' => function (Builder $query) {
+                dd($query);
+                $query->where('is_saved', true)->orderBy('position', 'asc');
+            }
+            ])->firstOrFail();
         
-        return new ProductFullResource($product);
+        return new ProductResource($product);
     }
 
     /**
@@ -65,9 +74,9 @@ class AdminProductController extends Controller
     public function update(UpdateProductRequest $request, Product $product)
     {
         if ($request->is_varied) {
-            $this->modifyVariants($request->validated()['variants'], $product);
+            $this->productToManyVariant($request->validated()['variants'], $product);
         } else {
-            $this->modifySingelVariant($request->validated()['variants'], $product);        
+            $this->productToSingelVariant($request->validated()['variants'], $product);        
         }
         
         $categories = $request->validated('categories');
@@ -97,19 +106,19 @@ class AdminProductController extends Controller
     //for variant//
     ///////////////
 
-    private function modifySingelVariant(array $request, Product $product)
+    private function productToSingelVariant(array $request, Product $product)
     {
         /** */
         if ($product->is_varied == true) {
             $this->deleteVariants($product->id);
             $this->createVariant($request, $product->id);
         } else {
-            $request['id'] = Variant::select('id')->where('product_id',$product->id)->firstOrFail();
+            $request['id'] = ProductVariant::where('product_id',$product->id)->value('id');
             $this->updateVariant($request, $product->id);
         }
     }
 
-    private function modifyVariants($reqestVariants, Product $product)
+    private function productToManyVariant($reqestVariants, Product $product)
     {
         $undeletedIds    = [];
 
@@ -129,7 +138,7 @@ class AdminProductController extends Controller
 
     private function createVariant(array $request, $product_id)
     {
-        $variant                = new Variant();
+        $variant                = new ProductVariant();
         $variant->product_id    = $product_id;
         $variant->name          = $request['name'];
         $variant->idr_price     = $request['idr_price'];
@@ -146,7 +155,7 @@ class AdminProductController extends Controller
     private function updateVariant(array $request, $product_id)
     {
         /** @var Variant */
-        $variant                = Variant::where('id', $request['id'])
+        $variant                = ProductVariant::where('id', $request['id'])
                                     ->where('product_id', $product_id)
                                     ->firstOrFail();
         
@@ -162,7 +171,7 @@ class AdminProductController extends Controller
 
     private function deleteVariants(string $product_id, array $undeletedIds = [])
     {
-        Variant::where('product_id', $product_id)
+        ProductVariant::where('product_id', $product_id)
                     ->whereNotIn('id', $undeletedIds)
                     ->delete();
     }
