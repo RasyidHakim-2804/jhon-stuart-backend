@@ -10,6 +10,7 @@ use App\Http\Requests\Api\V1\Product\UpdateProductRequest;
 use App\Http\Resources\Api\V1\Product\ProductResource;
 use App\Http\Resources\Api\V1\Common\SuccessResource;
 use Illuminate\Contracts\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\DB;
 
 class AdminProductController extends Controller
 {
@@ -30,23 +31,26 @@ class AdminProductController extends Controller
      */
     public function store(CreateProductRequest $request)
     {
-        $product                = new Product();
-        $product->name          = $request->name;
-        $product->is_varied     = $request->is_varied;
-        $product->description   = $request->description;
-
-        $product->save();
-
-        $categories = $request->validated('categories');
-        $product->categories()->attach($categories);
-
-        if ($request->is_varied) {
-            foreach ($request->validated()['variants'] as $key => $request) {
-                $this->createVariant($request, $product->id);   
+        DB::transaction(function() use ($request)
+        {
+            $product                = new Product();
+            $product->name          = $request->name;
+            $product->is_varied     = $request->is_varied;
+            $product->description   = $request->description;
+    
+            $product->save();
+    
+            $categories = $request->validated('categories');
+            $product->categories()->attach($categories);
+    
+            if ($request->is_varied) {
+                foreach ($request->validated()['variants'] as $key => $request) {
+                    $this->createVariant($request, $product->id);   
+                }
+            } else {
+                $this->createVariant($request->validated(), $product->id);            
             }
-        } else {
-            $this->createVariant($request->validated(), $product->id);            
-        }
+        });
 
         return new SuccessResource(201);
     }
@@ -72,20 +76,23 @@ class AdminProductController extends Controller
      */
     public function update(UpdateProductRequest $request, Product $product)
     {
-        if ($request->is_varied) {
-            $this->productToManyVariant($request->validated()['variants'], $product);
-        } else {
-            $this->productToSingelVariant($request->validated()['variants'], $product);        
-        }
+        DB::transaction(function() use ($request, $product)
+        {
+            if ($request->is_varied) {
+                $this->productToManyVariant($request->validated()['variants'], $product);
+            } else {
+                $this->productToSingelVariant($request->validated()['variants'], $product);        
+            }
+            
+            $categories = $request->validated('categories');
+    
+            $product->name          = $request->name;
+            $product->description   = $request->description;
+            $product->is_varied     = $request->is_varied;
+            $product->categories()->sync($categories);
+            $product->save();    
+        });
         
-        $categories = $request->validated('categories');
-
-        $product->name          = $request->name;
-        $product->description   = $request->description;
-        $product->is_varied     = $request->is_varied;
-        $product->categories()->sync($categories);
-        $product->save();
-
         return new SuccessResource(200);
     }
 
@@ -94,9 +101,11 @@ class AdminProductController extends Controller
      */
     public function destroy(Product $product)
     {
-        $product->variants()->delete();
-        $product->categories()->detach();
-        $product->delete();
+        DB::transaction(function () use ($product){
+            $product->variants()->delete();
+            $product->categories()->detach();
+            $product->delete();
+        });
 
         return new SuccessResource();
     }

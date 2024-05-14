@@ -8,6 +8,7 @@ use App\Http\Requests\Api\V1\Category\UpdateCategoryRequest;
 use App\Http\Resources\Api\V1\Category\CategoryResource;
 use App\Http\Resources\Api\V1\Common\SuccessResource;
 use App\Models\Category;
+use Illuminate\Support\Facades\DB;
 
 class AdminCategoryController extends Controller
 {
@@ -47,9 +48,12 @@ class AdminCategoryController extends Controller
 
     public function destroy(Category $category)
     {
-        $category->products()->detach();
-        $category->delete();
-
+        DB::transaction(function() use ($category)
+        {
+            $category->products()->detach();
+            $category->delete();    
+        });
+        
         return new SuccessResource();
     }
 }

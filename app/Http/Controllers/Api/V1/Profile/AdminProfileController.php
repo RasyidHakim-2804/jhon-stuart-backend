@@ -10,6 +10,7 @@ use App\Models\Admin;
 use App\Models\Image\AdminProfileImage;
 use App\Service\Services\ImageServices\ImageService;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
 
 class AdminProfileController extends Controller
 {
@@ -30,21 +31,24 @@ class AdminProfileController extends Controller
      */
     public function update(AdminUpdateRequest $request)
     {
-        /** @var Admin */
-        $admin              = Admin::where('email', $request->email)->firstOrFail();
+        DB::transaction(function() use ($request)
+        {
+            /** @var Admin */
+            $admin              = Admin::where('email', $request->email)->firstOrFail();
 
-        $admin->first_name  = $request->first_name;
-        $admin->last_name   = $request->last_name;
+            $admin->first_name  = $request->first_name;
+            $admin->last_name   = $request->last_name;
 
-        $admin->save();
+            $admin->save();
 
-        if ($admin->imageProfile() === null) {
+            if ($admin->imageProfile() === null) {
 
-            $this->createImage($request->image, $admin->id);
-        } else {
+                $this->createImage($request->image, $admin->id);
+            } else {
 
-            $this->updateImage($request->image, $admin->id);
-        }
+                $this->updateImage($request->image, $admin->id);
+            }
+        });
 
         return new SuccessResource();
     }

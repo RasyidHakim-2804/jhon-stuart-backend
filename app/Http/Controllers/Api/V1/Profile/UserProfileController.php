@@ -10,6 +10,7 @@ use App\Models\Image\UserProfileImage;
 use App\Models\User;
 use App\Service\Services\ImageServices\ImageService;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
 
 class UserProfileController extends Controller
 {
@@ -30,19 +31,22 @@ class UserProfileController extends Controller
      */
     public function update(UserUpdateRequest $request)
     {
-        /** @var User */
-        $user = auth()->user();
-        $user->first_name = $request->first_name;
-        $user->last_name  = $request->last_name;
-        $user->save();
+        DB::transaction(function() use ($request)
+        {
+            /** @var User */
+            $user = auth()->user();
+            $user->first_name = $request->first_name;
+            $user->last_name  = $request->last_name;
+            $user->save();
 
-        if ($user->imageProfile() === null) {
+            if ($user->imageProfile() === null) {
 
-            $this->createImage($request->image, $user->id);
-        } else {
+                $this->createImage($request->image, $user->id);
+            } else {
 
-            $this->updateImage($request->image, $user->id);
-        }
+                $this->updateImage($request->image, $user->id);
+            }
+        });
 
         return new SuccessResource();
     }

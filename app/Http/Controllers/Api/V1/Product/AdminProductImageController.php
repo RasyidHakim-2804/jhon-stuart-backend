@@ -10,6 +10,7 @@ use App\Http\Resources\Api\V1\Common\SuccessResource;
 use App\Models\Product;
 use App\Models\Image\ProductImage;
 use App\Service\Services\ImageServices\ImageService;
+use Illuminate\Support\Facades\DB;
 
 class AdminProductImageController extends Controller
 {
@@ -22,46 +23,57 @@ class AdminProductImageController extends Controller
 
     public function store(Product $product,StoreImageRequest $request)
     {
-        $lastPosition       = ProductImage::where('product_id', $product->id)
-                                ->orderByDesc('id')
-                                ->value('position');
-
         $image              = new ProductImage();
-        $imageService       = new ImageService($image);
-        $result             = $imageService->upload($request->images);            
-    
-        $image->product_id  = $product->id;
-        $image->name        = $result->name;
-        $image->path        = $result->path;
-        $image->position    = $lastPosition + 1;
-        $image->is_saved    = false;
-        $image->save();
+
+        DB::transaction(function() use ($product,$request, $image)
+        {
+            $lastPosition       = ProductImage::where('product_id', $product->id)
+            ->orderByDesc('id')
+            ->value('position');
+
+            $imageService       = new ImageService($image);
+            $result             = $imageService->upload($request->images);            
+
+            $image->product_id  = $product->id;
+            $image->name        = $result->name;
+            $image->path        = $result->path;
+            $image->position    = $lastPosition + 1;
+            $image->is_saved    = false;
+            $image->save();
+        });
 
         return new ProductImageResource($image);
     }
 
     public function saveImages(SaveImageRequest $request, Product $product)
     {
-        $imagesid     = $request->validated()['images_id'];
-        $position     = 1;
-        $undeletedIds = [];
+        DB::transaction(function() use ($request, $product)
+        {
+            $imagesid     = $request->validated()['images_id'];
+            $position     = 1;
+            $undeletedIds = [];
 
-        if ( count($imagesid) != 0 ) {
-            foreach ( $imagesid as $key => $id ) {
-                $image           = ProductImage::findOrFail($id);
-                $image->is_saved = true;
-                $image->position = $position;
-                $image->save();
-    
-                $position++;
-                $undeletedIds[] = $id;
-            }   
-        }
+            if ( count($imagesid) != 0 ) {
+                foreach ( $imagesid as $key => $id ) {
+                    $image           = ProductImage::findOrFail($id);
+                    $image->is_saved = true;
+                    $image->position = $position;
+                    $image->save();
+        
+                    $position++;
+                    $undeletedIds[] = $id;
+                }   
+            }
 
-        $this->deleteById($product->id, $undeletedIds);
+            $this->deleteById($product->id, $undeletedIds);
+        });
         
         return new SuccessResource();
     }
+
+    ////////////////////
+    // private methods//
+    ////////////////////
 
     private function deleteById($productId, array $undeletedIds)
     {
