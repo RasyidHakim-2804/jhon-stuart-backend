@@ -1,5 +1,5 @@
 <?php 
-namespace App\Custom\Query\Product;
+namespace App\Query\Product;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\JoinClause;

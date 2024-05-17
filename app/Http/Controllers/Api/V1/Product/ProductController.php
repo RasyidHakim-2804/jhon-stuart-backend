@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Api\V1\Product;
 
-use App\Custom\Query\Product\FilterByLimitPrice;
-use App\Custom\Query\Product\FilterByCategory;
-use App\Custom\Query\Product\SortByPrice;
+use App\Query\Product\FilterByLimitPrice;
+use App\Query\Product\FilterByCategory;
+use App\Query\Product\SortByPrice;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Http\Resources\Api\V1\Product\ProductResource;
