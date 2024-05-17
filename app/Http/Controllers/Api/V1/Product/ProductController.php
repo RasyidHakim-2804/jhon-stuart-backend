@@ -20,7 +20,6 @@ class ProductController extends Controller
      */
     public function index()
     {
-        // dd(count(request()->query()));
         if (count(request()->query()) != 0) {
             
             return $this->filter();
@@ -68,7 +67,6 @@ class ProductController extends Controller
                     ])
                     ->paginate(25)->appends(request()->query());
 
-                    // dd($products->toSql());
         return ProductResource::collection($products);
     }
 }
