@@ -9,6 +9,7 @@ use App\Http\Requests\Api\V1\Product\CreateProductRequest;
 use App\Http\Requests\Api\V1\Product\UpdateProductRequest;
 use App\Http\Resources\Api\V1\Product\ProductResource;
 use App\Http\Resources\Api\V1\Common\SuccessResource;
+use App\Service\Services\SearchServices\ProductSearchService;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 
@@ -19,11 +20,7 @@ class AdminProductController extends Controller
      */
     public function index()
     {
-        $products = Product::with(['images' => function (Builder $query) {
-            $query->where('is_saved', true)->orderBy('position', 'asc');
-        }])->paginate(25);
-        
-        return ProductResource::collection($products);
+        return (new ProductSearchService(request()->query()))->response();
     }
 
     /**
@@ -81,7 +78,7 @@ class AdminProductController extends Controller
             if ($request->is_varied) {
                 $this->productToManyVariant($request->validated()['variants'], $product);
             } else {
-                $this->productToSingelVariant($request->validated()['variants'], $product);        
+                $this->productToSingelVariant($request->validated(), $product);        
             }
             
             $categories = $request->validated('categories');
@@ -114,10 +111,13 @@ class AdminProductController extends Controller
     //for variant//
     ///////////////
 
+    /**
+     * update product to just has one variant
+     */
     private function productToSingelVariant(array $request, Product $product)
     {
         /** */
-        if ($product->is_varied == true) {
+        if ($product->is_varied == true) { //if current product is varied
             $this->deleteVariants($product->id);
             $this->createVariant($request, $product->id);
         } else {
@@ -126,6 +126,9 @@ class AdminProductController extends Controller
         }
     }
 
+    /**
+     * update product to many variants
+     */
     private function productToManyVariant($reqestVariants, Product $product)
     {
         $undeletedIds    = [];

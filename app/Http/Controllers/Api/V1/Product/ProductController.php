@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1\Product;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Http\Resources\Api\V1\Product\ProductResource;
+use App\Service\Services\SearchServices\ProductSearchService;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 
 class ProductController extends Controller
@@ -14,11 +15,7 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $products = Product::with(['images' => function (Builder $query) {
-            $query->where('is_saved', true)->orderBy('position', 'asc');
-        }])->paginate(25);
-
-        return ProductResource::collection($products);
+        return (new ProductSearchService(request()->query()))->response();
     }
 
     /**
