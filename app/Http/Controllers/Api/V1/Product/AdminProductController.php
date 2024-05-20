@@ -78,7 +78,7 @@ class AdminProductController extends Controller
             if ($request->is_varied) {
                 $this->productToManyVariant($request->validated()['variants'], $product);
             } else {
-                $this->productToSingelVariant($request->validated()['variants'], $product);        
+                $this->productToSingelVariant($request->validated(), $product);        
             }
             
             $categories = $request->validated('categories');
@@ -111,10 +111,13 @@ class AdminProductController extends Controller
     //for variant//
     ///////////////
 
+    /**
+     * update product to just has one variant
+     */
     private function productToSingelVariant(array $request, Product $product)
     {
         /** */
-        if ($product->is_varied == true) {
+        if ($product->is_varied == true) { //if current product is varied
             $this->deleteVariants($product->id);
             $this->createVariant($request, $product->id);
         } else {
@@ -123,6 +126,9 @@ class AdminProductController extends Controller
         }
     }
 
+    /**
+     * update product to many variants
+     */
     private function productToManyVariant($reqestVariants, Product $product)
     {
         $undeletedIds    = [];
