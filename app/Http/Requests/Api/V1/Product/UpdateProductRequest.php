@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Api\V1\Product;
 
+use App\Models\ProductVariant;
 use App\Models\Variant;
 use Illuminate\Foundation\Http\FormRequest;
 use App\Rules\IsArray;
@@ -56,7 +57,7 @@ class UpdateProductRequest extends FormRequest
             'variants.*.id'         => [
                 'exclude_if:is_varied,false',
                 'nullable',
-                Rule::exists(Variant::class, 'id')->where(function($query){
+                Rule::exists(ProductVariant::class, 'id')->where(function($query){
                     $query->where('product_id', $this->route()->parameters()['product']->id);
                 })
             ],
