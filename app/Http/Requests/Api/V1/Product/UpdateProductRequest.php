@@ -50,8 +50,8 @@ class UpdateProductRequest extends FormRequest
             'categories.*'          => 'required|exists:categories,id|distinct',
             
             'is_varied'             => 'required|boolean',
-            'idr_price'             => 'exclude_if:is_varied,true|required|numeric|min:1|max:10000000|max_digits:8',
-            'usd_price'             => 'exclude_if:is_varied,true|required|numeric|min:1|max:10000000|max_digits:8',
+            'idr_price'             => 'exclude_if:is_varied,true|required|numeric|min:1|max:10000000',
+            'usd_price'             => 'exclude_if:is_varied,true|required|numeric|min:1|max:10000000',
             'stock'                 => 'exclude_if:is_varied,true|required|numeric|min:0|max:60000|max_digits:5',
             'min_order'             => 'exclude_if:is_varied,true|required|numeric|min:1|max_digits:8`',
             'max_order'             => 'exclude_if:is_varied,true|nullable|numeric|max_digits:8|gte:min_order',
