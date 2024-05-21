@@ -6,7 +6,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class SetLocale
+class AcceptLanguage
 {
     /**
      * Handle an incoming request.
@@ -22,8 +22,6 @@ class SetLocale
                 'error' => 'Invalid or missing locale.'
             ], 400);
         }
-
-        app()->setLocale($locale);
 
         return $next($request);
     }
