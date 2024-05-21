@@ -134,13 +134,8 @@ Route::prefix('v1')->group(function(){
     Route::get('/categories/{slug}', [CategoryController::class,'show']);
 
     //Products
-    Route::get('/products', [ProductController::class, 'index']);
-    Route::get('/products/{slug}', [ProductController::class,'show']);
+    Route::middleware('language')->group(function(){
+        Route::get('/products', [ProductController::class, 'index']);
+        Route::get('/products/{slug}', [ProductController::class,'show']);    
+    });
 });
-
-// Route::get('/dummy', function(){
-//     /** @var Admin */
-//     $admin = Admin::find(1);
-//     $token = $admin->tokens();
-//     dd($admin);
-// });

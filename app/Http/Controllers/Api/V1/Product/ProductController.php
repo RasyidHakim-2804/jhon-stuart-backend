@@ -5,8 +5,14 @@ namespace App\Http\Controllers\Api\V1\Product;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Http\Resources\Api\V1\Product\ProductResource;
-use App\Service\Services\SearchServices\ProductSearchService;
 use Illuminate\Contracts\Database\Eloquent\Builder;
+use Illuminate\Http\Request;
+use App\Query\Product\FilterByLimitPrice;
+use App\Query\Product\FilterByCategory;
+use App\Query\Product\SortByPrice;
+use Spatie\QueryBuilder\AllowedFilter;
+use Spatie\QueryBuilder\AllowedSort;
+use Spatie\QueryBuilder\QueryBuilder;
 
 class ProductController extends Controller
 {
@@ -15,17 +21,46 @@ class ProductController extends Controller
      */
     public function index()
     {
-        return (new ProductSearchService(request()->query()))->response();
+        $lang = request()->getLanguages()[0];
+        $products = QueryBuilder::for(Product::class)
+                    ->with([
+                        'variants',
+                        'categories',
+                        'translations' => function(Builder $query) use ($lang){
+                            $query->where('lang', $lang);
+                        },
+                        'images' => function (Builder $query) {
+                            $query->where('is_saved', true)->orderBy('position', 'asc');
+                        }
+                        ])
+                    ->defaultSort('name')
+                    ->allowedSorts([
+                        'name',
+                        'id',
+                        AllowedSort::custom('price', new SortByPrice)
+                    ])
+                    ->allowedFilters([
+                        AllowedFilter::custom('limit_price', new FilterByLimitPrice),
+                        AllowedFilter::custom('categories',new FilterByCategory),
+                    ])
+                    ->paginate(25)->appends(request()->query());
+
+        return ProductResource::collection($products);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show($slug)
+    public function show($slug, Request $request)
     {
+        $lang = $request->getLanguages()[0];
+
         $product = Product::where('slug', $slug)->with([
             'variants',
             'categories',
+            'translations' => function(Builder $query) use ($lang){
+                $query->where('lang', $lang);
+            },
             'images' => function (Builder $query) {
                 $query->where('is_saved', true)->orderBy('position', 'asc');
             }

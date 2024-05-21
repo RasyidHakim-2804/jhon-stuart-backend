@@ -6,7 +6,6 @@
     "license": "MIT",
     "require": {
         "php": "^8.1",
-        "astrotomic/laravel-translatable": "^11.13",
         "guzzlehttp/guzzle": "^7.2",
         "intervention/image-laravel": "^1.2",
         "laravel/framework": "^10.10",

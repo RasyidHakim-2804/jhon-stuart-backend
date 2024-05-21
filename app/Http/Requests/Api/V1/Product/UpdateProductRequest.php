@@ -38,15 +38,24 @@ class UpdateProductRequest extends FormRequest
 
         return [
             'name'                  => 'required|min:3|max:100',
-            'description'           => 'required|min:3|max:1000',
+
+            'description'           => ['required', $isArray],
+            'description.id'        => 'required|string|max:255|min:3',
+            'description.en'        => 'required|string|max:255|min:3',
+            'full_description'      => ['required', $isArray],
+            'full_description.id'   => 'required|string|max:255|min:3',
+            'full_description.en'   => 'required|string|max:255|min:3',
+            
             'categories'            => ['required', $isArray],
             'categories.*'          => 'required|exists:categories,id|distinct',
+            
             'is_varied'             => 'required|boolean',
             'idr_price'             => 'exclude_if:is_varied,true|required|numeric|min:1|max:10000000|max_digits:8',
             'usd_price'             => 'exclude_if:is_varied,true|required|numeric|min:1|max:10000000|max_digits:8',
             'stock'                 => 'exclude_if:is_varied,true|required|numeric|min:0|max:60000|max_digits:5',
             'min_order'             => 'exclude_if:is_varied,true|required|numeric|min:1|max_digits:8`',
             'max_order'             => 'exclude_if:is_varied,true|nullable|numeric|max_digits:8|gte:min_order',
+            
             'variants'              => ['exclude_if:is_varied,false', 'required', $isArray, 'min:2', 'distinct'],
             'variants.*.name'       => ['exclude_if:is_varied,false', 'required', 'min:3', 'max:100',],
             'variants.*.idr_price'  => ['exclude_if:is_varied,false', 'required', 'numeric','min:1', 'max:10000000'],

@@ -16,7 +16,6 @@ return new class extends Migration
             $table->string('name', 255);
             $table->string('slug')->unique();
             $table->boolean('is_varied');
-            $table->text('description');
             $table->timestamps();
         });
     }
