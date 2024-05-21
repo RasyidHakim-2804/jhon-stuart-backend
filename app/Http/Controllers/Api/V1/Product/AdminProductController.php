@@ -42,10 +42,10 @@ class AdminProductController extends Controller
     
             if ($request->is_varied) {
                 foreach ($request->validated()['variants'] as $key => $request) {
-                    $this->createVariant($request, $product->id);   
+                    $this->setVariant($request, $product);   
                 }
             } else {
-                $this->createVariant($request->validated(), $product->id);            
+                $this->setVariant($request->validated(), $product);            
             }
         });
 
@@ -119,10 +119,10 @@ class AdminProductController extends Controller
         /** */
         if ($product->is_varied == true) { //if current product is varied
             $this->deleteVariants($product->id);
-            $this->createVariant($request, $product->id);
+            $this->setVariant($request, $product);
         } else {
             $request['id'] = ProductVariant::where('product_id',$product->id)->value('id');
-            $this->updateVariant($request, $product->id);
+            $this->setVariant($request, $product);
         }
     }
 
@@ -134,23 +134,21 @@ class AdminProductController extends Controller
         $undeletedIds    = [];
 
         foreach ($reqestVariants as $key => $request) {
-            if ($request['id'] === null) {
-            
-                $undeletedIds[] = $this->createVariant($request, $product->id);   
-            } else {
-
-                $undeletedIds[] = $request['id'];
-                $this->updateVariant($request, $product->id);
-            }   
+            $undeletedIds[] = $this->setVariant($request, $product);   
         }
 
         $this->deleteVariants($product->id, $undeletedIds);
     }
 
-    private function createVariant(array $request, $product_id)
+    private function setVariant(array $request, Product $product)
     {
-        $variant                = new ProductVariant();
-        $variant->product_id    = $product_id;
+        $request['id'] = isset($request['id']) ? $request['id'] : '';
+        $variant = ProductVariant::query()
+                    ->where('id', $request['id'])
+                    ->where('product_id', $product->id)
+                    ->firstOrNew();
+
+        $variant->product_id    = $product->id;
         $variant->name          = $request['name'];
         $variant->idr_price     = $request['idr_price'];
         $variant->usd_price     = $request['usd_price'];
@@ -161,23 +159,6 @@ class AdminProductController extends Controller
         $variant->save();
 
         return $variant->id;
-    }
-
-    private function updateVariant(array $request, $product_id)
-    {
-        /** @var Variant */
-        $variant                = ProductVariant::where('id', $request['id'])
-                                    ->where('product_id', $product_id)
-                                    ->firstOrFail();
-        
-        $variant->name          = $request['name'];
-        $variant->idr_price     = $request['idr_price'];
-        $variant->usd_price     = $request['usd_price'];
-        $variant->stock         = $request['stock'];
-        $variant->max_order     = $request['max_order'];
-        $variant->min_order     = $request['min_order'];
-        
-        $variant->save();
     }
 
     private function deleteVariants(string $product_id, array $undeletedIds = [])
