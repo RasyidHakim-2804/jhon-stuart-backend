@@ -2,11 +2,9 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use Faker\Factory;
 
 class ProductSeeder extends Seeder
 {
@@ -43,7 +41,6 @@ class ProductSeeder extends Seeder
             DB::table('products')->insert([
                 'name'          => $name,
                 'slug'          => Str::slug($name),
-                'description'   => $desc,
                 'is_varied'     => rand(0,1),
                 'created_at'    => now(),
             ]);
