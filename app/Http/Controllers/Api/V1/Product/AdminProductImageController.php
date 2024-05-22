@@ -77,14 +77,15 @@ class AdminProductImageController extends Controller
 
     private function deleteById($productId, array $undeletedIds)
     {
-        $images = ProductImage::where('product_id', $productId)->get();
+        $images = ProductImage::query()
+                    ->where('product_id', $productId)
+                    ->whereNotIn('id', $undeletedIds)
+                    ->get();
 
         foreach ($images as $image ) {
-            if (in_array($image->id, $undeletedIds) == false) {
-                $imageService = new ImageService($image);
-                $imageService->delete();
-                $image->delete();
-            }
+            $imageService = new ImageService($image);
+            $imageService->delete();
+            $image->delete();
         }
     }
 }
