@@ -19,7 +19,7 @@ class AcceptLanguage
 
         if (!$locale || !in_array($locale, ['en', 'id'])) {
             return response()->json([
-                'error' => 'Invalid or missing locale.'
+                'error' => 'Invalid or missing Accept-Language.'
             ], 400);
         }
 
