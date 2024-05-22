@@ -15,13 +15,12 @@ class ProductResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        // dd($this->translations);
         return [
             'id'                => $this->id,
             'name'              => $this->name,
             'slug'              => $this->slug,
-            'description'       => $this->translations[0]->description,
-            'full_description'  => $this->translations[0]->full_description,
+            'description'       => $this->translations->first()->description,
+            'full_description'  => $this->translations->first()->full_description,
             'is_varied'         => $this->is_varied,
             'variants'          => ProductVariantResource::collection($this->whenLoaded('variants')),
             'categories'        => CategoryResource::collection($this->whenLoaded('categories')),
