@@ -25,12 +25,12 @@ class ArticleController extends Controller
     public function show($slug)
     {
         $lang = request()->getLanguages();
-        $article = Article::with([
+        $article = Article::where('slug', $slug)->with([
             'image',
             'translation' => function($query) use ($lang){
                 $query->where('lang', $lang);
             }
-        ])->first();
+        ])->firstOrFail();
 
         return new ArticleResource($article);
     }
