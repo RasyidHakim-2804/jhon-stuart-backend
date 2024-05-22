@@ -5,13 +5,14 @@ namespace App\Models\Image;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Service\Abstracts\Model\MyBaseModel;
 use App\Models\Product;
+use App\Service\Contracts\Model\CanUploadImage;
+use App\Service\Traits\HasImage;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 
-class ProductImage extends MyBaseModel
+class ProductImage extends Model implements CanUploadImage
 {
-    use HasFactory;
+    use HasFactory, HasImage;
 
     protected $table      = 'product_images';
     protected $pathColumn = 'path';

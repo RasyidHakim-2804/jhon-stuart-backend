@@ -30,4 +30,33 @@ trait HasImage
         }  
         return false;
     }
+
+    /**
+     * The model must have the following attributes:
+     */
+
+    /**
+     * column name containing the image path
+     * 
+     * protected $pathColumn;
+     */
+
+    /**
+     * column name containing the dir path to save the image
+     * 
+     * protected $dirPath              = 'images/';
+     */
+
+    /**
+     * type of disk
+     *
+     * protected $disk                 = 'local';
+     */
+
+    /**
+     * suffix for image, ex: .jpg, .png, .gif, etc.
+     * 
+     * protected $format               = '';
+     */
+
 }

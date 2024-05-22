@@ -3,15 +3,16 @@
 namespace App\Models\Image;
 
 use Illuminate\Database\Eloquent\Casts\Attribute;
-use App\Service\Abstracts\Model\MyBaseModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Models\Admin;
+use App\Service\Contracts\Model\CanUploadImage;
+use App\Service\Traits\HasImage;
 
-class AdminProfileImage extends MyBaseModel
+class AdminProfileImage extends Model implements CanUploadImage
 {
-    use HasFactory;
+    use HasFactory, HasImage;
 
     protected $table      = 'admin_profile_images';
     protected $pathColumn = 'path';
