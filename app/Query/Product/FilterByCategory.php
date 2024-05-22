@@ -9,16 +9,18 @@ class FilterByCategory implements Filter
     public function __invoke(Builder $query, $value, string $property)
     {
         if (!is_array($value)) {
-            $categories[0] = $value;
+            $categories_id[0] = $value;
         } else {
-            $categories = $value;
+            $categories_id = $value;
         }
 
-        if ($categories[0] != null) {
-            return $query->with('categories')
-                    ->whereHas('categories', function($query) use ($categories) {
-                        $query->whereIn('category_id', $categories);
-                    }, '=', count($categories));
+        if ($categories_id[0] != null) {
+            $query->whereHas('categories', function($query) use ($categories_id) {
+                        $query->select('product_id')
+                        ->whereIn('category_id', $categories_id)
+                        ->groupBy('product_id')
+                        ->havingRaw('COUNT( DISTINCT category_id) = ' . count($categories_id));
+                    });
         }
         return $query;
     }
