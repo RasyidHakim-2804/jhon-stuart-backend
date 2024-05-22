@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\V1\Contact\AdminContactController;
 use App\Http\Controllers\Api\V1\Product\AdminProductController;
 use App\Http\Controllers\Api\V1\Product\AdminProductImageController;
 use App\Http\Controllers\Api\V1\Profile\AdminProfileController;
+use App\Http\Controllers\Api\V1\Article\AdminArticleController;
 
 use App\Http\Controllers\Api\V1\Auth\User\UserAuthController;
 use App\Http\Controllers\Api\V1\Auth\User\UserPasswordController;
@@ -17,6 +18,8 @@ use App\Http\Controllers\Api\V1\Profile\UserProfileController;
 use App\Http\Controllers\Api\V1\Category\CategoryController;
 use App\Http\Controllers\Api\V1\Contact\ContactController;
 use App\Http\Controllers\Api\V1\Product\ProductController;
+use App\Http\Controllers\Api\V1\Article\ArticleController;
+
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -60,6 +63,13 @@ Route::prefix('v1')->group(function(){
             //Contacts
             Route::get('/contacts', [AdminContactController::class,'index']);
             Route::get('/contacts/{contact}', [AdminContactController::class,'show']);
+
+            //Article
+            Route::get('/articles', [AdminArticleController::class, 'index']);
+            Route::post('/articles', [AdminArticleController::class, 'store']);
+            Route::get('/articles/{slug}', [AdminArticleController::class, 'show']);
+            Route::put('/articles/{article:slug}', [AdminArticleController::class, 'update']);
+            Route::delete('/articles/{article:slug}', [AdminArticleController::class, 'destroy']);
 
             //Category
             Route::get('/categories', [AdminCategoryController::class, 'index']);
@@ -135,6 +145,10 @@ Route::prefix('v1')->group(function(){
     Route::middleware('language')->group(function(){
         //Categories
         Route::get('/categories/{slug}', [CategoryController::class,'show']);
+
+        //Article
+        Route::get('/articles', [ArticleController::class, 'index']);
+        Route::get('/articles/{slug}', [ArticleController::class, 'show']);
 
         //Products
         Route::get('/products', [ProductController::class, 'index']);
