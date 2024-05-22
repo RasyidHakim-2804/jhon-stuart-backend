@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Http\Resources\Api\V1\Product\ProductResource;
 use Illuminate\Contracts\Database\Eloquent\Builder;
-use Illuminate\Http\Request;
 use App\Query\Product\FilterByLimitPrice;
 use App\Query\Product\FilterByCategory;
 use App\Query\Product\SortByPrice;
@@ -51,9 +50,9 @@ class ProductController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($slug, Request $request)
+    public function show($slug)
     {
-        $lang = $request->getLanguages()[0];
+        $lang = request()->getLanguages()[0];
 
         $product = Product::where('slug', $slug)->with([
             'variants',
