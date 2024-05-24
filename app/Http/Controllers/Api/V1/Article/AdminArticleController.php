@@ -4,7 +4,8 @@ namespace App\Http\Controllers\Api\V1\Article;
 
 use Illuminate\Support\Str;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Api\V1\Article\ArticleRequest;
+use App\Http\Requests\Api\V1\Article\CreateArticleRequest;
+use App\Http\Requests\Api\V1\Article\UpdateArticleRequest;
 use App\Http\Resources\Api\V1\Article\AdminArticleResource;
 use App\Http\Resources\Api\V1\Common\SuccessResource;
 use App\Models\Article;
@@ -35,7 +36,7 @@ class AdminArticleController extends Controller
         return new AdminArticleResource($article);
     }
 
-    public function store(ArticleRequest $request)
+    public function store(CreateArticleRequest $request)
     {
         DB::transaction(function() use ($request) {
             $requestArr = $request->validated();
@@ -54,7 +55,7 @@ class AdminArticleController extends Controller
         return new SuccessResource(JsonResponse::HTTP_CREATED);
     }
 
-    public function update(ArticleRequest $request, Article $article)
+    public function update(UpdateArticleRequest $request, Article $article)
     {
         DB::transaction(function() use ($request, $article) {
             $requestArr = $request->validated();
@@ -66,7 +67,9 @@ class AdminArticleController extends Controller
                 $this->setTranslation($requestArr, $lang, $article->id);
             }
     
-            $this->setImage($request->image, $article->id);    
+            if ($request->has('image')) {
+                $this->setImage($request->image, $article->id);    
+            }
         });
         
         return new SuccessResource();

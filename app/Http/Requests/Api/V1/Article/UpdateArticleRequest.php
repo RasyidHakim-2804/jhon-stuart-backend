@@ -5,7 +5,7 @@ namespace App\Http\Requests\Api\V1\Article;
 use App\Rules\IsArray;
 use Illuminate\Foundation\Http\FormRequest;
 
-class ArticleRequest extends FormRequest
+class UpdateArticleRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -32,7 +32,7 @@ class ArticleRequest extends FormRequest
             'body.en'  => ['required', 'string', 'min:3', 'max:255'],
             'body.id'  => ['required', 'string', 'min:3', 'max:255'],
 
-            'image'    => ['required', 'image','max:2048']
+            'image'    => ['nullable','image','max:2048']
         ];
     }
 }
