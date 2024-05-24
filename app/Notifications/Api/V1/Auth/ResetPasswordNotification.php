@@ -45,12 +45,6 @@ class ResetPasswordNotification extends Notification
                     ->subject('Otp Reset Password')
                     ->greeting('Hello,' . $this->user->first_name)
                     ->line('otp: '. $this->otp);
-                    // ->view('OtpForgetPassword', [
-                    //     'name'       => $this->user->first_name,
-                    //     'otp'        => $this->otp,
-                    //     'resend'     => config('app.url') . '/api/v1/'. $this->prefix . '/password/reset/resend?email=' . $this->user->email,
-                    //     'expired_at' => $this->expired_at,
-                    // ]);
     }
 
     /**
