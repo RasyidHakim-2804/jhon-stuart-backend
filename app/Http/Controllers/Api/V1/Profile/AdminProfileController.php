@@ -41,12 +41,8 @@ class AdminProfileController extends Controller
 
             $admin->save();
 
-            if ($admin->imageProfile === null) {
-
-                $this->createImage($request->image, $admin->id);
-            } else {
-
-                $this->updateImage($request->image, $admin->id);
+            if ($request->has('image')) {
+                $this->setImage($request->image, $admin->id);
             }
         });
 
@@ -57,24 +53,18 @@ class AdminProfileController extends Controller
     //   private methods    //
     //////////////////////////
 
-    private function createImage(UploadedFile $uploadedImage, $admin_id)
+    private function setImage(UploadedFile $uploadedImage, $admin_id)
     {
-        $image          = new AdminProfileImage();
+        /** @var AdminProfileImage */
+        $image          = AdminProfileImage::query()->where('admin_id', $admin_id)->firstOrNew();
         $imageService   = new ImageService($image);
 
-        $result             = $imageService->upload($uploadedImage);
-        $image->admin_id    = $admin_id;
-        $image->name        = $result->name;
-        $image->path        = $result->path;
-        $image->save();
-    }
+        if ($image->id) {
+            $result = $imageService->update($uploadedImage);
+        } else {
+            $result = $imageService->upload($uploadedImage);
+        }
 
-    private function updateImage(UploadedFile $uploadedImage, $admin_id)
-    {
-        $image          = AdminProfileImage::where('admin_id', $admin_id)->first();
-        $imageService   = new ImageService($image);
-
-        $result             = $imageService->update($uploadedImage);
         $image->name        = $result->name;
         $image->path        = $result->path;
         $image->save();

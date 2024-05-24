@@ -39,12 +39,8 @@ class UserProfileController extends Controller
             $user->last_name  = $request->last_name;
             $user->save();
 
-            if ($user->imageProfile === null) {
-
-                $this->createImage($request->image, $user->id);
-            } else {
-
-                $this->updateImage($request->image, $user->id);
+            if ($request->has('image')) {
+                $this->setImage($request->image, $user->id);
             }
         });
 
@@ -55,24 +51,19 @@ class UserProfileController extends Controller
     //   private methods    //
     //////////////////////////
 
-    private function createImage(UploadedFile $uploadedImage, $user_id)
+    private function setImage(UploadedFile $uploadedImage, $user_id)
     {
-        $image          = new UserProfileImage();
+        /** @var UserProfileImage */
+        $image          = UserProfileImage::query()->where('user_id', $user_id)->firstOrNew();
         $imageService   = new ImageService($image);
 
-        $result             = $imageService->upload($uploadedImage);
-        $image->user_id     = $user_id;
-        $image->name        = $result->name;
-        $image->path        = $result->path;
-        $image->save();
-    }
 
-    private function updateImage(UploadedFile $uploadedImage, $user_id)
-    {
-        $image          = UserProfileImage::where('user_id', $user_id)->first();
-        $imageService   = new ImageService($image);
-
-        $result             = $imageService->update($uploadedImage);
+        if ($image->id) {
+            $result = $imageService->update($uploadedImage);
+        } else {
+            $result = $imageService->upload($uploadedImage);
+        }
+        
         $image->name        = $result->name;
         $image->path        = $result->path;
         $image->save();

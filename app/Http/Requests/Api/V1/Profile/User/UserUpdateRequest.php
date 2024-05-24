@@ -24,7 +24,7 @@ class UserUpdateRequest extends FormRequest
         return [
             'first_name'    => 'required|string|min:3|max:255',
             'last_name'     => 'required|string|min:3|max:255',
-            'image'         => 'image|max:2048'
+            'image'         => 'nullable|image|max:2048'
         ];
     }
 }
