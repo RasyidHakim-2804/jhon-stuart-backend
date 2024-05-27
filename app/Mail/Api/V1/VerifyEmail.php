@@ -1,26 +1,28 @@
 <?php
 
-namespace App\Mail;
+namespace App\Mail\Api\V1;
 
-use App\Models\Contact;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Address;
-use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class ContactMail extends Mailable
+class VerifyEmail extends Mailable
 {
     use Queueable, SerializesModels;
+
+    private $name, $token, $prefix, $url;
 
     /**
      * Create a new message instance.
      */
-    public function __construct()
+    public function __construct($name, $token, $prefix = 'users')
     {
-    
+        $this->name   = $name;
+        $this->token  = $token;
+        $this->prefix = $prefix;
+        $this->url    = config('app.frontend_url') . $this->prefix .'/email-verify/confirm/' . $this->token;
     }
 
     /**
@@ -30,7 +32,7 @@ class ContactMail extends Mailable
     {
         return new Envelope(
             from: new Address('info@jonstuart', 'Admin - Jon Stuart'),
-            subject: 'Contact Mail',
+            subject: 'Verify Email',
         );
     }
 
@@ -41,7 +43,10 @@ class ContactMail extends Mailable
      */
     public function build()
     {
-        return $this->markdown('mail.contact');
+        return $this->markdown('mail.VerifyEmail',[
+            'name' => $this->name,
+            'url'  => $this->url,
+        ]);
     }
 
     /**

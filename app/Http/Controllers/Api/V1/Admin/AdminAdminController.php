@@ -5,10 +5,12 @@ namespace App\Http\Controllers\Api\V1\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\Admin\AdminCreatesAdminRequest;
 use App\Http\Requests\Api\V1\Admin\AdminUpdatesAdminRequest;
+use App\Http\Resources\Api\V1\Common\FailedResource;
 use App\Http\Resources\Api\V1\Common\SuccessResource;
 use App\Http\Resources\Api\V1\Profile\AdminProfileResource;
 use App\Models\Admin;
 use App\Service\Services\VerifyEmail\AdminVerifyEmailService;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class AdminAdminController extends Controller
@@ -25,18 +27,28 @@ class AdminAdminController extends Controller
 
     public function store(AdminCreatesAdminRequest $request)
     {
-        $admin              = new Admin();
-        $admin->uuid        = Str::ulid(now())->toBase58();
-        $admin->first_name  = $request->first_name;
-        $admin->last_name   = $request->last_name;
-        $admin->email       = $request->email;
-        $admin->active      = 0;
+        try {
+            DB::beginTransaction();
+            
+            $admin              = new Admin();
+            $admin->uuid        = Str::ulid(now())->toBase58();
+            $admin->first_name  = $request->first_name;
+            $admin->last_name   = $request->last_name;
+            $admin->email       = $request->email;
+            $admin->active      = 0;
+    
+            $admin->save();
+    
+            AdminVerifyEmailService::send($admin);
+            
+            DB::commit();
 
-        $admin->save();
-
-        AdminVerifyEmailService::send($admin);
-
-        return new SuccessResource(201);    
+            return new SuccessResource(201);    
+    
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return new FailedResource(500, $e->getMessage());
+        }
     }
 
 

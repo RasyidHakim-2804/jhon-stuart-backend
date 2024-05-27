@@ -8,7 +8,7 @@
 
 {{-- Body --}}
 <div style="text-align: center">
-    <img src="https://source.unsplash.com/random/300×300" class="logo" alt="Laravel Logo">
+    <img src="https://picsum.photos/200" class="logo" alt="Laravel Logo">
 </div>
 <br>
 {{ $slot }}

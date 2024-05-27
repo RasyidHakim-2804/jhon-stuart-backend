@@ -11,21 +11,32 @@ use App\Http\Requests\Api\V1\Auth\User\ConfirmResetPasswordRequest;
 use App\Http\Requests\Api\V1\Auth\User\VerifyOtpRequest;
 use App\Http\Resources\Api\V1\Common\SuccessResource;
 use App\Http\Resources\Api\V1\Common\FailedResource;
-use App\Notifications\Api\V1\Auth\ResetPasswordNotification;
-use Illuminate\Support\Facades\Hash;
+use App\Mail\Api\V1\ResetPasswordEmail;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 
 class UserPasswordController extends Controller
 {
     public function forgetPassword(ResetPasswordRequest $request)
     {
-        /** @var User */
-        $user = User::where('email', $request->email)->firstOrFail();
+        try {
+            DB::beginTransaction();
 
-        $this->sendForgetPassword($user);
-        
-        return new SuccessResource(
-            message: 'OTP has been sent to your email'
-        );
+            $user = User::where('email', $request->email)->first();
+
+            $this->sendForgetPassword($user);
+
+            DB::commit();
+
+            return new SuccessResource(
+                message: 'OTP has been sent to your email'
+            );
+
+        } catch (\Exception $e) {
+
+            DB::rollBack();
+            return new FailedResource(500, $e->getMessage());
+        }
     }
 
     public function verifyOtp(VerifyOtpRequest $request)
@@ -41,14 +52,16 @@ class UserPasswordController extends Controller
 
     public function resetPassword(ConfirmResetPasswordRequest $request)
     {
-        $otp = UserResetPassword::where('email', $request->email)->first();
+        DB::transaction(function() use ($request){
+            $otp = UserResetPassword::where('email', $request->email)->first();
         
-        $user           = User::where('email', $request->email)->first();
-        $user->password = $request->new_password;
-        $user->save();
-        
-        $this->deleteAllToken($user);
-        $otp->delete();
+            $user           = User::where('email', $request->email)->first();
+            $user->password = $request->new_password;
+            $user->save();
+            
+            $this->deleteAllToken($user);
+            $otp->delete();    
+        });
 
         return new SuccessResource(
             message: 'Your password has been changed'
@@ -73,11 +86,9 @@ class UserPasswordController extends Controller
     { 
         $otp = $this->makeOtpResetPassword($user);
 
-        $user->notify(new ResetPasswordNotification(
-            $user,
-            $otp->otp,
-            $otp->expired_at,
-            'users'
+        Mail::to($user)->send(new ResetPasswordEmail(
+            name: $user->first_name,
+            otp: $otp->otp
         ));
     }
 

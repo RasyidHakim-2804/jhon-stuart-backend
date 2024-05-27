@@ -10,20 +10,33 @@ use App\Http\Requests\Api\V1\Auth\Admin\ConfirmForgetPasswordRequest;
 use App\Http\Requests\Api\V1\Auth\Admin\ForgetPasswordRequest;
 use App\Http\Requests\Api\V1\Auth\Admin\VerifyOtpRequest;
 use App\Http\Resources\Api\V1\Common\SuccessResource;
-use App\Notifications\Api\V1\Auth\ResetPasswordNotification;
+use App\Http\Resources\Api\V1\Common\FailedResource;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\Api\V1\ResetPasswordEmail;
+use Illuminate\Support\Facades\DB;
 
 class AdminPasswordController extends Controller
 {
     public function forgetPassword(ForgetPasswordRequest $request)
     {
-        /** @var Admin */
-        $admin = Admin::where('email', $request->email)->firstOrFail();
-        
-        $this->sendForgetPassword($admin);
+        try {
+            DB::beginTransaction();
 
-        return new SuccessResource(
-            message: 'OTP has been sent to your email'
-        );
+            $admin = Admin::where('email', $request->email)->first();
+            
+            $this->sendForgetPassword($admin);
+
+            DB::commit();
+
+            return new SuccessResource(
+                message: 'OTP has been sent to your email'
+            );
+
+        } catch (\Exception $e) {
+            
+            DB::rollBack();
+            return new FailedResource(500, $e->getMessage());
+        }
     }
 
     public function verifyOtp(VerifyOtpRequest $request)
@@ -39,14 +52,16 @@ class AdminPasswordController extends Controller
 
     public function resetPassword(ConfirmForgetPasswordRequest $request)
     {
-        $otp = AdminResetPassword::where('email', $request->email)->first();
+        DB::transaction(function() use ($request){
+            $otp = AdminResetPassword::where('email', $request->email)->first();
 
-        $admin           = Admin::where('email', $request->email)->first();
-        $admin->password = $request->new_password;
-        $admin->save();
-        
-        $this->deleteAllToken($admin);
-        $otp->delete();
+            $admin           = Admin::where('email', $request->email)->first();
+            $admin->password = $request->new_password;
+            $admin->save();
+            
+            $this->deleteAllToken($admin);
+            $otp->delete();    
+        });
 
         return new SuccessResource(
             message: 'Your password has been changed'
@@ -71,11 +86,9 @@ class AdminPasswordController extends Controller
     { 
         $otp = $this->makeOtpResetPassword($admin);
 
-        $admin->notify(new ResetPasswordNotification(
-            $admin,
-            $otp->otp,
-            $otp->expired_at,
-            'admins'
+        Mail::to($admin)->send(new ResetPasswordEmail(
+            name: $admin->first_name,
+            otp: $otp->otp
         ));
     }
 

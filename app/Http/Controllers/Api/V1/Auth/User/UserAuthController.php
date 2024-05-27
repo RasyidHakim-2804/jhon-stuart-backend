@@ -7,34 +7,46 @@ use App\Http\Requests\Api\V1\Auth\User\LoginRequest;
 use App\Http\Requests\Api\V1\Auth\User\RegisterRequest;
 use App\Http\Requests\Api\V1\Auth\User\ResendEmailVerification;
 use App\Http\Requests\Api\V1\Auth\User\VerifyEmailRequest;
-use App\Http\Resources\Api\V1\Common\SuccessResource;
 use App\Http\Resources\Api\V1\Common\FailedResource;
+use App\Http\Resources\Api\V1\Common\SuccessResource;
+use App\Mail\Api\V1\VerifyEmail;
 use App\Models\User;
 use App\Models\UserVerifyEmail;
-use App\Notifications\Api\V1\Auth\VerifyEmailNotification;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
 class UserAuthController extends Controller
 {
     public function register(RegisterRequest $request)
     {
-        $user              = new User();
-        $user->uuid        = Str::ulid(now())->toBase58(); 
-        $user->first_name  = $request->first_name;
-        $user->last_name   = $request->last_name;
-        $user->email       = $request->email;
-        $user->password    = Hash::make($request->password);
+        try {
+            DB::beginTransaction();
+            $user              = new User();
+            $user->uuid        = Str::ulid(now())->toBase58(); 
+            $user->first_name  = $request->first_name;
+            $user->last_name   = $request->last_name;
+            $user->email       = $request->email;
+            $user->password    = Hash::make($request->password);
+    
+            $user->save();
+    
+            $this->sendEmailVerification($user);
 
-        $user->save();
-
-        $this->sendEmailVerification($user);
-
-        return new SuccessResource(
-            code: 201,
-            message: 'Your account has been created, please check your email for verification'
-        );        
+            DB::commit();
+    
+            return new SuccessResource(
+                code: 201,
+                message: 'Your account has been created, please check your email for verification'
+            );        
+    
+        } catch (\Exception $e) {
+            
+            DB::rollBack();
+            return new FailedResource(500, $e->getMessage());
+        }
     }
 
     public function resendEmailVerification(ResendEmailVerification $request)
@@ -51,13 +63,15 @@ class UserAuthController extends Controller
 
     public function verifyEmail(VerifyEmailRequest $request)
     {
-        $verify                  = UserVerifyEmail::where('token', $request->token)->first();
+        DB::transaction(function() use ($request) {
+            $verify                  = UserVerifyEmail::where('token', $request->token)->first();
 
-        $user                    = User::where('email', $verify->email)->firstOrFail();
-        $user->email_verified_at = now();
-        $user->save();
-        
-        $verify->delete();
+            $user                    = User::where('email', $verify->email)->firstOrFail();
+            $user->email_verified_at = now();
+            $user->save();
+            
+            $verify->delete();    
+        });
 
         return new SuccessResource(message:'Congrats, Your email has been verified');
     }
@@ -103,7 +117,12 @@ class UserAuthController extends Controller
             $token = $this->createVerifyToken($user);
         }
 
-        $user->notify(new VerifyEmailNotification($user, $token, 'users'));
+        Mail::to($user)->send(new VerifyEmail(
+            name: $user->first_name,
+            token: $token,
+            prefix: 'users'
+        ));
+        // $user->notify(new VerifyEmailNotification($user, $token, 'users'));
     }
 
     private function createVerifyToken(User $user)
@@ -111,7 +130,7 @@ class UserAuthController extends Controller
         $verifyEmail            = new UserVerifyEmail();
         $verifyEmail->user_id   = $user->id;
         $verifyEmail->email     = $user->email;
-        $verifyEmail->token     = Hash::make(now());
+        $verifyEmail->token     = str_replace(['.', '/', '\\'],'', Hash::make(now()));
         $verifyEmail->save();
 
         return $verifyEmail->token;

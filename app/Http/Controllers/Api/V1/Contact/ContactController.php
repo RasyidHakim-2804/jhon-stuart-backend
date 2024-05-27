@@ -6,7 +6,7 @@ use App\Http\Requests\Api\V1\Contact\CreateRequest;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\V1\Common\FailedResource;
 use App\Http\Resources\Api\V1\Common\SuccessResource;
-use App\Mail\ContactMail;
+use App\Mail\Api\V1\ContactMail;
 use App\Models\Contact;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
