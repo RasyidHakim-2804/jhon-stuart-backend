@@ -30,7 +30,7 @@ class ResetPasswordEmail extends Mailable
     {
         return new Envelope(
             from: new Address('info@jonstuart', 'Admin - Jon Stuart'),
-            subject: 'Contact Mail',
+            subject: 'OTP Reset Password',
         );
     }
 
