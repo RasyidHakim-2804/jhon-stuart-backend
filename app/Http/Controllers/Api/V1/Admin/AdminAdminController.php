@@ -38,10 +38,10 @@ class AdminAdminController extends Controller
             $admin->active      = 0;
     
             $admin->save();
-    
-            AdminVerifyEmailService::send($admin);
             
             DB::commit();
+            
+            AdminVerifyEmailService::send($admin);
 
             return new SuccessResource(201);    
     

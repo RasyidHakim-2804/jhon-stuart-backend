@@ -24,9 +24,9 @@ class UserPasswordController extends Controller
 
             $user = User::where('email', $request->email)->first();
 
-            $this->sendForgetPassword($user);
-
             DB::commit();
+
+            $this->sendForgetPassword($user);
 
             return new SuccessResource(
                 message: 'OTP has been sent to your email'

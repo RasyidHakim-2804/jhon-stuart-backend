@@ -33,9 +33,9 @@ class UserAuthController extends Controller
     
             $user->save();
     
-            $this->sendEmailVerification($user);
-
             DB::commit();
+
+            $this->sendEmailVerification($user);
     
             return new SuccessResource(
                 code: 201,

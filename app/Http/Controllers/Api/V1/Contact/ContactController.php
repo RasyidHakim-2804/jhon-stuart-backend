@@ -26,10 +26,10 @@ class ContactController extends Controller
             $contact->message       = $request->message;    
             $contact->save();    
 
-            Mail::to('rasarafi5@gmail.com')->send(new ContactMail());
-
             DB::commit();
-            
+
+            Mail::to(config('mail.from.address'))->send(new ContactMail());
+
             return new SuccessResource(code: 201);
 
         } catch (\Exception $e) {

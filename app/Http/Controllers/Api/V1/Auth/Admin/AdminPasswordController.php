@@ -24,9 +24,9 @@ class AdminPasswordController extends Controller
 
             $admin = Admin::where('email', $request->email)->first();
             
-            $this->sendForgetPassword($admin);
-
             DB::commit();
+
+            $this->sendForgetPassword($admin);
 
             return new SuccessResource(
                 message: 'OTP has been sent to your email'
