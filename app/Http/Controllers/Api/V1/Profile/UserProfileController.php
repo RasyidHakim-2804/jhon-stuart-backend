@@ -19,9 +19,7 @@ class UserProfileController extends Controller
      */
     public function show()
     {
-        $email = auth()->user()->email;
-
-        $user = User::with('imageProfile')->where('email', $email)->firstOrFail();
+        $user = auth()->user()->with('imageProfile')->firstOrFail();
 
         return new UserProfileResource($user);
     }

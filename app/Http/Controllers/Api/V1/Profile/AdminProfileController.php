@@ -9,6 +9,7 @@ use App\Http\Resources\Api\V1\Profile\AdminProfileResource;
 use App\Models\Admin;
 use App\Models\Image\AdminProfileImage;
 use App\Service\Services\ImageServices\ImageService;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 
@@ -19,10 +20,8 @@ class AdminProfileController extends Controller
      */
     public function show()
     {
-        $email = auth()->user()->email;
-
-        $admin = Admin::with('imageProfile')->where('email', $email)->firstOrFail();
-
+        $admin = auth()->user()->with('imageProfile')->firstOrFail();
+    
         return new AdminProfileResource($admin);
     }
 
@@ -31,20 +30,27 @@ class AdminProfileController extends Controller
      */
     public function update(AdminUpdateRequest $request)
     {
-        DB::transaction(function() use ($request)
-        {
+        try {
+            DB::beginTransaction();
+        
             /** @var Admin */
-            $admin              = Admin::where('email', $request->email)->firstOrFail();
+            $admin              = $request->user();
 
             $admin->first_name  = $request->first_name;
             $admin->last_name   = $request->last_name;
 
             $admin->save();
 
+            DB::commit();
+
             if ($request->has('image')) {
                 $this->setImage($request->image, $admin->id);
             }
-        });
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
 
         return new SuccessResource();
     }
@@ -65,6 +71,7 @@ class AdminProfileController extends Controller
             $result = $imageService->upload($uploadedImage);
         }
 
+        $image->admin_id    = $admin_id;
         $image->name        = $result->name;
         $image->path        = $result->path;
         $image->save();
