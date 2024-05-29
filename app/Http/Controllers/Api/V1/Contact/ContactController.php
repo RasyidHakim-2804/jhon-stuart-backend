@@ -19,8 +19,7 @@ class ContactController extends Controller
             DB::beginTransaction();
             
             $contact = new Contact();
-            $contact->first_name    = $request->first_name;
-            $contact->last_name     = $request->last_name;
+            $contact->name          = $request->name;
             $contact->email         = $request->email;
             $contact->phone         = $request->phone;
             $contact->message       = $request->message;    
