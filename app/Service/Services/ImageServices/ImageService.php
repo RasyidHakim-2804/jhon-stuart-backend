@@ -3,7 +3,6 @@ namespace App\Service\Services\ImageServices;
 
 use App\Service\Contracts\Model\CanUploadImage;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -19,8 +18,6 @@ class ImageService
     private $disk;
     private $pathColumn;
     private $format;
-    private $path;
-    private $name;
 
     public function __construct(CanUploadImage $model)
     {
@@ -28,25 +25,24 @@ class ImageService
         $this->disk       = $model->getDisk();
         $this->pathColumn = $model->getPathColumn();
         $this->format     = $model->getFormat();
-        $this->name       = $this->setName();
-        $this->path       = $this->setPath();
     }
 
     //////////////////////////
     // public CRUD function //
     /////////////////////////
     
-    public function upload(UploadedFile $image, ?string $name = null, ?string $suffixPath = null)
+    public function upload(UploadedFile $image, ?string $suffixPath = null)
     {
-        if ($name != null) $this->name = $name;
-        if ($suffixPath != null) $this->path = $this->path . '/' . $suffixPath;
-
         $this->validateType($image);
-        $this->store($image);
+
+        $name = $this->setName();
+        $path = $this->setPath($name, $suffixPath);
+
+        $this->store($image, $path);
 
         return (object) [
-            'path'  => $this->getPath(),
-            'name'  => $this->getName(),
+            'path'  => $path,
+            'name'  => $name,
         ];
     }
 
@@ -80,26 +76,19 @@ class ImageService
         return Image::read($image)->scaleDown(1280, 720)->toWebp(80);
     }
 
-    protected function setPath(): string
+    protected function setPath($name, ?string $suffixPath = null): string
     {
-        return $this->dirPath . $this->getName();
-    }
-
-    protected function getPath()
-    {
-        return $this->path;
+        if ($suffixPath) {
+            return $this->dirPath . '/' . $suffixPath . '/' . $name;
+        }
+        return $this->dirPath . $name;
     }
 
     protected function setName(): string
     {
-        $name = Hash::make(Str::uuid());
+        $name = Str::ulid()->toBase32();
 
         return str_replace(['.', '/', '\\'],'', $name)  . $this->format;
-    }
-
-    protected function getName()
-    {
-        return $this->name;
     }
 
     /////////////
@@ -116,10 +105,10 @@ class ImageService
         $validator->validate();
     }
 
-    private function store($image)
+    private function store($image, $path)
     {
         $image = $this->imagePreProcessing($image);
 
-        Storage::disk($this->disk)->put($this->getPath(), $image);
+        Storage::disk($this->disk)->put($path, $image);
     }
 }
