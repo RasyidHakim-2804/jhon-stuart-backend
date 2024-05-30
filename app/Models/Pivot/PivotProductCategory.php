@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Pivot;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class CategoryProduct extends Model
+class PivotProductCategory extends Model
 {
     use HasFactory;
 
-    protected $table = 'category_product';
+    protected $table = 'pivot_product_category';
 }

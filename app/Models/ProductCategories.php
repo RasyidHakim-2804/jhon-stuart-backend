@@ -8,16 +8,18 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 
-class Category extends Model
+class ProductCategories extends Model
 {
     use HasFactory, HasSlug;
 
-    protected $table = 'categories';
+    protected $table                = 'product_categories';
+
+    public static $categoryTypes    = [ 'museum', 'gallery' ];
 
     public function getSlugOptions(): SlugOptions
     {
         return SlugOptions::create()
-                ->generateSlugsFrom('name') 
+                ->generateSlugsFrom(['type','name']) 
                 ->saveSlugsTo('slug')
                 ->slugsShouldBeNoLongerThan(100)
                 ->startSlugSuffixFrom(2);
@@ -25,6 +27,6 @@ class Category extends Model
 
     public function products(): BelongsToMany
     {
-        return $this->belongsToMany(Product::class, 'category_product',  'category_id', 'product_id');
+        return $this->belongsToMany(Product::class, 'pivot_product_category',  'product_categories_id', 'product_id');
     }
 }
