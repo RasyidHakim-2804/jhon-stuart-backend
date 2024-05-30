@@ -15,7 +15,7 @@ use App\Http\Controllers\Api\V1\Auth\User\UserAuthController;
 use App\Http\Controllers\Api\V1\Auth\User\UserPasswordController;
 use App\Http\Controllers\Api\V1\Profile\UserProfileController;
 
-use App\Http\Controllers\Api\V1\Category\CategoryController;
+use App\Http\Controllers\Api\V1\Category\ProductCategory\CategoryController;
 use App\Http\Controllers\Api\V1\Contact\ContactController;
 use App\Http\Controllers\Api\V1\Product\ProductController;
 use App\Http\Controllers\Api\V1\Article\ArticleController;
@@ -143,8 +143,6 @@ Route::prefix('v1')->group(function(){
     Route::get('/categories', [CategoryController::class, 'index']);
     
     Route::middleware('language')->group(function(){
-        //Categories
-        Route::get('/categories/{slug}', [CategoryController::class,'show']);
 
         //Article
         Route::get('/articles', [ArticleController::class, 'index']);
