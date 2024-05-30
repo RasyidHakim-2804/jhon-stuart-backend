@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('article_id')->constrained('articles', 'id');
             $table->string('lang')->index();
-            $table->text('title');
+            $table->string('title', 255);
             $table->text('body');
             $table->timestamps();
         });
