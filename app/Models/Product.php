@@ -35,7 +35,7 @@ class Product extends Model
 
     public function categories(): BelongsToMany
     {
-        return $this->belongsToMany(ProductCategories::class, 'pivot_product_category',  'product_id', 'product_categories_id');
+        return $this->belongsToMany(ProductCategory::class, 'pivot_product_category',  'product_id', 'product_categories_id');
     }
 
     public function images(): HasMany

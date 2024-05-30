@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 
-class ProductCategories extends Model
+class ProductCategory extends Model
 {
     use HasFactory, HasSlug;
 
