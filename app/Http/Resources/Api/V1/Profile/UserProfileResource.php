@@ -20,7 +20,7 @@ class UserProfileResource extends JsonResource
             'first_name'    => $this->first_name,
             'last_name'     => $this->last_name,
             'email'         => $this->email,
-            'image'         => $this->imageProfile->path,
+            'image'         => isset($this->imageProfile)? $this->imageProfile->path : null,
             'created_at'    => $this->created_at,
             'updated_at'    => $this->updated_at,
         ];
