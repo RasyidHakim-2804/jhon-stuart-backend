@@ -4,7 +4,7 @@ use App\Http\Controllers\Api\V1\Admin\AdminAdminController;
 use App\Http\Controllers\Api\V1\Admin\AdminUserController;
 use App\Http\Controllers\Api\V1\Auth\Admin\AdminAuthController;
 use App\Http\Controllers\Api\V1\Auth\Admin\AdminPasswordController;
-use App\Http\Controllers\Api\V1\Category\AdminCategoryController;
+use App\Http\Controllers\Api\V1\Category\ProductCategory\AdminProductCategoryController;
 use App\Http\Controllers\Api\V1\Contact\AdminContactController;
 use App\Http\Controllers\Api\V1\Product\AdminProductController;
 use App\Http\Controllers\Api\V1\Product\AdminProductImageController;
@@ -71,12 +71,12 @@ Route::prefix('v1')->group(function(){
             Route::put('/articles/{article:slug}', [AdminArticleController::class, 'update']);
             Route::delete('/articles/{article:slug}', [AdminArticleController::class, 'destroy']);
 
-            //Category
-            Route::get('/categories', [AdminCategoryController::class, 'index']);
-            Route::post('/categories', [AdminCategoryController::class, 'store']);
-            Route::get('/categories/{slug}', [AdminCategoryController::class,'show']);
-            Route::put('/categories/{category:slug}', [AdminCategoryController::class, 'update']);
-            Route::delete('/categories/{category:slug}', [AdminCategoryController::class, 'destroy']);
+            //ProductCategory
+            Route::get('/categories', [AdminProductCategoryController::class, 'index']);
+            Route::post('/categories', [AdminProductCategoryController::class, 'store']);
+            Route::get('/categories/{category:slug}', [AdminProductCategoryController::class,'show']);
+            Route::put('/categories/{category:slug}', [AdminProductCategoryController::class, 'update']);
+            Route::delete('/categories/{category:slug}', [AdminProductCategoryController::class, 'destroy']);
             
             //Products
             Route::get('/products', [AdminProductController::class,'index']);
