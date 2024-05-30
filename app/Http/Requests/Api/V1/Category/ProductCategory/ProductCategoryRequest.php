@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Requests\Api\V1\Category;
+namespace App\Http\Requests\Api\V1\Category\ProductCategory;
 
-use App\Models\Category;
+use App\Models\ProductCategories;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class UpdateCategoryRequest extends FormRequest
+class ProductCategoryRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,11 +24,12 @@ class UpdateCategoryRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => [
-                'required',
-                'max:30',
-                Rule::unique(Category::class, 'name')->ignore($this->segment(count($this->segments())))
-            ]
+            'name' => 'required|string|max:30',
+            'type' => [
+                'required', 
+                'string',
+                Rule::in(ProductCategories::$categoryTypes)
+                ]
         ];
     }
 }
