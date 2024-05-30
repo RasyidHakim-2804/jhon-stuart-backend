@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Resources\Api\V1\Category;
+namespace App\Http\Resources\Api\V1\Category\ProductCategory;
 
 use App\Http\Resources\Api\V1\Product\ProductResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class CategoryResource extends JsonResource
+class ProductCategoryResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -18,10 +18,9 @@ class CategoryResource extends JsonResource
         return [
             'id'            => $this->id,
             'name'          => $this->name,
+            'type'          => $this->type,
             'slug'          => $this->slug,
             'products'      => ProductResource::collection($this->whenLoaded('products')),
-            'created_at'    => $this->created_at,
-            'updated_at'    => $this->updated_at,
         ];
     }
 }
