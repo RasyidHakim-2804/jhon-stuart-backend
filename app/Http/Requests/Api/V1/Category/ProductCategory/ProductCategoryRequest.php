@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests\Api\V1\Category\ProductCategory;
 
-use App\Models\ProductCategories;
+use App\Models\ProductCategory;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -28,7 +28,7 @@ class ProductCategoryRequest extends FormRequest
             'type' => [
                 'required', 
                 'string',
-                Rule::in(ProductCategories::$categoryTypes)
+                Rule::in(ProductCategory::$categoryTypes)
                 ]
         ];
     }
