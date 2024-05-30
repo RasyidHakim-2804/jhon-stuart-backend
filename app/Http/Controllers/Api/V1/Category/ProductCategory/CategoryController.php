@@ -1,19 +1,26 @@
 <?php
 
-namespace App\Http\Controllers\Api\V1\Category;
+namespace App\Http\Controllers\Api\V1\Category\ProductCategory;
 
 use App\Http\Controllers\Controller;
-use App\Models\Category;
-use App\Http\Resources\Api\V1\Category\CategoryResource;
+use App\Http\Resources\Api\V1\Category\ProductCategory\ProductCategoryResource;
 use App\Http\Resources\Api\V1\Product\ProductResource;
+use App\Models\ProductCategory;
+use Spatie\QueryBuilder\AllowedFilter;
+use Spatie\QueryBuilder\QueryBuilder;
 use App\Models\Product;
 
 class CategoryController extends Controller
 {
     public function index()
     {
-        $categories = Category::orderBy('name')->paginate(25);
-        return CategoryResource::collection($categories);
+        $categories = QueryBuilder::for(ProductCategory::class)
+                        ->allowedFilters([
+                            AllowedFilter::exact('type')->default('museum')
+                        ])
+                        ->paginate(25);
+    
+        return ProductCategoryResource::collection($categories);
     }
 
     public function show($slug)
@@ -21,8 +28,6 @@ class CategoryController extends Controller
         $lang = request()->getLanguages()[0];
 
         $products = Product::with([
-            'variants',
-            'categories',
             'images' => function($query){
                 $query->where('is_saved', true)->orderBy('position', 'asc');
             },
