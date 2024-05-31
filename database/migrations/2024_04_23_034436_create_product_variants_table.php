@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('name', 255);
             $table->string('symbol', 255);
             $table->foreignId('product_id')->constrained('products', 'id');
+            $table->boolean('is_default');
             $table->unsignedSmallInteger('stock');
             $table->unsignedSmallInteger('max_order')->nullable();
             $table->unsignedSmallInteger('min_order')->default('1');
