@@ -17,7 +17,7 @@ class AdminProductCategoryController extends Controller
     {
         $categories = QueryBuilder::for(ProductCategory::class)
                         ->allowedFilters([
-                            AllowedFilter::exact('type')->default('museum')
+                            AllowedFilter::exact('type')
                         ])
                         ->paginate(25);
     
