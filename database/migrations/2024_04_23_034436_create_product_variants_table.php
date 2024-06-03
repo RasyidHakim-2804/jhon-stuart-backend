@@ -14,8 +14,9 @@ return new class extends Migration
         Schema::create('product_variants', function (Blueprint $table) {
             $table->id();
             $table->string('name', 255);
-            $table->foreignId('product_id')->constrained('products', 'id');
+            $table->string('size',255);
             $table->boolean('is_default')->default(0);
+            $table->foreignId('product_id')->constrained('products', 'id');
             $table->unsignedSmallInteger('stock');
             $table->unsignedSmallInteger('max_order')->nullable();
             $table->unsignedSmallInteger('min_order')->default('1');
