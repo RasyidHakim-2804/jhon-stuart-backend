@@ -28,14 +28,6 @@ class AdminProductController extends Controller
     public function index()
     {
         $products = QueryBuilder::for(Product::class)
-                    ->with([
-                        'variants',
-                        'translations',
-                        'categories',
-                        'images' => function (Builder $query) {
-                            $query->where('is_saved', true)->orderBy('position', 'asc');
-                        }
-                        ])
                     ->defaultSort('name')
                     ->allowedSorts([
                         'name',
@@ -52,6 +44,23 @@ class AdminProductController extends Controller
     }
 
     /**
+     * Display the specified resource.
+     */
+    public function show($slug, Request $requet)
+    {
+        $product = Product::query()->where('slug', $slug)->with([
+            'variants',
+            'categories',
+            'translations',
+            'images' => function (Builder $query) {
+                $query->where('is_saved', true)->orderBy('position', 'asc');
+            }
+            ])->firstOrFail();
+
+        return new AdminProductResource($product);
+    }
+
+    /**
      * Store a newly created resource in storage.
      */
     public function store(CreateProductRequest $request)
@@ -61,6 +70,7 @@ class AdminProductController extends Controller
             $product                = new Product();
             $product->name          = $request->name;
             $product->is_varied     = $request->is_varied;
+            $product->is_saleable   = $request->is_saleable;
     
             $product->save();
 
@@ -76,28 +86,11 @@ class AdminProductController extends Controller
                     $this->setVariant($request, $product);   
                 }
             } else {
-                $this->setVariant($request->validated(), $product);            
+                $this->setVariant($request->validated(), $product, true);            
             }
         });
 
         return new SuccessResource(201);
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show($slug, Request $requet)
-    {
-        $product = Product::where('slug', $slug)->with([
-            'variants',
-            'categories',
-            'translations',
-            'images' => function (Builder $query) {
-                $query->where('is_saved', true)->orderBy('position', 'asc');
-            }
-            ])->firstOrFail();
-        
-        return new AdminProductResource($product);
     }
 
     /**
@@ -156,10 +149,10 @@ class AdminProductController extends Controller
         /** */
         if ($product->is_varied == true) { //if current product is varied
             $this->deleteVariants($product->id);
-            $this->setVariant($request, $product);
+            $this->setVariant($request, $product, true);
         } else {
             $request['id'] = ProductVariant::where('product_id',$product->id)->value('id');
-            $this->setVariant($request, $product);
+            $this->setVariant($request, $product, true);
         }
     }
 
@@ -177,7 +170,7 @@ class AdminProductController extends Controller
         $this->deleteVariants($product->id, $undeletedIds);
     }
 
-    private function setVariant(array $request, Product $product)
+    private function setVariant(array $request, Product $product, bool $isDefault = false)
     {
         $request['id'] = isset($request['id']) ? $request['id'] : '';
         $variant = ProductVariant::query()
@@ -186,12 +179,12 @@ class AdminProductController extends Controller
                     ->firstOrNew();
 
         $variant->product_id    = $product->id;
+        $variant->is_default    = $isDefault;
         $variant->name          = $request['name'];
+        $variant->size          = $request['size'];
         $variant->idr_price     = $request['idr_price'];
         $variant->usd_price     = $request['usd_price'];
         $variant->stock         = $request['stock'];
-        $variant->max_order     = $request['max_order'];
-        $variant->min_order     = $request['min_order'];
         
         $variant->save();
 
@@ -215,7 +208,6 @@ class AdminProductController extends Controller
         $translation->product_id       = $product->id;
         $translation->lang             = $lang;
         $translation->description      = $request['description'][$lang];
-        $translation->full_description = $request['full_description'][$lang];
         
         $translation->save();
     }
