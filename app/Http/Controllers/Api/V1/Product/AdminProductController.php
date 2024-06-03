@@ -31,6 +31,7 @@ class AdminProductController extends Controller
                         'id',
                         AllowedSort::custom('price', new SortByPrice)
                     ])
+                    ->allowedFilters(['name'])
                     ->paginate(25)->appends(request()->query());
 
         return AdminProductResource::collection($products);
