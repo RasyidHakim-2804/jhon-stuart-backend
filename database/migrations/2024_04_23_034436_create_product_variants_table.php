@@ -18,8 +18,6 @@ return new class extends Migration
             $table->boolean('is_default')->default(0);
             $table->foreignId('product_id')->constrained('products', 'id');
             $table->unsignedSmallInteger('stock');
-            $table->unsignedSmallInteger('max_order')->nullable();
-            $table->unsignedSmallInteger('min_order')->default('1');
             $table->decimal('idr_price', 10, 2);
             $table->decimal('usd_price', 10, 2);
             $table->timestamps();
