@@ -10,10 +10,7 @@ use App\Http\Requests\Api\V1\Product\CreateProductRequest;
 use App\Http\Requests\Api\V1\Product\UpdateProductRequest;
 use App\Http\Resources\Api\V1\Common\SuccessResource;
 use App\Http\Resources\Api\V1\Product\AdminProductResource;
-use App\Query\Product\FilterByLimitPrice;
-use App\Query\Product\FilterByCategory;
 use App\Query\Product\SortByPrice;
-use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\AllowedSort;
 use Spatie\QueryBuilder\QueryBuilder;
 use Illuminate\Contracts\Database\Eloquent\Builder;
@@ -33,10 +30,6 @@ class AdminProductController extends Controller
                         'name',
                         'id',
                         AllowedSort::custom('price', new SortByPrice)
-                    ])
-                    ->allowedFilters([
-                        AllowedFilter::custom('limit_price', new FilterByLimitPrice),
-                        AllowedFilter::custom('categories',new FilterByCategory),
                     ])
                     ->paginate(25)->appends(request()->query());
 
