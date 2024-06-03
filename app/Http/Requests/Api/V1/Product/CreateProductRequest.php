@@ -2,8 +2,10 @@
 
 namespace App\Http\Requests\Api\V1\Product;
 
-use App\Rules\IsArray;
+use App\Models\ProductCategory;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class CreateProductRequest extends FormRequest
 {
@@ -18,8 +20,7 @@ class CreateProductRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'categories.*.exists' => 'Id is not exist in categories',
-            'variants.min'        => 'The variants field must be at least 2 objects'
+            'categories.*.exists' => 'Category Id is not exists or id is not ' . $this->input('category_type') . ' type',
         ];
     }
 
@@ -30,34 +31,40 @@ class CreateProductRequest extends FormRequest
      */
     public function rules(): array
     {
-        $isArray    = new IsArray;
-
         return [
-            'name'                  => 'required|min:3|max:100',
+            'name'                  => 'required|max:100',
 
-            'description'           => ['required', $isArray],
-            'description.id'        => 'required|string|max:255|min:3',
-            'description.en'        => 'required|string|max:255|min:3',
-            'full_description'      => ['required', $isArray],
-            'full_description.id'   => 'required|string|max:255|min:3',
-            'full_description.en'   => 'required|string|max:255|min:3',
+            'description'           => ['required', 'array'],
+            'description.id'        => 'required|string',
+            'description.en'        => 'required|string',
             
-            'categories'            => ['required', $isArray],
-            'categories.*'          => 'numeric|exists:categories,id|distinct',
+            'category_type'         => [
+                'required',
+                'string',
+                Rule::in(ProductCategory::$categoryTypes)
+            ],
+            'categories'            => 'required|array',
+            'categories.*'          => [
+                'numeric',
+                'distinct',
+                Rule::exists('product_categories', 'id')->where(function(Builder $query) {
+                    return $query->where('type', $this->input('category_type'));
+                })
+            ],
             
             'is_varied'             => 'required|boolean',
-            'idr_price'             => 'exclude_if:is_varied,true|required|numeric|min:1|max:10000000',
-            'usd_price'             => 'exclude_if:is_varied,true|required|numeric|min:1|max:10000000',
+            'is_saleable'           => 'required|boolean',
+
+            'size'                  => 'exclude_if:is_varied,true|required|string|max:255',
+            'idr_price'             => 'exclude_if:is_varied,true|required|numeric|max:10000000',
+            'usd_price'             => 'exclude_if:is_varied,true|required|numeric|max:10000000',
             'stock'                 => 'exclude_if:is_varied,true|required|numeric|min:0',
-            'min_order'             => 'exclude_if:is_varied,true|required|numeric|min:1',
-            'max_order'             => 'exclude_if:is_varied,true|nullable|numeric|gte:min_order',
             
-            'variants'              => ['exclude_if:is_varied,false', 'required', $isArray, 'min:2'],
-            'variants.*.name'       => ['exclude_if:is_varied,false', 'required', 'min:3', 'max:100',],
-            'variants.*.idr_price'  => ['exclude_if:is_varied,false', 'required', 'numeric','min:1', 'max:10000000'],
-            'variants.*.usd_price'  => ['exclude_if:is_varied,false', 'required', 'numeric','min:1', 'max:10000000'],
-            'variants.*.min_order'  => ['exclude_if:is_varied,false', 'required', 'numeric','min:1', 'max:10000000'],
-            'variants.*.max_order'  => ['exclude_if:is_varied,false', 'nullable', 'numeric','gte:variants.*.min_order'],
+            'variants'              => ['exclude_if:is_varied,false', 'required', 'array'],
+            'variants.*.name'       => ['exclude_if:is_varied,false', 'required', 'max:100',],
+            'variants.*.size'       => ['exclude_if:is_varied,false', 'required', 'string', 'max:255'],
+            'variants.*.idr_price'  => ['exclude_if:is_varied,false', 'required', 'numeric', 'max:10000000'],
+            'variants.*.usd_price'  => ['exclude_if:is_varied,false', 'required', 'numeric', 'max:10000000'],
             'variants.*.stock'      => ['exclude_if:is_varied,false', 'required', 'numeric','min:0', 'max:10000000']
         ];
     }
