@@ -19,6 +19,11 @@ class ProductController extends Controller
     {
         $lang = request()->getLanguages()[0];
         $products = QueryBuilder::for(Product::class)
+                    ->with([
+                        'images' => function (Builder $query) {
+                            $query->where('is_saved', true)->orderBy('position', 'asc');
+                        }
+                    ])
                     ->defaultSort('name')
                     ->allowedSorts([
                         'name',

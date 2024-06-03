@@ -16,17 +16,25 @@ class ProductResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id'                => $this->id,
-            'name'              => $this->name,
-            'slug'              => $this->slug,
-            'description'       => $this->translations->first()->description,
-            'full_description'  => $this->translations->first()->full_description,
-            'is_varied'         => $this->is_varied,
-            'variants'          => ProductVariantResource::collection($this->whenLoaded('variants')),
-            'categories'        => ProductCategoryResource::collection($this->whenLoaded('categories')),
-            'images'            => ProductImageResource::collection($this->whenLoaded('images')),
-            'created_at'        => $this->created_at,
-            'updated_at'        => $this->updated_at,
+            'id'            => $this->id,
+            'name'          => $this->name,
+            'slug'          => $this->slug,
+            'is_varied'     => $this->is_varied,
+            'is_saleable'   => $this->is_saleable,
+
+            $this->mergeWhen( $this->relationLoaded('translations'), [
+                'description'       => $this->translations->first()->description,
+            ]),
+
+            $this->mergeWhen( $this->relationLoaded('categories'), [
+                'category_type' => $this->categories->first()->type,
+                'categories'    => ProductCategoryResource::collection($this->categories),    
+            ]),
+
+            'variants'      => ProductVariantResource::collection($this->whenLoaded('variants')), 
+            'images'        => ProductImageResource::collection($this->whenLoaded('images')),
+            'created_at'    => $this->created_at,
+            'updated_at'    => $this->updated_at,
         ];
     }
 }
