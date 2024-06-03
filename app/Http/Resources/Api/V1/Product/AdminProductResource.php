@@ -4,7 +4,7 @@ namespace App\Http\Resources\Api\V1\Product;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use App\Http\Resources\Api\V1\Category\CategoryResource;
+use App\Http\Resources\Api\V1\Category\ProductCategory\ProductCategoryResource;
 
 class AdminProductResource extends JsonResource
 {
@@ -19,11 +19,26 @@ class AdminProductResource extends JsonResource
             'id'            => $this->id,
             'name'          => $this->name,
             'slug'          => $this->slug,
-            'translations'  => ProductTranslationResource::collection($this->translations),
             'is_varied'     => $this->is_varied,
-            'variants'      => ProductVariantResource::collection($this->whenLoaded('variants')),
-            'categories'    => CategoryResource::collection($this->whenLoaded('categories')),
-            'images'        => ProductImageResource::collection($this->whenLoaded('images')),
+            'is_saleable'   => $this->is_saleable,
+
+            $this->mergeWhen( $this->relationLoaded('categories'),[
+                'category_type' => $this->categories->first()->type,
+                'categories'    => ProductCategoryResource::collection($this->categories),    
+            ]),
+
+            $this->mergeWhen( $this->relationLoaded('variants'), [
+                'size'          => $this->when(!$this->is_varied, $this->variants->first()->size, null),
+                'idr_price'     => $this->when(!$this->is_varied, $this->variants->first()->idr_price, null),
+                'usd_price'     => $this->when(!$this->is_varied, $this->variants->first()->usd_price, null),
+                'stock'         => $this->when(!$this->is_varied, $this->variants->first()->stock, null),
+                'variants'      => $this->when( $this->is_varied, function() {
+                    return ProductVariantResource::collection($this->variants);
+                }, null),
+            ]),
+               
+            'translations'  => ProductTranslationResource::collection($this->whenLoaded('translations')),    
+            
             'created_at'    => $this->created_at,
             'updated_at'    => $this->updated_at,
         ];

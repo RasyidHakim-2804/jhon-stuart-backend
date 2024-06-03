@@ -18,7 +18,6 @@ class ProductTranslationResource extends JsonResource
             'id'                => $this->id,
             'lang'              => $this->lang,
             'description'       => $this->description,
-            'full_description'  => $this->full_description,
         ];
     }
 }

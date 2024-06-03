@@ -17,11 +17,12 @@ class ProductVariantResource extends JsonResource
         return [
             'id'            => $this->id,
             'name'          => $this->name,
+            'size'          => $this->size,
+            'product_id'    => $this->product_id,
+            'is_default'    => $this->is_default,
             'idr_price'     => $this->idr_price,
             'usd_price'     => $this->usd_price,
             'stock'         => $this->stock,
-            'max_order'     => $this->max_order,
-            'min_order'     => $this->min_order,
             'created_at'    => $this->created_at,
             'updated_at'    => $this->updated_at,
         ];
