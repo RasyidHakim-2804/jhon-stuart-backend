@@ -28,6 +28,7 @@ class ProductController extends Controller
                     ->allowedSorts([
                         'name',
                         'id',
+                        'popular',
                         AllowedSort::custom('price', new SortByPrice)
                     ])
                     ->allowedFilters(['name'])
