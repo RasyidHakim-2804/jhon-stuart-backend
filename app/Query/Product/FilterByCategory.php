@@ -14,14 +14,11 @@ class FilterByCategory implements Filter
             $categories_id = $value;
         }
 
-        if ($categories_id[0] != null) {
-            $query->whereHas('categories', function($query) use ($categories_id) {
-                        $query->select('product_id')
-                        ->whereIn('category_id', $categories_id)
-                        ->groupBy('product_id')
-                        ->havingRaw('COUNT( DISTINCT category_id) = ' . count($categories_id));
-                    });
-        }
-        return $query;
+        return $query->whereHas('categories', function($query) use ($categories_id) {
+            $query->select('product_id')
+            ->whereIn('product_categories_id', $categories_id)
+            ->groupBy('product_id');
+            // ->havingRaw('COUNT( DISTINCT product_categories_id) = ' . count($categories_id));
+        });
     }
 }
