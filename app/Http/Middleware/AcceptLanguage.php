@@ -15,11 +15,11 @@ class AcceptLanguage
      */
     public function handle(Request $request, Closure $next)
     {
-        $locale = $request->header('Accept-Language');
+        $locale = $request->lang ?? 'en';
 
-        if (!$locale || !in_array($locale, ['en', 'id'])) {
+        if (!in_array($locale, ['en', 'id'])) {
             return response()->json([
-                'error' => 'Invalid or missing Accept-Language.'
+                'error' => 'Invalid language.'
             ], 400);
         }
 
