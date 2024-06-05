@@ -24,10 +24,9 @@ class AdminProductController extends Controller
     public function index()
     {
         $products = QueryBuilder::for(Product::class)
-                    ->defaultSort('name')
+                    ->defaultSort('-id')
                     ->allowedSorts([
                         'name',
-                        'id',
                         'popular',
                         AllowedSort::custom('price', new SortByPrice)
                     ])
