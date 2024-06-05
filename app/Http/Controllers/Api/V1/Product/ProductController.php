@@ -8,6 +8,7 @@ use App\Http\Resources\Api\V1\Product\ProductResource;
 use App\Query\Product\FilterByCategory;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use App\Query\Product\SortByPrice;
+use Illuminate\Http\Request;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\AllowedSort;
 use Spatie\QueryBuilder\QueryBuilder;
@@ -45,10 +46,10 @@ class ProductController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($slug)
+    public function show($slug, Request $request)
     {
-        $lang = request()->getLanguages()[0];
-
+        $lang = $request->lang;
+        
         $product = Product::where('slug', $slug)->with([
             'variants',
             'categories',

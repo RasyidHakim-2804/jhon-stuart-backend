@@ -9,9 +9,10 @@ use Illuminate\Http\Request;
 
 class ArticleController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $lang = request()->getLanguages();
+        $lang    = $request->lang;
+
         $article = Article::with([
             'image',
             'translation' => function($query) use ($lang){
@@ -22,9 +23,10 @@ class ArticleController extends Controller
         return ArticleResource::collection($article);
     }
 
-    public function show($slug)
+    public function show($slug, Request $request)
     {
-        $lang = request()->getLanguages();
+        $lang    = $request->lang;
+
         $article = Article::where('slug', $slug)->with([
             'image',
             'translation' => function($query) use ($lang){
