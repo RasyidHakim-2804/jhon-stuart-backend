@@ -8,42 +8,120 @@ use Illuminate\Support\Str;
 
 class ProductSeeder extends Seeder
 {
-    private $products = [
-        "Swirl"                         => "Abstract painting by Jackson Pollock (Abstract Expressionism)",
-        "Girl with a Pearl Earring"     => "Portrait painting by Johannes Vermeer (Baroque)",
-        "The Thinker"                   => "Figurative sculpture by Auguste Rodin (Modern)",
-        "Teton Range"                   => "Landscape photography by Ansel Adams (Black and White)",
-        "Afghan Girl"                   => "Portrait photography by Steve McCurry (Photojournalism)",
-        "Night City"                    => "Digital art illustration by Beeple (Crypto Art)",
-        "I ❤ NY"                        => "Digital art graphic design by Milton Glaser (Pop Art)",
-        "Ukiran Kayu Bali"              => "Traditional Balinese wood carving from Indonesia",
-        "Batik Mega Mendung"            => "A motif of traditional batik from Central Java, Indonesia",
-        "Tapestry Wall Hanging"         => "A decorative textile weaving art form",
-        "Cloud Gate"                    => "A stainless steel sculpture by Anish Kapoor in Chicago",
-        "Rumah Fallingwater"            => "A house designed by Frank Lloyd Wright in Pennsylvania, USA",
-        "Desain Karakter Video Game"    => "Concept art for a video game character",
-        "Sprite Video Game Klasik"      => "Pixel art sprites from a classic video game",
-        "Kain Kente"                    => "A traditional handwoven cloth from Ghana",
-        "Tiket Teater Drama"            => "A ticket to see a play",
-        "Pertunjukan Tari Kontemporer"  => "Tickets to a modern dance performance",
-        "Kind of Blue"                  => "A jazz music album by Miles Davis (Modal Jazz)",
-        "Forest of Numbers"             => "An interactive art installation by Rafael Lozano-Hemmer (Mexico)",
-        "Pameran Seni Multimedia VR"    => "A ticket to a virtual reality art exhibition",
-    ];
-    
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
-        foreach ($this->products as $name => $desc) {
-            
-            DB::table('products')->insert([
-                'name'          => $name,
-                'slug'          => Str::slug($name),
-                'is_varied'     => rand(0,1),
-                'created_at'    => now(),
-            ]);
-        }
+        //museum
+
+        DB::table('products')->insert([
+            'id'            => 1,
+            'name'          => 'Jon Stuart Anderson Orb of Delight II 2024',
+            'slug'          => Str::slug('Jon Stuart Anderson Orb of Delight II 2024'),
+            'is_saleable'   => 1,
+            'is_varied'     => 0,
+            'popular'       => 100,
+        ]);
+
+        DB::table('products')->insert([
+            'id'            => 2,
+            'name'          => 'Jon Stuart Anderson Orb of Delight I 2024',
+            'slug'          => Str::slug('Jon Stuart Anderson Orb of Delight I 2024'),
+            'is_saleable'   => 1,
+            'is_varied'     => 0,
+            'popular'       => 70,
+        ]);
+
+        DB::table('products')->insert([
+            'id'            => 3,
+            'name'          => 'Jon Stuart Anderson Skull III 2024',
+            'slug'          => Str::slug('Jon Stuart Anderson Skull III 2024'),
+            'is_saleable'   => 1,
+            'is_varied'     => 0,
+            'popular'       => 65,
+        ]);
+
+        DB::table('products')->insert([
+            'id'            => 4,
+            'name'          => 'Jon Stuart Anderson Vase I 2024',
+            'slug'          => Str::slug('Jon Stuart Anderson Vase I 2024'),
+            'is_saleable'   => 1,
+            'is_varied'     => 0,
+            'popular'       => 80,
+        ]);
+
+        DB::table('products')->insert([
+            'id'            => 5,
+            'name'          => 'Jon Stuart Anderson Winged Dragon 2024',
+            'slug'          => Str::slug('Jon Stuart Anderson Winged Dragon 2024'),
+            'is_saleable'   => 1,
+            'is_varied'     => 0,
+            'popular'       => 90,
+        ]);
+
+        //gallery
+        DB::table('products')->insert([
+            'id'            => 6,
+            'name'          => 'Jon Stuart Anderson Wolf Family 2023',
+            'slug'          => Str::slug('Jon Stuart Anderson Wolf Family 2023'),
+            'is_saleable'   => 1,
+            'is_varied'     => 1,
+            'popular'       => 100,
+        ]);
+
+        DB::table('products')->insert([
+            'id'            => 7,
+            'name'          => 'Jon Stuart Anderson Tyrannosaurus Desk II',
+            'slug'          => Str::slug('Jon Stuart Anderson Tyrannosaurus Desk II'),
+            'is_saleable'   => 1,
+            'is_varied'     => 1,
+            'popular'       => 10,
+        ]);
+
+        DB::table('products')->insert([
+            'id'            => 8,
+            'name'          => 'Jon Stuart Anderson Horned Toad Jumbo 2023',
+            'slug'          => Str::slug('Jon Stuart Anderson Horned Toad Jumbo 2023'),
+            'is_saleable'   => 1,
+            'is_varied'     => 1,
+            'popular'       => 76,
+        ]);
+
+        DB::table('products')->insert([
+            'id'            => 9,
+            'name'          => 'Glacial Triangle',
+            'slug'          => Str::slug('Glacial Triangle'),
+            'is_saleable'   => 1,
+            'is_varied'     => 1,
+            'popular'       => 100,
+        ]);
+
+        DB::table('products')->insert([
+            'id'            => 10,
+            'name'          => 'Jaguar Pendant, Brooch',
+            'slug'          => Str::slug('Jaguar Pendant, Brooch'),
+            'is_saleable'   => 1,
+            'is_varied'     => 1,
+            'popular'       => 103,
+        ]);
+
+        DB::table('products')->insert([
+            'id'            => 11,
+            'name'          => 'Jon Stuart Anderson Vase III 2023',
+            'slug'          => Str::slug('Jon Stuart Anderson Vase III 2023'),
+            'is_saleable'   => 1,
+            'is_varied'     => 0,
+            'popular'       => 10,
+        ]);
+
+        DB::table('products')->insert([
+            'id'            => 12,
+            'name'          => 'Jon Stuart Anderson Rectangular Frog Bowl',
+            'slug'          => Str::slug('Jon Stuart Anderson Rectangular Frog Bowl'),
+            'is_saleable'   => 1,
+            'is_varied'     => 0,
+            'popular'       => 10,
+        ]);
     }
 }
