@@ -13,7 +13,6 @@ use App\Http\Resources\Api\V1\Product\AdminProductResource;
 use App\Query\Product\SortByPrice;
 use Spatie\QueryBuilder\AllowedSort;
 use Spatie\QueryBuilder\QueryBuilder;
-use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -29,6 +28,7 @@ class AdminProductController extends Controller
                     ->allowedSorts([
                         'name',
                         'id',
+                        'popular',
                         AllowedSort::custom('price', new SortByPrice)
                     ])
                     ->allowedFilters(['name'])
@@ -40,15 +40,12 @@ class AdminProductController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($slug, Request $requet)
+    public function show($slug)
     {
         $product = Product::query()->where('slug', $slug)->with([
             'variants',
             'categories',
             'translations',
-            'images' => function (Builder $query) {
-                $query->where('is_saved', true)->orderBy('position', 'asc');
-            }
             ])->firstOrFail();
 
         return new AdminProductResource($product);

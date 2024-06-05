@@ -16,25 +16,26 @@ class ProductResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id'            => $this->id,
-            'name'          => $this->name,
-            'slug'          => $this->slug,
-            'is_varied'     => $this->is_varied,
-            'is_saleable'   => $this->is_saleable,
+            'id'              => $this->id,
+            'name'            => $this->name,
+            'slug'            => $this->slug,
+            'is_varied'       => $this->is_varied,
+            'is_saleable'     => $this->is_saleable,
+            'thumbnail_price' => $this->when(
+                $this->variants_min_usd_price,
+                $this->variants_min_usd_price,      // when sort not by price, this from withMin()
+                $this->min_price                    // when sort by price, this from query sorting SortByPrice class
+            ),
 
-            $this->mergeWhen( $this->relationLoaded('translations'), [
-                'description'       => $this->translations->first()->description,
-            ]),
+            'description'   => $this->whenLoaded('translations', function () {
+                return $this->translations->first()->description;
+            }),
 
-            $this->mergeWhen( $this->relationLoaded('categories'), [
-                'category_type' => $this->categories->first()->type,
-                'categories'    => ProductCategoryResource::collection($this->categories),    
-            ]),
-
-            'variants'      => ProductVariantResource::collection($this->whenLoaded('variants')), 
-            'images'        => ProductImageResource::collection($this->whenLoaded('images')),
-            'created_at'    => $this->created_at,
-            'updated_at'    => $this->updated_at,
+            'categories'      => ProductCategoryResource::collection($this->whenLoaded('categories')),
+            'variants'        => ProductVariantResource::collection($this->whenLoaded('variants')), 
+            'images'          => ProductImageResource::collection($this->whenLoaded('images')),
+            'created_at'      => $this->created_at,
+            'updated_at'      => $this->updated_at,
         ];
     }
 }

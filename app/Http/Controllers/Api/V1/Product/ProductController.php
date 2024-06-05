@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Api\V1\Product;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Http\Resources\Api\V1\Product\ProductResource;
+use App\Query\Product\FilterByCategory;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use App\Query\Product\SortByPrice;
+use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\AllowedSort;
 use Spatie\QueryBuilder\QueryBuilder;
 
@@ -17,13 +19,13 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $lang = request()->getLanguages()[0];
         $products = QueryBuilder::for(Product::class)
                     ->with([
                         'images' => function (Builder $query) {
-                            $query->where('is_saved', true)->orderBy('position', 'asc');
-                        }
+                            $query->where('is_saved', true);
+                        },
                     ])
+                    ->withMin('variants', 'usd_price')
                     ->defaultSort('name')
                     ->allowedSorts([
                         'name',
@@ -31,7 +33,10 @@ class ProductController extends Controller
                         'popular',
                         AllowedSort::custom('price', new SortByPrice)
                     ])
-                    ->allowedFilters(['name'])
+                    ->allowedFilters([
+                        'name',
+                        AllowedFilter::custom('category', new FilterByCategory)
+                    ])
                     ->paginate(25)->appends(request()->query());
 
         return ProductResource::collection($products);
@@ -51,7 +56,7 @@ class ProductController extends Controller
                 $query->where('lang', $lang);
             },
             'images' => function (Builder $query) {
-                $query->where('is_saved', true)->orderBy('position', 'asc');
+                $query->where('is_saved', true);
             }
             ])->firstOrFail();
         
