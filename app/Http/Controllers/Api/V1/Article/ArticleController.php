@@ -14,7 +14,6 @@ class ArticleController extends Controller
         $lang    = $request->lang;
 
         $article = Article::with([
-            'image',
             'translation' => function($query) use ($lang){
                 $query->where('lang', $lang);
             }
@@ -28,7 +27,6 @@ class ArticleController extends Controller
         $lang    = $request->lang;
 
         $article = Article::where('slug', $slug)->with([
-            'image',
             'translation' => function($query) use ($lang){
                 $query->where('lang', $lang);
             }
