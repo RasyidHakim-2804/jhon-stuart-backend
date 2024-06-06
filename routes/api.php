@@ -77,6 +77,13 @@ Route::prefix('v1')->group(function(){
             Route::get('/categories/{category:slug}', [AdminProductCategoryController::class,'show']);
             Route::put('/categories/{category:slug}', [AdminProductCategoryController::class, 'update']);
             Route::delete('/categories/{category:slug}', [AdminProductCategoryController::class, 'destroy']);
+
+            //ArticleCategory
+            Route::get('/categories-article', [AdminArticleCategoryController::class, 'index']);
+            Route::post('/categories-article', [AdminArticleCategoryController::class, 'store']);
+            Route::get('/categories-article/{category:slug}', [AdminArticleCategoryController::class,'show']);
+            Route::put('/categories-article/{category:slug}', [AdminArticleCategoryController::class, 'update']);
+            Route::delete('/categories-article/{category:slug}', [AdminArticleCategoryController::class, 'destroy']);
   
             //Products
             Route::get('/products', [AdminProductController::class,'index']);
