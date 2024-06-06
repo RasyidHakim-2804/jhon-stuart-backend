@@ -22,17 +22,19 @@ class UpdateArticleRequest extends FormRequest
      */
     public function rules(): array
     {
-        $isArray = new IsArray;
         return [
-            'title'    => ['required', $isArray],
-            'title.en' => ['required', 'string', 'min:3', 'max:255'],
-            'title.id' => ['required', 'string', 'min:3', 'max:255'],
+            'title'       => ['required', 'array'],
+            'title.en'    => ['required', 'string', 'min:3', 'max:255'],
+            'title.id'    => ['required', 'string', 'min:3', 'max:255'],
+   
+            'body'        => ['required', 'array'],
+            'body.en'     => ['required', 'string', 'min:3', 'max:255'],
+            'body.id'     => ['required', 'string', 'min:3', 'max:255'],
 
-            'body'     => ['required', $isArray],
-            'body.en'  => ['required', 'string', 'min:3', 'max:255'],
-            'body.id'  => ['required', 'string', 'min:3', 'max:255'],
+            'author_id'   => 'required|exists:article_authors,id',
+            'category_id' => 'required|string|exists:article_categories,id',
 
-            'image'    => ['nullable','image','max:2048']
+            'image'       => ['nullable','image','max:2048']
         ];
     }
 }
