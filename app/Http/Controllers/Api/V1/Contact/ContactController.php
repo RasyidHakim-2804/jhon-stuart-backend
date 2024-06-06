@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Api\V1\Contact;
 
-use App\Http\Requests\Api\V1\Contact\CreateRequest;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\V1\Contact\CreateContactRequest;
 use App\Http\Resources\Api\V1\Common\FailedResource;
 use App\Http\Resources\Api\V1\Common\SuccessResource;
 use App\Mail\Api\V1\ContactMail;
@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Mail;
 
 class ContactController extends Controller
 {
-    public function store(CreateRequest $request)
+    public function store(CreateContactRequest $request)
     {
         try {
             DB::beginTransaction();
