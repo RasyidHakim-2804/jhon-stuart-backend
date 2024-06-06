@@ -34,7 +34,6 @@ class CreateProductRequest extends FormRequest
         return [
             'name'                  => 'required|max:100',
 
-            'description'           => ['required', 'array'],
             'description.id'        => 'required|string',
             'description.en'        => 'required|string',
             
@@ -43,7 +42,6 @@ class CreateProductRequest extends FormRequest
                 'string',
                 Rule::in(ProductCategory::$categoryTypes)
             ],
-            'categories'            => 'required|array',
             'categories.*'          => [
                 'numeric',
                 'distinct',
@@ -60,7 +58,6 @@ class CreateProductRequest extends FormRequest
             'usd_price'             => 'exclude_if:is_varied,true|required|numeric|max:10000000',
             'stock'                 => 'exclude_if:is_varied,true|required|numeric|min:0',
             
-            'variants'              => ['exclude_if:is_varied,false', 'required', 'array'],
             'variants.*.name'       => ['exclude_if:is_varied,false', 'required', 'max:100',],
             'variants.*.size'       => ['exclude_if:is_varied,false', 'required', 'string', 'max:255'],
             'variants.*.idr_price'  => ['exclude_if:is_varied,false', 'required', 'numeric', 'max:10000000'],

@@ -35,7 +35,6 @@ class UpdateProductRequest extends FormRequest
         return [
             'name'                  => 'required|max:100',
 
-            'description'           => 'required|array',
             'description.id'        => 'required|string',
             'description.en'        => 'required|string',
             
@@ -44,7 +43,6 @@ class UpdateProductRequest extends FormRequest
                 'string',
                 Rule::in(ProductCategory::$categoryTypes)
             ],
-            'categories'            => 'required|array',
             'categories.*'          => [
                 'numeric',
                 'distinct',
@@ -61,7 +59,6 @@ class UpdateProductRequest extends FormRequest
             'usd_price'             => 'exclude_if:is_varied,true|required|numeric|max:10000000',
             'stock'                 => 'exclude_if:is_varied,true|required|numeric|min:0',
             
-            'variants'              => 'exclude_if:is_varied,false|required|array|distinct',
             'variants.*.name'       => 'exclude_if:is_varied,false|required|max:100',
             'variants.*.idr_price'  => 'exclude_if:is_varied,false|required|numeric|max:10000000',
             'variants.*.usd_price'  => 'exclude_if:is_varied,false|required|numeric|max:10000000',
@@ -70,6 +67,7 @@ class UpdateProductRequest extends FormRequest
             'variants.*.id'         => [
                 'exclude_if:is_varied,false',
                 'nullable',
+                'distinct',
                 Rule::exists('product_variants', 'id')->where(function($query){
                     $query->where('product_id', $this->route()->parameters()['product']->id);
                 })
