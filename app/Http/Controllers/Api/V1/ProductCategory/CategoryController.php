@@ -1,10 +1,9 @@
 <?php
 
-namespace App\Http\Controllers\Api\V1\Category\ProductCategory;
+namespace App\Http\Controllers\Api\V1\ProductCategory;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\Api\V1\Category\ProductCategory\ProductCategoryResource;
-use App\Http\Resources\Api\V1\Product\ProductResource;
+use App\Http\Resources\Api\V1\ProductCategory\ProductCategoryResource;
 use App\Models\ProductCategory;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;

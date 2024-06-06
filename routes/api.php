@@ -4,7 +4,8 @@ use App\Http\Controllers\Api\V1\Admin\AdminAdminController;
 use App\Http\Controllers\Api\V1\Admin\AdminUserController;
 use App\Http\Controllers\Api\V1\Auth\Admin\AdminAuthController;
 use App\Http\Controllers\Api\V1\Auth\Admin\AdminPasswordController;
-use App\Http\Controllers\Api\V1\Category\ProductCategory\AdminProductCategoryController;
+use App\Http\Controllers\Api\V1\ProductCategory\AdminProductCategoryController;
+use App\Http\Controllers\Api\V1\Category\ArticleCategory\AdminArticleCategoryController;
 use App\Http\Controllers\Api\V1\Contact\AdminContactController;
 use App\Http\Controllers\Api\V1\Product\AdminProductController;
 use App\Http\Controllers\Api\V1\Product\AdminProductImageController;
@@ -15,11 +16,10 @@ use App\Http\Controllers\Api\V1\Auth\User\UserAuthController;
 use App\Http\Controllers\Api\V1\Auth\User\UserPasswordController;
 use App\Http\Controllers\Api\V1\Profile\UserProfileController;
 
-use App\Http\Controllers\Api\V1\Category\ProductCategory\CategoryController;
+use App\Http\Controllers\Api\V1\ProductCategory\CategoryController;
 use App\Http\Controllers\Api\V1\Contact\ContactController;
 use App\Http\Controllers\Api\V1\Product\ProductController;
 use App\Http\Controllers\Api\V1\Article\ArticleController;
-
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -77,7 +77,7 @@ Route::prefix('v1')->group(function(){
             Route::get('/categories/{category:slug}', [AdminProductCategoryController::class,'show']);
             Route::put('/categories/{category:slug}', [AdminProductCategoryController::class, 'update']);
             Route::delete('/categories/{category:slug}', [AdminProductCategoryController::class, 'destroy']);
-            
+  
             //Products
             Route::get('/products', [AdminProductController::class,'index']);
             Route::post('/products', [AdminProductController::class, 'store']);

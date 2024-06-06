@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Resources\Api\V1\Category\ProductCategory;
+namespace App\Http\Resources\Api\V1\ProductCategory;
 
 use App\Http\Resources\Api\V1\Product\ProductResource;
 use Illuminate\Http\Request;
