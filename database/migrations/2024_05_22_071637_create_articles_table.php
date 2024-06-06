@@ -15,7 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('slug')->unique();
-            $table->foreignId('category_id')->constrained('article_categories', 'id');
+            $table->foreignId('category_id')->nullable()->constrained('article_categories', 'id');
+            $table->foreignId('author_id')->nullable()->constrained('article_authors', 'id');
             $table->timestamps();
         });
     }
