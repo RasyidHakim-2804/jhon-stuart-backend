@@ -32,9 +32,10 @@ class AdminProductResource extends JsonResource
                 'idr_price'     => $this->when(!$this->is_varied, $this->variants->first()->idr_price, null),
                 'usd_price'     => $this->when(!$this->is_varied, $this->variants->first()->usd_price, null),
                 'stock'         => $this->when(!$this->is_varied, $this->variants->first()->stock, null),
-                'variants'      => $this->when( $this->is_varied, function() {
-                    return ProductVariantResource::collection($this->variants);
-                }, null),
+                'variants'      => $this->when(
+                    $this->is_varied,
+                    ProductVariantResource::collection($this->variants), 
+                    null),
             ]),
                
             'translations'  => ProductTranslationResource::collection($this->whenLoaded('translations')),    
