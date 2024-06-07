@@ -22,6 +22,7 @@ class ProductSeeder extends Seeder
             'is_saleable'   => 1,
             'is_varied'     => 0,
             'popular'       => 100,
+            'created_at'    => now(),
         ]);
 
         DB::table('products')->insert([
@@ -31,6 +32,7 @@ class ProductSeeder extends Seeder
             'is_saleable'   => 1,
             'is_varied'     => 0,
             'popular'       => 70,
+            'created_at'    => now(),
         ]);
 
         DB::table('products')->insert([
@@ -40,6 +42,7 @@ class ProductSeeder extends Seeder
             'is_saleable'   => 1,
             'is_varied'     => 0,
             'popular'       => 65,
+            'created_at'    => now(),
         ]);
 
         DB::table('products')->insert([
@@ -49,6 +52,7 @@ class ProductSeeder extends Seeder
             'is_saleable'   => 1,
             'is_varied'     => 0,
             'popular'       => 80,
+            'created_at'    => now(),
         ]);
 
         DB::table('products')->insert([
@@ -58,6 +62,7 @@ class ProductSeeder extends Seeder
             'is_saleable'   => 1,
             'is_varied'     => 0,
             'popular'       => 90,
+            'created_at'    => now(),
         ]);
 
         //gallery
@@ -68,6 +73,7 @@ class ProductSeeder extends Seeder
             'is_saleable'   => 1,
             'is_varied'     => 1,
             'popular'       => 100,
+            'created_at'    => now(),
         ]);
 
         DB::table('products')->insert([
@@ -77,6 +83,7 @@ class ProductSeeder extends Seeder
             'is_saleable'   => 1,
             'is_varied'     => 1,
             'popular'       => 10,
+            'created_at'    => now(),
         ]);
 
         DB::table('products')->insert([
@@ -86,6 +93,7 @@ class ProductSeeder extends Seeder
             'is_saleable'   => 1,
             'is_varied'     => 1,
             'popular'       => 76,
+            'created_at'    => now(),
         ]);
 
         DB::table('products')->insert([
@@ -95,6 +103,7 @@ class ProductSeeder extends Seeder
             'is_saleable'   => 1,
             'is_varied'     => 1,
             'popular'       => 100,
+            'created_at'    => now(),
         ]);
 
         DB::table('products')->insert([
@@ -104,6 +113,7 @@ class ProductSeeder extends Seeder
             'is_saleable'   => 1,
             'is_varied'     => 1,
             'popular'       => 103,
+            'created_at'    => now(),
         ]);
 
         DB::table('products')->insert([
@@ -113,6 +123,7 @@ class ProductSeeder extends Seeder
             'is_saleable'   => 1,
             'is_varied'     => 0,
             'popular'       => 10,
+            'created_at'    => now(),
         ]);
 
         DB::table('products')->insert([
@@ -122,6 +133,7 @@ class ProductSeeder extends Seeder
             'is_saleable'   => 1,
             'is_varied'     => 0,
             'popular'       => 10,
+            'created_at'    => now(),
         ]);
     }
 }
