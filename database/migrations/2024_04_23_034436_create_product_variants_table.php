@@ -17,9 +17,9 @@ return new class extends Migration
             $table->string('size',255);
             $table->boolean('is_default')->default(0);
             $table->foreignId('product_id')->constrained('products', 'id');
-            $table->unsignedSmallInteger('stock');
-            $table->decimal('idr_price', 10, 2);
-            $table->decimal('usd_price', 10, 2);
+            $table->unsignedInteger('stock');
+            $table->unsignedDecimal('idr_price', 10, 2);
+            $table->unsignedDecimal('usd_price', 10, 2);
             $table->timestamps();
         });
     }
