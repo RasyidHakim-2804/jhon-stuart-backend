@@ -20,7 +20,6 @@ class ArticleResource extends JsonResource
             'slug'          => $this->slug,
             'category'      => $this->category->name,
             'title'         => $this->translations->first()->title,
-            'description'   => $this->translations->first()->description,
             'body'          => $this->translations->first()->body,
             'author'        => new ArticleAuthorResource($this->author),
             'image'         => $this->image_url,

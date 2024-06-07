@@ -124,7 +124,6 @@ class AdminArticleController extends Controller
         $translation->article_id    = $article_id;
         $translation->lang          = $lang;
         $translation->title         = $request['title'][$lang];
-        $translation->description   = $request['description'][$lang];
         $translation->body          = $request['body'][$lang];
         $translation->save();
     }

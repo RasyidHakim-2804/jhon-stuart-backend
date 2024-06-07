@@ -24,9 +24,7 @@ class CreateArticleRequest extends FormRequest
         return [
             'title.en'       => 'required|string|max:255',
             'title.id'       => 'required|string|max:255',
-
-            'description.en' => 'required|string',
-   
+            
             'body.en'        => 'required|string',
             'body.id'        => 'required|string',
 
