@@ -14,7 +14,9 @@ class ArticleController extends Controller
         $lang    = $request->lang;
 
         $article = Article::with([
-            'translation' => function($query) use ($lang){
+            'author',
+            'category',
+            'translations' => function($query) use ($lang){
                 $query->where('lang', $lang);
             }
         ])->paginate(25);
@@ -27,10 +29,15 @@ class ArticleController extends Controller
         $lang    = $request->lang;
 
         $article = Article::where('slug', $slug)->with([
-            'translation' => function($query) use ($lang){
+            'author',
+            'category:id,name',
+            'translations' => function($query) use ($lang){
                 $query->where('lang', $lang);
             }
         ])->firstOrFail();
+
+        $article->views++;
+        $article->save();
 
         return new ArticleResource($article);
     }

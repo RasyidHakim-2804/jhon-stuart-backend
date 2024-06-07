@@ -17,14 +17,16 @@ class AdminArticleController extends Controller
 {
     public function index()
     {
-        $article = Article::with('translation')->paginate(25);
+        $article = Article::paginate(25);
 
         return AdminArticleResource::collection($article);
     }
 
     public function show($slug)
     {
-        $article = Article::with('translation')->where('slug', $slug)->first();
+        $article = Article::with([
+            'translations', 'author', 'category'
+            ])->where('slug', $slug)->first();
 
         return new AdminArticleResource($article);
     }
