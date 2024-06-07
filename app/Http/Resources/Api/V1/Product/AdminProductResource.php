@@ -4,7 +4,7 @@ namespace App\Http\Resources\Api\V1\Product;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use App\Http\Resources\Api\V1\Category\ProductCategory\ProductCategoryResource;
+use App\Http\Resources\Api\V1\ProductCategory\ProductCategoryResource;
 
 class AdminProductResource extends JsonResource
 {
