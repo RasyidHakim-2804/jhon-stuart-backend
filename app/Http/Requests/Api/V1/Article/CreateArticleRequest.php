@@ -22,18 +22,18 @@ class CreateArticleRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title'       => ['required', 'array'],
-            'title.en'    => ['required', 'string', 'min:3', 'max:255'],
-            'title.id'    => ['required', 'string', 'min:3', 'max:255'],
-              
-            'body'        => ['required', 'array'],
-            'body.en'     => ['required', 'string', 'min:3', 'max:255'],
-            'body.id'     => ['required', 'string', 'min:3', 'max:255'],
+            'title.en'       => 'required|string|max:255',
+            'title.id'       => 'required|string|max:255',
 
-            'author_id'   => 'required|exists:article_authors,id',
-            'category_id' => 'required|string|exists:article_categories,id',
+            'description.en' => 'required|string',
+   
+            'body.en'        => 'required|string',
+            'body.id'        => 'required|string',
 
-            'image'       => ['required', 'image','max:2048']
+            'author_id'      => 'required|exists:article_authors,id',
+            'category_id'    => 'required|string|exists:article_categories,id',
+
+            'image'          => 'required|image|max:2048'
         ];
     }
 }

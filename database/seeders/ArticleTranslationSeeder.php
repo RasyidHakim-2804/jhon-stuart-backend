@@ -21,6 +21,7 @@ class ArticleTranslationSeeder extends Seeder
                 'article_id'    => $article->id,
                 'lang'          => 'en',
                 'title'         => $article->name,
+                'description'   => fake()->paragraph(),
                 'body'          => fake()->paragraph(),
                 'created_at'    => now(),
             ]);
@@ -29,6 +30,7 @@ class ArticleTranslationSeeder extends Seeder
                 'article_id'    => $article->id,
                 'lang'          => 'id',
                 'title'         => $article->name,
+                'description'   => fake()->paragraph(),
                 'body'          => fake()->paragraph(),
                 'created_at'    => now(),
             ]);

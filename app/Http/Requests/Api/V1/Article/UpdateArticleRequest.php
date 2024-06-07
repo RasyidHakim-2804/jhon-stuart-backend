@@ -23,18 +23,18 @@ class UpdateArticleRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title'       => ['required', 'array'],
-            'title.en'    => ['required', 'string', 'min:3', 'max:255'],
-            'title.id'    => ['required', 'string', 'min:3', 'max:255'],
+            'title.en'       => 'required|string|max:255',
+            'title.id'       => 'required|string|max:255',
+
+            'description.en' => 'required|string',
    
-            'body'        => ['required', 'array'],
-            'body.en'     => ['required', 'string', 'min:3', 'max:255'],
-            'body.id'     => ['required', 'string', 'min:3', 'max:255'],
+            'body.en'        => 'required|string',
+            'body.id'        => 'required|string',
 
-            'author_id'   => 'required|exists:article_authors,id',
-            'category_id' => 'required|string|exists:article_categories,id',
+            'author_id'      => 'required|exists:article_authors,id',
+            'category_id'    => 'required|string|exists:article_categories,id',
 
-            'image'       => ['nullable','image','max:2048']
+            'image'          => 'nullable|image|max:2048'
         ];
     }
 }
