@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('slug')->unique();
             $table->string('image_url');
+            $table->unsignedInteger('views');
             $table->foreignId('category_id')->nullable()->constrained('article_categories', 'id');
             $table->foreignId('author_id')->nullable()->constrained('article_authors', 'id');
             $table->timestamps();
