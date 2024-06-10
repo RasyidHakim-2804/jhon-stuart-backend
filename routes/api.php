@@ -149,16 +149,14 @@ Route::prefix('v1')->group(function(){
     //Categories
     Route::get('/categories', [CategoryController::class, 'index']);
 
-    //Products
-    Route::get('/products', [ProductController::class, 'index']);
-
     Route::middleware('language')->group(function(){
-
+        
         //Article
         Route::get('/articles', [ArticleController::class, 'index']);
         Route::get('/articles/{slug}', [ArticleController::class, 'show']);
-
+        
         //Products
+        Route::get('/products', [ProductController::class, 'index']);
         Route::get('/products/{slug}', [ProductController::class,'show']);    
     });
 });
