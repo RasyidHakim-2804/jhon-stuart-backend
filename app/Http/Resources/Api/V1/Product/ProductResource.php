@@ -21,11 +21,18 @@ class ProductResource extends JsonResource
             'slug'            => $this->slug,
             'is_varied'       => $this->is_varied,
             'is_saleable'     => $this->is_saleable,
-            'thumbnail_price' => $this->when(
-                $this->variants_min_usd_price,
-                $this->variants_min_usd_price,
-                $this->variants_min_idr_price
-            ),
+            'thumbnail_price' => [
+                'currency' => $this->when(
+                    $this->variants_min_usd_price,
+                    'USD',
+                    'IDR'
+                ),
+                'price'    => $this->when(
+                    $this->variants_min_usd_price,
+                    $this->variants_min_usd_price,
+                    $this->variants_min_idr_price
+                ),
+            ],
 
             'description'   => $this->whenLoaded('translations', function () {
                 return $this->translations->first()->description;
