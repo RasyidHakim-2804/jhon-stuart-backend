@@ -23,8 +23,8 @@ class ProductResource extends JsonResource
             'is_saleable'     => $this->is_saleable,
             'thumbnail_price' => $this->when(
                 $this->variants_min_usd_price,
-                $this->variants_min_usd_price,      // when sort not by price, this from withMin()
-                $this->min_price                    // when sort by price, this from query sorting SortByPrice class
+                $this->variants_min_usd_price,
+                $this->variants_min_idr_price
             ),
 
             'description'   => $this->whenLoaded('translations', function () {
