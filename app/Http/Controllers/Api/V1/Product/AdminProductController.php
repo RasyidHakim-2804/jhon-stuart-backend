@@ -10,11 +10,10 @@ use App\Http\Requests\Api\V1\Product\CreateProductRequest;
 use App\Http\Requests\Api\V1\Product\UpdateProductRequest;
 use App\Http\Resources\Api\V1\Common\SuccessResource;
 use App\Http\Resources\Api\V1\Product\AdminProductResource;
-use App\Query\Product\SortByPrice;
 use Spatie\QueryBuilder\AllowedSort;
 use Spatie\QueryBuilder\QueryBuilder;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Spatie\QueryBuilder\AllowedFilter;
 
 class AdminProductController extends Controller
 {
@@ -25,12 +24,15 @@ class AdminProductController extends Controller
     {
         $products = QueryBuilder::for(Product::class)
                     ->defaultSort('-id')
+                    ->withMin('variants', 'usd_price')
                     ->allowedSorts([
                         'name',
                         'popular',
-                        AllowedSort::custom('price', new SortByPrice)
+                        AllowedSort::field('price', 'variants_min_usd_price')
                     ])
-                    ->allowedFilters(['name'])
+                    ->allowedFilters([
+                        AllowedFilter::partial('search', 'name')
+                    ])
                     ->paginate(25)->appends(request()->query());
 
         return AdminProductResource::collection($products);

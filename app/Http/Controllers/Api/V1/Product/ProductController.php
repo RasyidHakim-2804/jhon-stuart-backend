@@ -5,9 +5,7 @@ namespace App\Http\Controllers\Api\V1\Product;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Http\Resources\Api\V1\Product\ProductResource;
-use App\Query\Product\FilterByCategory;
 use Illuminate\Contracts\Database\Eloquent\Builder;
-use App\Query\Product\SortByPrice;
 use Illuminate\Http\Request;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\AllowedSort;
@@ -18,25 +16,28 @@ class ProductController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
+        $column = $this->getVariantMinPriceColumn($request->lang);
+
         $products = QueryBuilder::for(Product::class)
                     ->with([
                         'images' => function (Builder $query) {
                             $query->where('is_saved', true);
                         },
                     ])
-                    ->withMin('variants', 'usd_price')
+                    ->withMin('variants', $column['price_column'])
                     ->defaultSort('name')
                     ->allowedSorts([
                         'name',
                         'id',
                         'popular',
-                        AllowedSort::custom('price', new SortByPrice)
+                        AllowedSort::field('price', $column['join_column']) // this column is from withMin('variants', 'usd_price')
                     ])
+                    ->join('pivot_product_category', 'pivot_product_category.product_id', 'products.id')
                     ->allowedFilters([
-                        'name',
-                        AllowedFilter::custom('category', new FilterByCategory)
+                        AllowedFilter::partial('search', 'name'),
+                        AllowedFilter::exact('category','pivot_product_category.product_categories_id')
                     ])
                     ->paginate(25)->appends(request()->query());
 
@@ -62,5 +63,23 @@ class ProductController extends Controller
             ])->firstOrFail();
         
         return new ProductResource($product);
+    }
+
+    //////////////////////
+    // private function //
+    //////////////////////
+
+    private function getVariantMinPriceColumn($lang)
+    {
+        $priceColumn = 'usd_price';
+
+        if ($lang == 'id') {
+            $priceColumn = 'idr_price';
+        }
+
+        return [
+            'price_column'    => $priceColumn,
+            'join_column'     => 'variants_min_' . $priceColumn
+        ];
     }
 }
