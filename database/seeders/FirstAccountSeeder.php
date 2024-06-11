@@ -49,7 +49,21 @@ class FirstAccountSeeder extends Seeder
             'token'         => 'ec0074c1b3c3b6a78d8867b0a9d451f0fee1f021b31273e8e2326e0d25c849bd',
             'abilities'     => '["is_admin","admin_master"]',
             'last_used_at'  => null,
-            'expires_at'    => now()->addMonths(3),
+            'expires_at'    => null,
+            'created_at'    => now(),
+            'updated_at'    => now(),
+        ]);
+
+        //user token
+        DB::table('personal_access_tokens')->insert([
+            'id'            => 2,
+            'tokenable_type'=> 'App\Models\User',
+            'tokenable_id'  => 1,
+            'name'          => 'user',
+            'token'         => 'c5d9312d9d68049fd10d255d7cd9576eb63d2966933499c7a9261cfa635870ac',
+            'abilities'     => '["is_user"]',
+            'last_used_at'  => null,
+            'expires_at'    => null,
             'created_at'    => now(),
             'updated_at'    => now(),
         ]);
