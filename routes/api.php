@@ -15,6 +15,7 @@ use App\Http\Controllers\Api\V1\Article\AdminArticleController;
 use App\Http\Controllers\Api\V1\Auth\User\UserAuthController;
 use App\Http\Controllers\Api\V1\Auth\User\UserPasswordController;
 use App\Http\Controllers\Api\V1\Profile\UserProfileController;
+use App\Http\Controllers\Api\V1\Wishlist\UserWishlistController;
 
 use App\Http\Controllers\Api\V1\ProductCategory\CategoryController;
 use App\Http\Controllers\Api\V1\Contact\ContactController;
@@ -139,6 +140,11 @@ Route::prefix('v1')->group(function(){
             //User Profile
             Route::get('/profile', [UserProfileController::class,'show']);
             Route::put('/profile', [UserProfileController::class, 'update']);
+
+            //Wishlists
+            Route::get('/wishlists', [UserWishlistController::class, 'index'])->middleware('language');
+            Route::post('/wishlists', [UserWishlistController::class,'store']);
+            Route::delete('/wishlists', [UserWishlistController::class, 'destroy']);
             
         });
     });
