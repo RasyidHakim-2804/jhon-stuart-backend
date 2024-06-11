@@ -9,6 +9,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use App\Models\Image\UserProfileImage;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class User extends Authenticatable
 {
@@ -58,5 +59,10 @@ class User extends Authenticatable
     public function imageProfile():HasOne
     {
         return $this->hasOne(UserProfileImage::class);
+    }
+
+    public function wishlists(): BelongsToMany
+    {
+        return $this->belongsToMany(Product::class, 'user_wishlists', 'user_id', 'product_id');
     }
 }
