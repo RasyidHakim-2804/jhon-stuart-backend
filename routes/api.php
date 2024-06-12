@@ -78,18 +78,18 @@ Route::prefix('v1')->group(function(){
             Route::delete('/articles/{article:slug}', [AdminArticleController::class, 'destroy']);
 
             //ProductCategory
-            Route::get('/categories', [AdminProductCategoryController::class, 'index']);
-            Route::post('/categories', [AdminProductCategoryController::class, 'store']);
-            Route::get('/categories/{category:slug}', [AdminProductCategoryController::class,'show']);
-            Route::put('/categories/{category:slug}', [AdminProductCategoryController::class, 'update']);
-            Route::delete('/categories/{category:slug}', [AdminProductCategoryController::class, 'destroy']);
+            Route::get('/product-categories', [AdminProductCategoryController::class, 'index']);
+            Route::post('/product-categories', [AdminProductCategoryController::class, 'store']);
+            Route::get('/product-categories/{category:slug}', [AdminProductCategoryController::class,'show']);
+            Route::put('/product-categories/{category:slug}', [AdminProductCategoryController::class, 'update']);
+            Route::delete('/product-categories/{category:slug}', [AdminProductCategoryController::class, 'destroy']);
 
             //ArticleCategory
-            Route::get('/categories-article', [AdminArticleCategoryController::class, 'index']);
-            Route::post('/categories-article', [AdminArticleCategoryController::class, 'store']);
-            Route::get('/categories-article/{category:slug}', [AdminArticleCategoryController::class,'show']);
-            Route::put('/categories-article/{category:slug}', [AdminArticleCategoryController::class, 'update']);
-            Route::delete('/categories-article/{category:slug}', [AdminArticleCategoryController::class, 'destroy']);
+            Route::get('/article-categories', [AdminArticleCategoryController::class, 'index']);
+            Route::post('/article-categories', [AdminArticleCategoryController::class, 'store']);
+            Route::get('/article-categories/{category:slug}', [AdminArticleCategoryController::class,'show']);
+            Route::put('/article-categories/{category:slug}', [AdminArticleCategoryController::class, 'update']);
+            Route::delete('/article-categories/{category:slug}', [AdminArticleCategoryController::class, 'destroy']);
   
             //Products
             Route::get('/products', [AdminProductController::class,'index']);
@@ -160,8 +160,8 @@ Route::prefix('v1')->group(function(){
     //Subscriber
     Route::post('/subscribers', [SubscriberController::class, 'store']);
 
-    //Categories
-    Route::get('/categories', [ProductCategoryController::class, 'index']);
+    //ProductCategories
+    Route::get('/product-categories', [ProductCategoryController::class, 'index']);
 
     Route::middleware('language')->group(function(){
         
