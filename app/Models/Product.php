@@ -47,9 +47,4 @@ class Product extends Model
     {
         return $this->hasMany(ProductTranslation::class);
     }
-
-    public function wishlistBy(): BelongsToMany
-    {
-        return $this->belongsToMany(User::class, 'user_wishlists', 'product_id', 'user_id');
-    }
 }

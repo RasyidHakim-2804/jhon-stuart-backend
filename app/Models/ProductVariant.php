@@ -5,8 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use App\Models\Translation\ProductVariantTranslation;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class ProductVariant extends Model
 {
@@ -23,8 +22,8 @@ class ProductVariant extends Model
         return $this->belongsTo(Product::class);
     }
 
-    public function translations(): HasMany
+    public function wishlistBy(): BelongsToMany
     {
-        return $this->hasMany(ProductVariantTranslation::class);
+        return $this->belongsToMany(User::class, 'user_wishlists', 'product_variant_id', 'user_id');
     }
 }
