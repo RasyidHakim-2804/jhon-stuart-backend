@@ -19,6 +19,9 @@ class ProductVariantResource extends JsonResource
             'name'          => $this->name,
             'size'          => $this->size,
             'product_id'    => $this->product_id,
+            'product_name'  => $this->whenLoaded('product', function() {
+                return $this->product->name;
+            }),
             'is_default'    => $this->is_default,
             'idr_price'     => $this->idr_price,
             'usd_price'     => $this->usd_price,
