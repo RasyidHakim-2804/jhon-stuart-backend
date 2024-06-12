@@ -13,9 +13,18 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         (new FirstAccountSeeder)->run();
-        (new CategorySeeder)->run();
+
+        //product
+        (new ProductCategorySeeder)->run();
         (new ProductSeeder)->run();
-        (new VariantSeeder)->run();
-        (new CategoryProductSeeder)->run();
+        (new ProductVariantSeeder)->run();
+        (new PivotProductCategorySeeder)->run();
+        (new ProductTranslationsSeeder)->run();
+
+        //article
+        (new ArticleAuthorSeeder)->run();
+        (new ArticleCategorySeeder)->run();
+        (new ArticleSeeder)->run();
+        (new ArticleTranslationSeeder)->run();
     }
 }
