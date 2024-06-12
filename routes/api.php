@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\V1\Product\AdminProductController;
 use App\Http\Controllers\Api\V1\Product\AdminProductImageController;
 use App\Http\Controllers\Api\V1\Profile\AdminProfileController;
 use App\Http\Controllers\Api\V1\Article\AdminArticleController;
+use App\Http\Controllers\Api\V1\Subscriber\AdminSubscriberController;
 
 use App\Http\Controllers\Api\V1\Auth\User\UserAuthController;
 use App\Http\Controllers\Api\V1\Auth\User\UserPasswordController;
@@ -21,6 +22,7 @@ use App\Http\Controllers\Api\V1\ProductCategory\CategoryController;
 use App\Http\Controllers\Api\V1\Contact\ContactController;
 use App\Http\Controllers\Api\V1\Product\ProductController;
 use App\Http\Controllers\Api\V1\Article\ArticleController;
+use App\Http\Controllers\Api\V1\Subscriber\SubscriberController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -64,6 +66,9 @@ Route::prefix('v1')->group(function(){
             //Contacts
             Route::get('/contacts', [AdminContactController::class,'index']);
             Route::get('/contacts/{contact}', [AdminContactController::class,'show']);
+
+            //Subscriber
+            Route::get('/subscribers', [AdminSubscriberController::class, 'index']);
 
             //Article
             Route::get('/articles', [AdminArticleController::class, 'index']);
@@ -151,6 +156,9 @@ Route::prefix('v1')->group(function(){
 
     //Contacts
     Route::post('/contacts', [ContactController::class,'store']);
+
+    //Subscriber
+    Route::post('/subscribers', [SubscriberController::class, 'store']);
 
     //Categories
     Route::get('/categories', [CategoryController::class, 'index']);
