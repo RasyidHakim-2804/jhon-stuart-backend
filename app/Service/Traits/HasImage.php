@@ -23,12 +23,12 @@ trait HasImage
      * return path of image folder
      * this function for your model if already has image 
      */
-    public function getPathColumn()
+    public function getOldImageUrl()
     {
-        if ( isset( $this->attributes[$this->pathColumn])){
-            return $this->attributes[$this->pathColumn];
+        if ( isset( $this->attributes[$this->imageUrlColumn])){
+            return $this->attributes[$this->imageUrlColumn];
         }  
-        return false;
+        return null;
     }
 
     /**
