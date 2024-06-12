@@ -53,13 +53,11 @@ class CreateProductRequest extends FormRequest
             'is_varied'             => 'required|boolean',
             'is_saleable'           => 'required|boolean',
 
-            'size'                  => 'exclude_if:is_varied,true|required|string|max:255',
             'idr_price'             => 'exclude_if:is_varied,true|required|numeric|max:10000000',
             'usd_price'             => 'exclude_if:is_varied,true|required|numeric|max:10000000',
             'stock'                 => 'exclude_if:is_varied,true|required|numeric|min:0',
             
             'variants.*.name'       => ['exclude_if:is_varied,false', 'required', 'max:100',],
-            'variants.*.size'       => ['exclude_if:is_varied,false', 'required', 'string', 'max:255'],
             'variants.*.idr_price'  => ['exclude_if:is_varied,false', 'required', 'numeric', 'max:10000000'],
             'variants.*.usd_price'  => ['exclude_if:is_varied,false', 'required', 'numeric', 'max:10000000'],
             'variants.*.stock'      => ['exclude_if:is_varied,false', 'required', 'numeric','min:0', 'max:10000000']

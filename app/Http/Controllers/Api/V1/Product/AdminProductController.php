@@ -93,9 +93,9 @@ class AdminProductController extends Controller
         DB::transaction( function() use ($request, $product)
         {
             if ($request->is_varied) {
-                $this->productToManyVariant($request->validated()['variants'], $product);
+                $this->updateProductToManyVariant($request->validated()['variants'], $product);
             } else {
-                $this->productToSingelVariant($request->validated(), $product);        
+                $this->updateProductToSingelVariant($request->validated(), $product);        
             }
 
             foreach ($request->description as $lang => $value) {
@@ -106,6 +106,7 @@ class AdminProductController extends Controller
     
             $product->name          = $request->name;
             $product->is_varied     = $request->is_varied;
+            
             $product->categories()->sync($categories);
 
             $product->save();    
@@ -129,29 +130,26 @@ class AdminProductController extends Controller
         return new SuccessResource();
     }
     
-    ///////////////
-    //for variant//
-    ///////////////
+    ////////////////////
+    //private function//
+    ////////////////////
 
     /**
      * update product to just has one variant
      */
-    private function productToSingelVariant(array $request, Product $product)
+    private function updateProductToSingelVariant(array $request, Product $product)
     {
-        /** */
-        if ($product->is_varied == true) { //if current product is varied
+        if ($product->is_varied == true) { //if old product is varied
             $this->deleteVariants($product->id);
-            $this->setVariant($request, $product, true);
-        } else {
-            $request['id'] = ProductVariant::where('product_id',$product->id)->value('id');
-            $this->setVariant($request, $product, true);
         }
+
+        $this->setVariant($request, $product, true);
     }
 
     /**
      * update product to many variants
      */
-    private function productToManyVariant($reqestVariants, Product $product)
+    private function updateProductToManyVariant($reqestVariants, Product $product)
     {
         $undeletedIds    = [];
 
@@ -165,15 +163,18 @@ class AdminProductController extends Controller
     private function setVariant(array $request, Product $product, bool $isDefault = false)
     {
         $request['id'] = isset($request['id']) ? $request['id'] : '';
+        
         $variant = ProductVariant::query()
-                    ->where('id', $request['id'])
-                    ->where('product_id', $product->id)
+                    ->where(function($query) use ($request) {
+                        $query->where('id', $request['id']);
+                        $query->orWhere('is_default', true);
+                    })
+                    ->where('product_id', '=', $product->id)
                     ->firstOrNew();
 
         $variant->product_id    = $product->id;
         $variant->is_default    = $isDefault;
         $variant->name          = $request['name'];
-        $variant->size          = $request['size'];
         $variant->idr_price     = $request['idr_price'];
         $variant->usd_price     = $request['usd_price'];
         $variant->stock         = $request['stock'];

@@ -28,7 +28,6 @@ class AdminProductResource extends JsonResource
             ]),
 
             $this->mergeWhen( $this->relationLoaded('variants'), [
-                'size'          => $this->when(!$this->is_varied, $this->variants->first()->size, null),
                 'idr_price'     => $this->when(!$this->is_varied, $this->variants->first()->idr_price, null),
                 'usd_price'     => $this->when(!$this->is_varied, $this->variants->first()->usd_price, null),
                 'stock'         => $this->when(!$this->is_varied, $this->variants->first()->stock, null),

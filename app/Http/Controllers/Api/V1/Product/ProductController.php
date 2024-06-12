@@ -39,7 +39,7 @@ class ProductController extends Controller
                         AllowedFilter::partial('search', 'name'),
                         AllowedFilter::exact('category','pivot_product_category.product_categories_id')
                     ])
-                    ->paginate(25)->appends(request()->query());
+                    ->paginate(12)->appends(request()->query());
 
         return ProductResource::collection($products);
     }

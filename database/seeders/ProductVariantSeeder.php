@@ -31,7 +31,6 @@ class ProductVariantSeeder extends Seeder
     {
         DB::table('product_variants')->insert([
             'name'          => $product->name,
-            'size'          => '8.5x6x7.5 cm/3.35x2.36x2.95 inches',
             'is_default'    => true,
             'product_id'    => $product->id,
             'stock'         => rand(30, 120),
@@ -46,7 +45,6 @@ class ProductVariantSeeder extends Seeder
     {
         DB::table('product_variants')->insert([
             'name'          => 'Small',
-            'size'          => '8.5x6x7.5 cm/3.35x2.36x2.95 inches',
             'is_default'    => false,
             'product_id'    => $product->id,
             'stock'         => rand(30, 120),
@@ -58,7 +56,6 @@ class ProductVariantSeeder extends Seeder
 
         DB::table('product_variants')->insert([
             'name'          => 'Medium',
-            'size'          => '8.5x6x7.5 cm/3.35x2.36x2.95 inches',
             'is_default'    => false,
             'product_id'    => $product->id,
             'stock'         => rand(30, 120),
@@ -70,7 +67,6 @@ class ProductVariantSeeder extends Seeder
 
         DB::table('product_variants')->insert([
             'name'          => 'Large',
-            'size'          => '8.5x6x7.5 cm/3.35x2.36x2.95 inches',
             'is_default'    => false,
             'product_id'    => $product->id,
             'stock'         => rand(30, 120),
