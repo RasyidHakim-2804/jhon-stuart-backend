@@ -7,6 +7,7 @@ use App\Http\Requests\Api\V1\Wishlist\CreateWishlistRequest;
 use App\Http\Requests\Api\V1\Wishlist\DeleteWishlistRequest;
 use App\Http\Resources\Api\V1\Common\SuccessResource;
 use App\Http\Resources\Api\V1\Product\ProductResource;
+use App\Http\Resources\Api\V1\Product\ProductVariantResource;
 use App\Models\Wishlist;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -20,9 +21,9 @@ class UserWishlistController extends Controller
     public function index(Request $request)
     {
         /** @var \App\Models\User */
-        $user = $request->user()->with('wishlists.variants')->firstOrFail();
+        $user = $request->user()->with('wishlists.product')->firstOrFail();
         
-        return ProductResource::collection($user->wishlists);
+        return ProductVariantResource::collection($user->wishlists);
     }
 
     /**
@@ -35,7 +36,7 @@ class UserWishlistController extends Controller
             /** @var \App\Models\User */
             $user = $request->user();
             $user->wishlists()->syncWithoutDetaching([
-                $request->validated('product_id') => ['created_at' => now()]
+                $request->validated('product_variant_id') => ['created_at' => now()]
             ]);
         });
 
@@ -52,7 +53,7 @@ class UserWishlistController extends Controller
             /** @var \App\Models\User */
             $user = $request->user();
             $user->wishlists()->detach([
-                $request->validated('product_id')
+                $request->validated('product_variant_id')
             ]);
         });
 
