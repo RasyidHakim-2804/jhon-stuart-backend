@@ -44,6 +44,7 @@ class AdminArticleController extends Controller
             $article->author_id     = $requestArr['author_id'];
             $article->category_id   = $requestArr['category_id'];
             $article->image_url     = $result->path;
+            $article->views         = 1;
             $article->save();
     
             foreach ( $request['title'] as $lang => $value) {

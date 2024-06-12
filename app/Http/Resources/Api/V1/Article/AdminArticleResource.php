@@ -19,6 +19,7 @@ class AdminArticleResource extends JsonResource
         return [
             'id'            => $this->id,
             'slug'          => $this->slug,
+            'name'          => $this->name,
             'image'         => $this->image_url,
             'views'         => $this->views,
             'translation'   => ArticleTranslationResource::collection($this->whenLoaded('translations')),
