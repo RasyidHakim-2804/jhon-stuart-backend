@@ -38,7 +38,7 @@ trait HasImage
     /**
      * column name containing the image path
      * 
-     * protected $pathColumn;
+     * protected $imageUrlColumn;
      */
 
     /**
