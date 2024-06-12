@@ -16,15 +16,15 @@ class ImageService
 {
     private $dirPath;
     private $disk;
-    private $pathColumn;
+    private $modelOldImageUrl;
     private $format;
 
     public function __construct(CanUploadImage $model)
     {
-        $this->dirPath    = $model->getDirPath();
-        $this->disk       = $model->getDisk();
-        $this->pathColumn = $model->getPathColumn();
-        $this->format     = $model->getFormat();
+        $this->dirPath          = $model->getDirPath();
+        $this->disk             = $model->getDisk();
+        $this->format           = $model->getFormat();
+        $this->modelOldImageUrl = $model->getOldImageUrl();
     }
 
     //////////////////////////
@@ -57,12 +57,12 @@ class ImageService
      */
     public function delete(): bool|null
     {
-        if ( $this->pathColumn == false) {
+        if ( $this->modelOldImageUrl == null) {
             return null;
         }
 
-        if (Storage::disk($this->disk)->exists($this->pathColumn)) {
-            return Storage::disk($this->disk)->delete($this->pathColumn);
+        if (Storage::disk($this->disk)->exists($this->modelOldImageUrl)) {
+            return Storage::disk($this->disk)->delete($this->modelOldImageUrl);
         }
         return null;
     }
