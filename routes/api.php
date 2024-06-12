@@ -18,7 +18,7 @@ use App\Http\Controllers\Api\V1\Auth\User\UserPasswordController;
 use App\Http\Controllers\Api\V1\Profile\UserProfileController;
 use App\Http\Controllers\Api\V1\Wishlist\UserWishlistController;
 
-use App\Http\Controllers\Api\V1\ProductCategory\CategoryController;
+use App\Http\Controllers\Api\V1\ProductCategory\ProductCategoryController;
 use App\Http\Controllers\Api\V1\Contact\ContactController;
 use App\Http\Controllers\Api\V1\Product\ProductController;
 use App\Http\Controllers\Api\V1\Article\ArticleController;
@@ -161,13 +161,14 @@ Route::prefix('v1')->group(function(){
     Route::post('/subscribers', [SubscriberController::class, 'store']);
 
     //Categories
-    Route::get('/categories', [CategoryController::class, 'index']);
+    Route::get('/categories', [ProductCategoryController::class, 'index']);
 
     Route::middleware('language')->group(function(){
         
         //Article
         Route::get('/articles', [ArticleController::class, 'index']);
         Route::get('/articles/{slug}', [ArticleController::class, 'show']);
+        Route::get('/top-article', [ArticleController::class, 'topArticle']);
         
         //Products
         Route::get('/products', [ProductController::class, 'index']);

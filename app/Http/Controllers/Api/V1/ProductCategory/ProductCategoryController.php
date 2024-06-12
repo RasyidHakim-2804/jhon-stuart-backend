@@ -9,7 +9,7 @@ use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 use App\Models\Product;
 
-class CategoryController extends Controller
+class ProductCategoryController extends Controller
 {
     public function index()
     {
