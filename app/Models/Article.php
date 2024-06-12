@@ -17,10 +17,10 @@ class Article extends Model implements CanUploadImage
 {
     use HasFactory, HasSlug, HasImage;
 
-    protected $pathColumn = 'image_url';
-    protected $format     = '.webp';
-    protected $disk       = 'public';
-    protected $dirPath    = 'upload/images/article/';
+    protected $imageUrlColumn   = 'image_url';
+    protected $format           = '.webp';
+    protected $disk             = 'public';
+    protected $dirPath          = 'upload/images/article/';
 
     public function getSlugOptions(): SlugOptions
     {

@@ -13,11 +13,11 @@ class ArticleAuthor extends Model implements CanUploadImage
 {
     use HasFactory, HasImage;
 
-    protected $table      = 'article_authors';
-    protected $pathColumn = 'image_url';
-    protected $format     = '.webp';
-    protected $disk       = 'public';
-    protected $dirPath    = 'upload/images/author/';
+    protected $table            = 'article_authors';
+    protected $imageUrlColumn   = 'image_url';
+    protected $format           = '.webp';
+    protected $disk             = 'public';
+    protected $dirPath          = 'upload/images/author/';
 
     public function article() : HasMany
     {

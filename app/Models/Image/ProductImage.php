@@ -14,11 +14,11 @@ class ProductImage extends Model implements CanUploadImage
 {
     use HasFactory, HasImage;
 
-    protected $table      = 'product_images';
-    protected $pathColumn = 'path';
-    protected $format     = '.webp';
-    protected $disk       = 'public';
-    protected $dirPath    = 'upload/images/product/';
+    protected $table            = 'product_images';
+    protected $imageUrlColumn   = 'path';
+    protected $format           = '.webp';
+    protected $disk             = 'public';
+    protected $dirPath          = 'upload/images/product/';
 
     
     public function product(): BelongsTo

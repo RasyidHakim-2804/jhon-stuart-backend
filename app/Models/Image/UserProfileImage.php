@@ -15,11 +15,11 @@ class UserProfileImage extends Model implements CanUploadImage
 {
     use HasFactory, HasImage;
 
-    protected $table      = 'user_profile_images';
-    protected $pathColumn = 'path';
-    protected $format     = '.webp';
-    protected $disk       = 'public';
-    protected $dirPath    = 'upload/images/profile/user/';
+    protected $table            = 'user_profile_images';
+    protected $imageUrlColumn   = 'path';
+    protected $format           = '.webp';
+    protected $disk             = 'public';
+    protected $dirPath          = 'upload/images/profile/user/';
 
     public function user():BelongsTo
     {

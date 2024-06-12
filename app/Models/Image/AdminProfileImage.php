@@ -14,11 +14,11 @@ class AdminProfileImage extends Model implements CanUploadImage
 {
     use HasFactory, HasImage;
 
-    protected $table      = 'admin_profile_images';
-    protected $pathColumn = 'path';
-    protected $format     = '.webp';
-    protected $disk       = 'public';
-    protected $dirPath    = 'upload/images/profile/admin/';
+    protected $table          = 'admin_profile_images';
+    protected $imageUrlColumn = 'path';
+    protected $format         = '.webp';
+    protected $disk           = 'public';
+    protected $dirPath        = 'upload/images/profile/admin/';
 
     public function admin(): BelongsTo
     {
