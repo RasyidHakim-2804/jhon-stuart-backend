@@ -12,7 +12,9 @@ class ProductTranslation extends Model
     use HasFactory;
 
     public $fillable = [
-        'description', 'full_description'
+        'product_id',
+        'lang',
+        'description'
     ];
 
     public function product(): BelongsTo

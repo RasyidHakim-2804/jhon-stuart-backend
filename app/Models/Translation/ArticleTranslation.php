@@ -11,6 +11,12 @@ class ArticleTranslation extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'article_id',
+        'lang',
+        'body'
+    ];
+
     public function article() : BelongsTo 
     {
         return $this->belongsTo(Article::class);    
