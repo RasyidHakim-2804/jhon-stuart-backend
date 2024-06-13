@@ -10,6 +10,8 @@ use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 use App\Models\Image\ProductImage;
 use App\Models\Translation\ProductTranslation;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Facades\DB;
 
 class Product extends Model
 {
@@ -46,5 +48,15 @@ class Product extends Model
     public function translations(): HasMany
     {
         return $this->hasMany(ProductTranslation::class);
+    }
+
+    public function translate($lang)
+    {
+        return $this->translations->where('lang', $lang)->first();
+    }
+
+    public function minPriceVariant(): HasOne
+    {
+        return $this->hasOne(ProductVariant::class)->ofMany('idr_price', 'MIN');
     }
 }
