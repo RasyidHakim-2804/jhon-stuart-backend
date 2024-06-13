@@ -20,7 +20,6 @@ class ArticleTranslationSeeder extends Seeder
             DB::table('article_translations')->insert([
                 'article_id'    => $article->id,
                 'lang'          => 'en',
-                'title'         => $article->name,
                 'body'          => fake()->paragraph(),
                 'created_at'    => now(),
             ]);
@@ -28,7 +27,6 @@ class ArticleTranslationSeeder extends Seeder
             DB::table('article_translations')->insert([
                 'article_id'    => $article->id,
                 'lang'          => 'id',
-                'title'         => $article->name,
                 'body'          => fake()->paragraph(),
                 'created_at'    => now(),
             ]);
