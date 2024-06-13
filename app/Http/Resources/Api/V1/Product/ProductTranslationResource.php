@@ -15,9 +15,7 @@ class ProductTranslationResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id'                => $this->id,
-            'lang'              => $this->lang,
-            'description'       => $this->description,
+            $this->lang => $this->description,
         ];
     }
 }

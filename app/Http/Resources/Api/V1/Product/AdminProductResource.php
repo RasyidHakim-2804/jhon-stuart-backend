@@ -21,6 +21,8 @@ class AdminProductResource extends JsonResource
             'slug'          => $this->slug,
             'is_varied'     => $this->is_varied,
             'is_saleable'   => $this->is_saleable,
+            
+            'description'  => ProductTranslationResource::collection($this->whenLoaded('translations')),    
 
             $this->mergeWhen( $this->relationLoaded('categories'),[
                 'category_type' => $this->categories->first()->type,
@@ -37,7 +39,6 @@ class AdminProductResource extends JsonResource
                     null),
             ]),
                
-            'translations'  => ProductTranslationResource::collection($this->whenLoaded('translations')),    
             
             'created_at'    => $this->created_at,
             'updated_at'    => $this->updated_at,
