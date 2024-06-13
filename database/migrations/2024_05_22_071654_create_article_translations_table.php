@@ -14,10 +14,12 @@ return new class extends Migration
         Schema::create('article_translations', function (Blueprint $table) {
             $table->id();
             $table->foreignId('article_id')->constrained('articles', 'id');
-            $table->string('lang')->index();
-            $table->string('title', 255);
+            $table->string('lang', 10);
             $table->text('body');
             $table->timestamps();
+
+            $table->foreign('lang')->references('code')->on('languages');
+            $table->unique(['article_id', 'lang']);
         });
     }
 

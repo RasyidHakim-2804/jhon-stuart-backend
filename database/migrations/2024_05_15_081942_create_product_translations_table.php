@@ -14,10 +14,11 @@ return new class extends Migration
         Schema::create('product_translations', function (Blueprint $table) {
             $table->id();
             $table->foreignId('product_id')->constrained('products', 'id');
-            $table->string('lang')->index();
+            $table->string('lang', 20);
             $table->text('description');
             $table->timestamps();
             
+            $table->foreign('lang')->references('code')->on('languages');
             $table->unique(['product_id', 'lang']);
         });
     }
