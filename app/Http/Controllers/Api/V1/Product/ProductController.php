@@ -18,21 +18,20 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        $column = $this->getVariantMinPriceColumn($request->lang);
-
         $products = QueryBuilder::for(Product::class)
                     ->with([
                         'images' => function (Builder $query) {
                             $query->where('is_saved', true);
                         },
+                        'minPriceVariant'
                     ])
-                    ->withMin('variants', $column['price_column'])
+                    ->withMin('variants', 'usd_price')
                     ->defaultSort('name')
                     ->allowedSorts([
                         'name',
                         'id',
                         'popular',
-                        AllowedSort::field('price', $column['join_column']) // this column is from withMin('variants', 'usd_price')
+                        AllowedSort::field('price', 'variants_min_usd_price') // this column is from withMin('variants', 'usd_price')
                     ])
                     ->join('pivot_product_category', 'pivot_product_category.product_id', 'products.id')
                     ->allowedFilters([
@@ -63,23 +62,5 @@ class ProductController extends Controller
             ])->firstOrFail();
         
         return new ProductResource($product);
-    }
-
-    //////////////////////
-    // private function //
-    //////////////////////
-
-    private function getVariantMinPriceColumn($lang)
-    {
-        $priceColumn = 'usd_price';
-
-        if ($lang == 'id') {
-            $priceColumn = 'idr_price';
-        }
-
-        return [
-            'price_column'    => $priceColumn,
-            'join_column'     => 'variants_min_' . $priceColumn
-        ];
     }
 }

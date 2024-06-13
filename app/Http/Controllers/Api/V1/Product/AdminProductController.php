@@ -57,28 +57,35 @@ class AdminProductController extends Controller
      */
     public function store(CreateProductRequest $request)
     {
+        $request = $request->validated();
+
         DB::transaction( function() use ($request)
         {
             $product                = new Product();
-            $product->name          = $request->name;
-            $product->is_varied     = $request->is_varied;
-            $product->is_saleable   = $request->is_saleable;
+            $product->name          = $request['name'];
+            $product->is_varied     = $request['is_varied'];
+            $product->is_saleable   = $request['is_saleable'];
     
             $product->save();
 
-            $categories = $request->validated('categories');
+            $categories = $request['categories'];
             $product->categories()->attach($categories);
-            
-            foreach ($request->description as $lang => $value) {
-                $this->setTranslation($product, $request->validated(), $lang);
-            }
+
+            $this->setTranslation($product, $request);
     
-            if ($request->is_varied) {
-                foreach ($request->validated()['variants'] as $key => $request) {
-                    $this->setVariant($request, $product);   
+            if ($product->is_varied) {
+
+                foreach ($request['variants'] as $key => $value) {
+                
+                    $variant = new ProductVariant();
+
+                    $this->setVariant($value, $variant, $product);   
                 }
             } else {
-                $this->setVariant($request->validated(), $product, true);            
+
+                $variant = new ProductVariant();
+
+                $this->setVariant($request, $variant, $product);            
             }
         });
 
@@ -90,26 +97,30 @@ class AdminProductController extends Controller
      */
     public function update(UpdateProductRequest $request, Product $product)
     {
+        $request = $request->validated();
+
         DB::transaction( function() use ($request, $product)
         {
-            if ($request->is_varied) {
-                $this->updateProductToManyVariant($request->validated()['variants'], $product);
-            } else {
-                $this->updateProductToSingelVariant($request->validated(), $product);        
-            }
-
-            foreach ($request->description as $lang => $value) {
-                $this->setTranslation($product, $request->validated(), $lang);
-            }
-            
-            $categories = $request->validated('categories');
+            $oldProductIsVaried = $product->is_varied;
+            $categories         = $request['categories'];
     
-            $product->name          = $request->name;
-            $product->is_varied     = $request->is_varied;
+            $product->name          = $request['name'];
+            $product->is_varied     = $request['is_varied'];
             
             $product->categories()->sync($categories);
 
-            $product->save();    
+            $product->save();
+
+            if ($request['is_varied']) {
+
+                $this->updateProductToManyVariant($request['variants'], $product);
+            } else {
+                
+                $this->updateProductToSingelVariant($request, $product, $oldProductIsVaried);        
+            }
+
+            $this->setTranslation($product, $request);
+            
         });
         
         return new SuccessResource(200);
@@ -137,13 +148,20 @@ class AdminProductController extends Controller
     /**
      * update product to just has one variant
      */
-    private function updateProductToSingelVariant(array $request, Product $product)
+    private function updateProductToSingelVariant(array $request, Product $product, bool $oldProductIsVaried)
     {
-        if ($product->is_varied == true) { //if old product is varied
+        if ($oldProductIsVaried) { //if old product is varied
             $this->deleteVariants($product->id);
         }
 
-        $this->setVariant($request, $product, true);
+        $variant = ProductVariant::query()
+                    ->where([
+                        [ 'is_default', '=', true ],
+                        [ 'product_id', '=', $product->id ]
+                    ])
+                    ->firstOrNew();
+
+        $this->setVariant($request, $variant, $product);
     }
 
     /**
@@ -154,30 +172,31 @@ class AdminProductController extends Controller
         $undeletedIds    = [];
 
         foreach ($reqestVariants as $key => $request) {
-            $undeletedIds[] = $this->setVariant($request, $product);   
+            $variant = ProductVariant::query()
+                    ->where([
+                        [ 'id', '=', $request['id'] ],
+                        [ 'product_id', '=', $product->id ]
+                    ])
+                    ->firstOrNew();
+            $undeletedIds[] = $this->setVariant($request, $variant, $product);   
         }
 
         $this->deleteVariants($product->id, $undeletedIds);
     }
 
-    private function setVariant(array $request, Product $product, bool $isDefault = false)
+    private function setVariant(array $request, ProductVariant $variant, Product $product)
     {
-        $request['id'] = isset($request['id']) ? $request['id'] : '';
-        
-        $variant = ProductVariant::query()
-                    ->where(function($query) use ($request) {
-                        $query->where('id', $request['id']);
-                        $query->orWhere('is_default', true);
-                    })
-                    ->where('product_id', '=', $product->id)
-                    ->firstOrNew();
-
         $variant->product_id    = $product->id;
-        $variant->is_default    = $isDefault;
         $variant->name          = $request['name'];
         $variant->idr_price     = $request['idr_price'];
         $variant->usd_price     = $request['usd_price'];
         $variant->stock         = $request['stock'];
+
+        if ($product->is_varied) {
+            $variant->is_default = 0;
+        } else {
+            $variant->is_default = 1;
+        }
         
         $variant->save();
 
@@ -191,17 +210,20 @@ class AdminProductController extends Controller
                     ->delete();
     }
 
-    private function setTranslation(Product $product, $request, string $lang)
+    private function setTranslation(Product $product, $request)
     {
-        $translation                   = ProductTranslation::query()
+        foreach ($request['description'] as $lang => $value) {
+
+            $translation                   = ProductTranslation::query()
                                             ->where('product_id', $product->id)
                                             ->where('lang', $lang)
                                             ->firstOrNew();
 
-        $translation->product_id       = $product->id;
-        $translation->lang             = $lang;
-        $translation->description      = $request['description'][$lang];
-        
-        $translation->save();
+            $translation->product_id       = $product->id;
+            $translation->lang             = $lang;
+            $translation->description      = $request['description'][$lang];
+            
+            $translation->save();
+        }
     }
 }
