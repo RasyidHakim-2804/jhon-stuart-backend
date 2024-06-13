@@ -22,23 +22,17 @@ class ProductResource extends JsonResource
             'is_varied'       => $this->is_varied,
             'is_saleable'     => $this->is_saleable,
 
-            $this->mergeWhen( !$this->relationLoaded('variants'), [
-                'thumbnail_price' => [
-                    'currency' => $this->when(
-                        $this->variants_min_usd_price,
-                        'USD',
-                        'IDR'
-                    ),
-                    'price'    => $this->when(
-                        $this->variants_min_usd_price,
-                        $this->variants_min_usd_price,
-                        $this->variants_min_idr_price
-                    ),
-                ],    
-            ]),
+            $this->mergeWhen( !$this->relationLoaded('minPricevariant'), function() {
+                return [
+                    'prices' => [
+                        'idr_price' => $this->minPricevariant->idr_price,
+                        'usd_price' => $this->minPricevariant->usd_price,
+                    ],
+                ];
+            }),
 
-            'description'   => $this->whenLoaded('translations', function () {
-                return $this->translations->first()->description;
+            'description'   => $this->whenLoaded('translations', function () use ($request){
+                return $this->translate($request->lang)->description;
             }),
 
             'categories'      => ProductCategoryResource::collection($this->whenLoaded('categories')),
