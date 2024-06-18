@@ -19,6 +19,7 @@ class ProductController extends Controller
     public function index(Request $request)
     {
         $products = QueryBuilder::for(Product::class)
+                    ->where('is_saleable', '=', true)
                     ->with([
                         'images' => function (Builder $query) {
                             $query->where([
@@ -53,7 +54,10 @@ class ProductController extends Controller
     {
         $lang = $request->lang;
         
-        $product = Product::where('slug', $slug)->with([
+        $product = Product::where([
+                ['slug', '=', $slug],
+                ['is_saleable', '=', true]
+            ])->with([
             'variants',
             'categories',
             'translations' => function(Builder $query) use ($lang){
