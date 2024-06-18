@@ -41,4 +41,19 @@ class ArticleController extends Controller
 
         return new ArticleResource($article);
     }
+
+    public function topArticles(Request $request)
+    {
+        $lang = $request->lang;
+
+        $topArticles = Article::with([
+            'author',
+            'category',
+            'translations' => function($query) use ($lang){
+                $query->where('lang', $lang);
+            }
+        ])->orderBy('views', 'asc')->take(10)->get();
+
+        return ArticleResource::collection($topArticles);
+    }
 }
