@@ -21,7 +21,10 @@ class ProductController extends Controller
         $products = QueryBuilder::for(Product::class)
                     ->with([
                         'images' => function (Builder $query) {
-                            $query->where('is_saved', true);
+                            $query->where([
+                                [ 'is_saved', '=', true ],
+                                [ 'position', '=', 1]
+                            ]);
                         },
                         'minPriceVariant'
                     ])
@@ -62,5 +65,28 @@ class ProductController extends Controller
             ])->firstOrFail();
         
         return new ProductResource($product);
+    }
+
+    public function moreProducts(Request $request)
+    {
+        $products = QueryBuilder::for(Product::class)
+                    ->with([
+                        'images' => function (Builder $query) {
+                            $query->where([
+                                [ 'is_saved', '=', true ],
+                                [ 'position', '=', 1]
+                            ]);
+                        },
+                        'minPriceVariant'
+                    ])
+                    ->withMin('variants', 'usd_price')
+                    ->defaultSort('-popular')
+                    ->join('pivot_product_category', 'pivot_product_category.product_id', 'products.id')
+                    ->allowedFilters([
+                        AllowedFilter::exact('category','pivot_product_category.product_categories_id')
+                    ])
+                    ->paginate(3)->appends(request()->query());
+
+        return ProductResource::collection($products);
     }
 }
