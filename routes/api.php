@@ -168,10 +168,11 @@ Route::prefix('v1')->group(function(){
         //Article
         Route::get('/articles', [ArticleController::class, 'index']);
         Route::get('/articles/{slug}', [ArticleController::class, 'show']);
-        Route::get('/top-article', [ArticleController::class, 'topArticle']);
+        Route::get('/top-articles', [ArticleController::class, 'topArticles']);
         
         //Products
         Route::get('/products', [ProductController::class, 'index']);
-        Route::get('/products/{slug}', [ProductController::class,'show']);    
+        Route::get('/products/{slug}', [ProductController::class,'show']);
+        Route::get('/more-products', [ProductController::class, 'moreProducts']);
     });
 });
