@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\V1\Contact\AdminContactController;
 use App\Http\Controllers\Api\V1\Product\AdminProductController;
 use App\Http\Controllers\Api\V1\Product\AdminProductImageController;
 use App\Http\Controllers\Api\V1\Profile\AdminProfileController;
+use App\Http\Controllers\Api\V1\ArticleAuthor\AdminArticleAuthorController;
 use App\Http\Controllers\Api\V1\Article\AdminArticleController;
 use App\Http\Controllers\Api\V1\Subscriber\AdminSubscriberController;
 
@@ -69,6 +70,13 @@ Route::prefix('v1')->group(function(){
 
             //Subscriber
             Route::get('/subscribers', [AdminSubscriberController::class, 'index']);
+
+            //ArticleAuthor
+            Route::get('/authors', [AdminArticleAuthorController::class, 'index']);
+            Route::get('/authors/{author}', [AdminArticleAuthorController::class, 'show']);
+            Route::post('/authors/{author}', [AdminArticleAuthorController::class, 'store']);
+            Route::put('/authors/{author}', [AdminArticleAuthorController::class, 'update']);
+            Route::delete('/authors/{author}', [AdminArticleAuthorController::class, 'destroy']);
 
             //Article
             Route::get('/articles', [AdminArticleController::class, 'index']);
