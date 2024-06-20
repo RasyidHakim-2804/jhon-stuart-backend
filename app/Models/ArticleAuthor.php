@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Str;
 
 class ArticleAuthor extends Model implements CanUploadImage
 {
@@ -27,7 +28,14 @@ class ArticleAuthor extends Model implements CanUploadImage
     public function imageUrl(): Attribute
     {
         return new Attribute(
-            get: fn (string $value) => config('app.frontend_url') . 'storage/'. $value
+            get: function(string $value) {
+
+                if (Str::contains($value, 'https://') || Str::contains($value,'http://')) {
+                    return $value;
+                }
+                
+                return config('app.frontend_url') . 'storage/' . $value;
+            }
         );
     }
 }

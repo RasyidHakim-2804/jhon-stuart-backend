@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
+use Illuminate\Support\Str;
 
 class Article extends Model implements CanUploadImage
 {
@@ -34,7 +35,14 @@ class Article extends Model implements CanUploadImage
     public function imageUrl(): Attribute
     {
         return new Attribute(
-            get: fn (string $value) => config('app.frontend_url') . 'storage/' . $value
+            get: function(string $value) {
+
+                if (Str::contains($value, 'https://') || Str::contains($value,'http://')) {
+                    return $value;
+                }
+                
+                return config('app.frontend_url') . 'storage/' . $value;
+            }
         );
     }
 
