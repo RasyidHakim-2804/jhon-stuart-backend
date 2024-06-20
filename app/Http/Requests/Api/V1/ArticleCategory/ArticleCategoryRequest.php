@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\Api\V1\Category\ArticleCategory;
+namespace App\Http\Requests\Api\V1\ArticleCategory;
 
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -11,7 +11,7 @@ class ArticleCategoryRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**

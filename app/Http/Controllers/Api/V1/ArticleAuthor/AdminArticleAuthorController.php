@@ -56,9 +56,9 @@ class AdminArticleAuthorController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(ArticleAuthor $articleAuthor)
+    public function show(ArticleAuthor $author)
     {
-        return new ArticleAuthorResource($articleAuthor);
+        return new ArticleAuthorResource($author);
     }
 
     /**
