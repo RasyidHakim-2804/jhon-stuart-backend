@@ -25,7 +25,7 @@ class Article extends Model implements CanUploadImage
     public function getSlugOptions(): SlugOptions
     {
         return SlugOptions::create()
-                ->generateSlugsFrom('name')
+                ->generateSlugsFrom('title')
                 ->saveSlugsTo('slug')
                 ->slugsShouldBeNoLongerThan(100)
                 ->startSlugSuffixFrom(2);
