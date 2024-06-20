@@ -26,7 +26,7 @@ class AdminArticleController extends Controller
     {
         $article = Article::with([
             'translations', 'author', 'category'
-            ])->where('slug', $slug)->first();
+            ])->where('slug', $slug)->firstOrFail();
 
         return new AdminArticleResource($article);
     }
@@ -40,14 +40,14 @@ class AdminArticleController extends Controller
             $imageService   = new ImageService($article);
             $result         = $imageService->upload($request->image);
     
-            $article->name          = $requestArr['title']['en'];
+            $article->title         = $requestArr['title'];
             $article->author_id     = $requestArr['author_id'];
             $article->category_id   = $requestArr['category_id'];
             $article->image_url     = $result->path;
-            $article->views         = 1;
+            $article->views         = 0;
             $article->save();
     
-            foreach ( $request['title'] as $lang => $value) {
+            foreach ( $request['body'] as $lang => $value) {
                 $this->setTranslation($requestArr, $lang, $article->id);
             }
 
@@ -67,11 +67,11 @@ class AdminArticleController extends Controller
             DB::beginTransaction();
             $requestArr = $request->validated();
     
-            $article->name          = $requestArr['title']['en'];
+            $article->title         = $requestArr['title'];
             $article->author_id     = $requestArr['author_id'];
             $article->category_id   = $requestArr['category_id'];
     
-            foreach ( $request['title'] as $lang => $value) {
+            foreach ( $request['body'] as $lang => $value) {
                 $this->setTranslation($requestArr, $lang, $article->id);
             }
     
@@ -124,7 +124,6 @@ class AdminArticleController extends Controller
         
         $translation->article_id    = $article_id;
         $translation->lang          = $lang;
-        $translation->title         = $request['title'][$lang];
         $translation->body          = $request['body'][$lang];
         $translation->save();
     }

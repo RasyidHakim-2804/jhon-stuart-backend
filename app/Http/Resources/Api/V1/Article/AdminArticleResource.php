@@ -19,10 +19,10 @@ class AdminArticleResource extends JsonResource
         return [
             'id'            => $this->id,
             'slug'          => $this->slug,
-            'name'          => $this->name,
+            'title'         => $this->title,
             'image'         => $this->image_url,
             'views'         => $this->views,
-            'translation'   => ArticleTranslationResource::collection($this->whenLoaded('translations')),
+            'description'   => ArticleTranslationResource::collection($this->whenLoaded('translations')),
             'author'        => new ArticleAuthorResource($this->whenLoaded('author')),
             'category'      => new ArticleCategoryResource($this->whenLoaded('category')),
             'created_at'    => $this->created_at,

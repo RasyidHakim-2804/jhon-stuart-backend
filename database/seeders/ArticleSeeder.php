@@ -16,7 +16,7 @@ class ArticleSeeder extends Seeder
     {
         DB::table('articles')->insert([
             'id'            => 1,
-            'name'          => 'Polymer Art Magazines',
+            'title'          => 'Polymer Art Magazines',
             'slug'          => Str::slug('Polymer Art Magazines'),
             'views'         => rand(50, 100),
             'image_url'     => 'https://source.unsplash.com/random/500x500',
@@ -27,7 +27,7 @@ class ArticleSeeder extends Seeder
 
         DB::table('articles')->insert([
             'id'            => 2,
-            'name'          => 'Dramatic Color Blends for Canes',
+            'title'          => 'Dramatic Color Blends for Canes',
             'slug'          => Str::slug('Dramatic Color Blends for Canes'),
             'views'         => rand(50, 100),
             'image_url'     => 'https://source.unsplash.com/random/500x500',
@@ -38,7 +38,7 @@ class ArticleSeeder extends Seeder
 
         DB::table('articles')->insert([
             'id'            => 3,
-            'name'          => 'Painting with Polymer clay',
+            'title'          => 'Painting with Polymer clay',
             'slug'          => Str::slug('Painting with Polymer clay'),
             'views'         => rand(50, 100),
             'image_url'     => 'https://source.unsplash.com/random/500x500',
