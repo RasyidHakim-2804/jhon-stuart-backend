@@ -5,8 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
+use App\Models\Translation\ProductCategoryTranslation;
 
 class ProductCategory extends Model
 {
@@ -28,5 +30,15 @@ class ProductCategory extends Model
     public function products(): BelongsToMany
     {
         return $this->belongsToMany(Product::class, 'pivot_product_category',  'product_categories_id', 'product_id');
+    }
+
+    public function translations(): HasMany
+    {
+        return $this->hasMany(ProductCategoryTranslation::class);
+    }
+
+    public function translate()
+    {
+        return $this->hasOne(ProductCategoryTranslation::class);
     }
 }
