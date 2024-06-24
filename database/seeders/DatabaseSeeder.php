@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
         (new ProductVariantSeeder)->run();
         (new PivotProductCategorySeeder)->run();
         (new ProductTranslationsSeeder)->run();
+        (new ProductCategoryTranslationSeeder)->run();
 
         //article
         (new ArticleAuthorSeeder)->run();
