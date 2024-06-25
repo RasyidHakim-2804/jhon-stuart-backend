@@ -5,48 +5,11 @@ namespace App\Http\Controllers\Api\V1\Product;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Http\Resources\Api\V1\Product\ProductResource;
-use Illuminate\Contracts\Database\Eloquent\Builder;
+use App\Models\ProductCategory;
 use Illuminate\Http\Request;
-use Spatie\QueryBuilder\AllowedFilter;
-use Spatie\QueryBuilder\AllowedSort;
-use Spatie\QueryBuilder\QueryBuilder;
 
 class ProductController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index(Request $request)
-    {
-        $products = QueryBuilder::for(Product::class)
-                    ->where('is_saleable', '=', true)
-                    ->with([
-                        'images' => function (Builder $query) {
-                            $query->where([
-                                [ 'is_saved', '=', true ],
-                                [ 'position', '=', 1]
-                            ]);
-                        },
-                        'minPriceVariant'
-                    ])
-                    ->withMin('variants', 'usd_price')
-                    ->defaultSort('name')
-                    ->allowedSorts([
-                        'name',
-                        'id',
-                        'popular',
-                        AllowedSort::field('price', 'variants_min_usd_price') // this column is from withMin('variants', 'usd_price')
-                    ])
-                    ->join('pivot_product_category', 'pivot_product_category.product_id', 'products.id')
-                    ->allowedFilters([
-                        AllowedFilter::partial('search', 'name'),
-                        AllowedFilter::exact('category','pivot_product_category.product_categories_id')
-                    ])
-                    ->paginate(12)->appends(request()->query());
-
-        return ProductResource::collection($products);
-    }
-
     /**
      * Display the specified resource.
      */
@@ -60,10 +23,10 @@ class ProductController extends Controller
             ])->with([
             'variants',
             'categories',
-            'translate' => function(Builder $query) use ($lang){
+            'translate' => function($query) use ($lang){
                 $query->where('lang', $lang);
             },
-            'images' => function (Builder $query) {
+            'images' => function ($query) {
                 $query->where('is_saved', true);
             }
             ])->firstOrFail();
@@ -71,11 +34,14 @@ class ProductController extends Controller
         return new ProductResource($product);
     }
 
-    public function moreProducts(Request $request)
+    public function moreProducts(ProductCategory $category)
     {
-        $products = QueryBuilder::for(Product::class)
+        $products = Product::query()
+                    ->join('pivot_product_category', 'pivot_product_category.product_id', 'products.id')
+                    ->where('is_saleable', '=', true)
+                    ->where('pivot_product_category.product_categories_id', '=', $category->id)
                     ->with([
-                        'images' => function (Builder $query) {
+                        'images' => function ($query) {
                             $query->where([
                                 [ 'is_saved', '=', true ],
                                 [ 'position', '=', 1]
@@ -84,11 +50,7 @@ class ProductController extends Controller
                         'minPriceVariant'
                     ])
                     ->withMin('variants', 'usd_price')
-                    ->defaultSort('-popular')
-                    ->join('pivot_product_category', 'pivot_product_category.product_id', 'products.id')
-                    ->allowedFilters([
-                        AllowedFilter::exact('category','pivot_product_category.product_categories_id')
-                    ])
+                    ->orderBy('popular', 'desc')
                     ->paginate(3)->appends(request()->query());
 
         return ProductResource::collection($products);
