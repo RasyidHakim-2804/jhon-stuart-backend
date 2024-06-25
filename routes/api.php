@@ -173,6 +173,7 @@ Route::prefix('v1')->group(function(){
 
         //ProductCategories
         Route::get('/product-categories', [ProductCategoryController::class, 'index']);
+        Route::get('/product-categories/{category:slug}', [ProductCategoryController::class, 'show']);
         
         //Article
         Route::get('/articles', [ArticleController::class, 'index']);
@@ -180,8 +181,7 @@ Route::prefix('v1')->group(function(){
         Route::get('/top-articles', [ArticleController::class, 'topArticles']);
         
         //Products
-        Route::get('/products', [ProductController::class, 'index']);
         Route::get('/products/{slug}', [ProductController::class,'show']);
-        Route::get('/more-products', [ProductController::class, 'moreProducts']);
+        Route::get('/more-products/{category:slug}', [ProductController::class, 'moreProducts']);
     });
 });
