@@ -47,7 +47,7 @@ class AdminArticleController extends Controller
             $article->views         = 0;
             $article->save();
     
-            foreach ( $request['body'] as $lang => $value) {
+            foreach ( $requestArr['body'] as $lang => $value) {
                 $this->setTranslation($requestArr, $lang, $article->id);
             }
 
