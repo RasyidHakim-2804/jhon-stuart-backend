@@ -60,7 +60,7 @@ class ProductController extends Controller
             ])->with([
             'variants',
             'categories',
-            'translations' => function(Builder $query) use ($lang){
+            'translate' => function(Builder $query) use ($lang){
                 $query->where('lang', $lang);
             },
             'images' => function (Builder $query) {

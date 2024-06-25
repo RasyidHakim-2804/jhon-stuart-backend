@@ -24,22 +24,25 @@ class AdminProductResource extends JsonResource
             
             'description'  => ProductTranslationResource::collection($this->whenLoaded('translations')),    
 
-            $this->mergeWhen( $this->relationLoaded('categories'),[
-                'category_type' => $this->categories->first()->type,
-                'categories'    => ProductCategoryResource::collection($this->categories),    
-            ]),
+            $this->mergeWhen( $this->relationLoaded('categories'),function(){
+                return [
+                    'category_type' => $this->categories->first()->type,
+                    'categories'    => ProductCategoryResource::collection($this->categories),    
+                ];
+            }),
 
-            $this->mergeWhen( $this->relationLoaded('variants'), [
-                'idr_price'     => $this->when(!$this->is_varied, $this->variants->first()->idr_price, null),
-                'usd_price'     => $this->when(!$this->is_varied, $this->variants->first()->usd_price, null),
-                'stock'         => $this->when(!$this->is_varied, $this->variants->first()->stock, null),
-                'variants'      => $this->when(
-                    $this->is_varied,
-                    ProductVariantResource::collection($this->variants), 
-                    null),
-            ]),
+            $this->mergeWhen( $this->relationLoaded('variants'), function(){
+                return [
+                    'idr_price'     => $this->when(!$this->is_varied, $this->variants->first()->idr_price, null),
+                    'usd_price'     => $this->when(!$this->is_varied, $this->variants->first()->usd_price, null),
+                    'stock'         => $this->when(!$this->is_varied, $this->variants->first()->stock, null),
+                    'variants'      => $this->when(
+                        $this->is_varied,
+                        ProductVariantResource::collection($this->variants), 
+                        null),
+                    ];
+            }),
                
-            
             'created_at'    => $this->created_at,
             'updated_at'    => $this->updated_at,
         ];

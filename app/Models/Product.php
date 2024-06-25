@@ -50,9 +50,9 @@ class Product extends Model
         return $this->hasMany(ProductTranslation::class);
     }
 
-    public function translate($lang)
+    public function translate()
     {
-        return $this->translations->where('lang', $lang)->first();
+        return $this->hasOne(ProductTranslation::class);
     }
 
     public function minPriceVariant(): HasOne

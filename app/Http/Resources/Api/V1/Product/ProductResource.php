@@ -31,8 +31,8 @@ class ProductResource extends JsonResource
                 ];
             }),
 
-            'description'   => $this->whenLoaded('translations', function () use ($request){
-                return $this->translate($request->lang)->description;
+            'description'   => $this->whenLoaded('translate', function() {
+                return $this->translate->description;
             }),
 
             'categories'      => ProductCategoryResource::collection($this->whenLoaded('categories')),
