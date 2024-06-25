@@ -168,10 +168,11 @@ Route::prefix('v1')->group(function(){
     //Subscriber
     Route::post('/subscribers', [SubscriberController::class, 'store']);
 
-    //ProductCategories
-    Route::get('/product-categories', [ProductCategoryController::class, 'index']);
-
+    
     Route::middleware('language')->group(function(){
+
+        //ProductCategories
+        Route::get('/product-categories', [ProductCategoryController::class, 'index']);
         
         //Article
         Route::get('/articles', [ArticleController::class, 'index']);
