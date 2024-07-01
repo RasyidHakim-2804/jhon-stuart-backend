@@ -6,7 +6,6 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
-use Illuminate\Validation\Rules\File;
 use Intervention\Image\Laravel\Facades\Image;
 
 /**
@@ -14,31 +13,37 @@ use Intervention\Image\Laravel\Facades\Image;
  */
 class ImageService
 {
-    private $dirPath;
-    private $disk;
+    private $modelDirPath;
+    private $modelDisk;
     private $modelOldImageUrl;
-    private $format;
+    private $modelFormat;
+
+    private $newImageUrl        = null;
+    private $deletedImageUrl    = null;
+    private $deletedDirectory   = 'imageService/deleted/';
+
 
     public function __construct(CanUploadImage $model)
     {
-        $this->dirPath          = $model->getDirPath();
-        $this->disk             = $model->getDisk();
-        $this->format           = $model->getFormat();
-        $this->modelOldImageUrl = $model->getOldImageUrl();
+        $this->modelDirPath          = $model->getDirPath();
+        $this->modelDisk             = $model->getDisk();
+        $this->modelFormat           = $model->getFormat();
+        $this->modelOldImageUrl      = $model->getOldImageUrl();
     }
 
     //////////////////////////
     // public CRUD function //
     /////////////////////////
     
-    public function upload(UploadedFile $image, ?string $suffixPath = null)
+    public function upload(UploadedFile $image)
     {
         $this->validateType($image);
 
-        $name = $this->setName();
-        $path = $this->setPath($name, $suffixPath);
+        $name = str_replace(['.', '/', '\\'],'', Str::ulid()->toBase32())  . $this->modelFormat;
+        $path = $this->modelDirPath . $name;
 
         $this->store($image, $path);
+        $this->newImageUrl = $path;
 
         return (object) [
             'path'  => $path,
@@ -57,14 +62,43 @@ class ImageService
      */
     public function delete(): bool|null
     {
-        if ( $this->modelOldImageUrl == null) {
-            return null;
-        }
+        if ( ($this->modelOldImageUrl != null) &&
+             ( Storage::disk($this->modelDisk)->exists($this->modelOldImageUrl) ) ) {
 
-        if (Storage::disk($this->disk)->exists($this->modelOldImageUrl)) {
-            return Storage::disk($this->disk)->delete($this->modelOldImageUrl);
+            $this->deletedImageUrl = $this->deletedDirectory . $this->modelOldImageUrl;
+        
+            Storage::disk($this->modelDisk)->move(
+                from: $this->modelOldImageUrl,
+                to: $this->deletedImageUrl
+            );
         }
         return null;
+    }
+
+    public function rollback()
+    {
+        if( $this->newImageUrl != null ) {
+            Storage::disk($this->modelDisk)->delete($this->newImageUrl);
+
+            $this->newImageUrl = null;
+        }
+
+        if ( $this->deletedImageUrl != null ) {
+
+            Storage::disk($this->modelDisk)->move(
+                from: $this->deletedImageUrl,
+                to: $this->modelOldImageUrl
+            );
+
+            $this->deletedImageUrl = null;
+        }
+    }
+
+    public function __destruct()
+    {
+        if ($this->deletedImageUrl != null) {
+            Storage::disk($this->modelDisk)->delete($this->deletedImageUrl);
+        }
     }
 
     /////////////
@@ -73,22 +107,20 @@ class ImageService
 
     protected function imagePreProcessing($image)
     {
-        return Image::read($image)->scaleDown(1280, 720)->toWebp(80);
-    }
-
-    protected function setPath($name, ?string $suffixPath = null): string
-    {
-        if ($suffixPath) {
-            return $this->dirPath . '/' . $suffixPath . '/' . $name;
+        switch ($this->modelFormat) {
+            case '.jpeg':
+            case '.jpg':
+                return Image::read($image)->scaleDown(1280, 720)->toJpeg(80);
+                break;
+            
+            case '.png':
+                return Image::read($image)->scaleDown(1280, 720)->toPng(80);
+                break;
+            
+            default:
+                return Image::read($image)->scaleDown(1280, 720)->toWebp(80);
+                break;
         }
-        return $this->dirPath . $name;
-    }
-
-    protected function setName(): string
-    {
-        $name = Str::ulid()->toBase32();
-
-        return str_replace(['.', '/', '\\'],'', $name)  . $this->format;
     }
 
     /////////////
@@ -99,7 +131,7 @@ class ImageService
     {
         $validator = Validator::make(
             data: ['image' => $image],
-            rules: ['image' => File::image()]
+            rules: ['image' => 'image']
         );
 
         $validator->validate();
@@ -109,6 +141,6 @@ class ImageService
     {
         $image = $this->imagePreProcessing($image);
 
-        Storage::disk($this->disk)->put($path, $image);
+        Storage::disk($this->modelDisk)->put($path, $image);
     }
 }
