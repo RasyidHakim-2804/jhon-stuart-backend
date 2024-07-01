@@ -74,14 +74,14 @@ Route::prefix('v1')->group(function(){
             //ArticleAuthor
             Route::get('/authors', [AdminArticleAuthorController::class, 'index']);
             Route::get('/authors/{author}', [AdminArticleAuthorController::class, 'show']);
-            Route::post('/authors/{author}', [AdminArticleAuthorController::class, 'store']);
+            Route::post('/authors', [AdminArticleAuthorController::class, 'store']);
             Route::put('/authors/{author}', [AdminArticleAuthorController::class, 'update']);
             Route::delete('/authors/{author}', [AdminArticleAuthorController::class, 'destroy']);
 
             //Article
             Route::get('/articles', [AdminArticleController::class, 'index']);
             Route::post('/articles', [AdminArticleController::class, 'store']);
-            Route::get('/articles/{slug}', [AdminArticleController::class, 'show']);
+            Route::get('/articles/{article:slug}', [AdminArticleController::class, 'show']);
             Route::put('/articles/{article:slug}', [AdminArticleController::class, 'update']);
             Route::delete('/articles/{article:slug}', [AdminArticleController::class, 'destroy']);
 
@@ -102,7 +102,7 @@ Route::prefix('v1')->group(function(){
             //Products
             Route::get('/products', [AdminProductController::class,'index']);
             Route::post('/products', [AdminProductController::class, 'store']);
-            Route::get('/products/{slug}', [AdminProductController::class,'show']);
+            Route::get('/products/{product:slug}', [AdminProductController::class,'show']);
             Route::put('/products/{product:slug}', [AdminProductController::class,'update']);
             Route::delete('/products/{product:slug}', [AdminProductController::class,'destroy']);
 
@@ -177,7 +177,7 @@ Route::prefix('v1')->group(function(){
         
         //Article
         Route::get('/articles', [ArticleController::class, 'index']);
-        Route::get('/articles/{slug}', [ArticleController::class, 'show']);
+        Route::get('/articles/{article:slug}', [ArticleController::class, 'show']);
         Route::get('/top-articles', [ArticleController::class, 'topArticles']);
         
         //Products
