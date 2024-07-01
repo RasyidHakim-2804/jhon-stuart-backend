@@ -21,7 +21,7 @@ class UserWishlistController extends Controller
     public function index(Request $request)
     {
         /** @var \App\Models\User */
-        $user = $request->user()->with('wishlists.product')->firstOrFail();
+        $user = $request->user()->load('wishlists.product');
         
         return ProductVariantResource::collection($user->wishlists);
     }
