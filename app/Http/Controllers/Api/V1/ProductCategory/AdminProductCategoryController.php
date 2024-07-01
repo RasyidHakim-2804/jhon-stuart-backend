@@ -43,11 +43,10 @@ class AdminProductCategoryController extends Controller
         return new SuccessResource(201);
     }
 
-    public function show($slug)
+    public function show(ProductCategory $category)
     {
-        $category = ProductCategory::with('translations')
-                    ->where('slug', '=', $slug)
-                    ->firstOrFail();
+        $category = $category->load('translations');
+        
         return new ProductCategoryResource($category);
     }
 

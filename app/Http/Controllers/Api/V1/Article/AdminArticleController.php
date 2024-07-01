@@ -22,11 +22,11 @@ class AdminArticleController extends Controller
         return AdminArticleResource::collection($article);
     }
 
-    public function show($slug)
+    public function show(Article $article)
     {
-        $article = Article::with([
+        $article = $article->load([
             'translations', 'author', 'category'
-            ])->where('slug', $slug)->firstOrFail();
+            ]);
 
         return new AdminArticleResource($article);
     }

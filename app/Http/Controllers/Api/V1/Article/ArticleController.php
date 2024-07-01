@@ -24,17 +24,17 @@ class ArticleController extends Controller
         return ArticleResource::collection($article);
     }
 
-    public function show($slug, Request $request)
+    public function show(Article $article, Request $request)
     {
         $lang    = $request->lang;
 
-        $article = Article::where('slug', $slug)->with([
+        $article = $article->load([
             'author',
             'category:id,name',
             'translations' => function($query) use ($lang){
                 $query->where('lang', $lang);
             }
-        ])->firstOrFail();
+        ]);
 
         $article->views++;
         $article->save();

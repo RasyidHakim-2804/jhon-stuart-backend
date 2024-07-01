@@ -41,13 +41,13 @@ class AdminProductController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($slug)
+    public function show(Product $product)
     {
-        $product = Product::query()->where('slug', $slug)->with([
+        $product = $product->load([
             'variants',
             'categories',
             'translations',
-            ])->firstOrFail();
+            ]);
 
         return new AdminProductResource($product);
     }
