@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Http\Requests\Api\V1\Admin\AdminUpdatesUserRequest;
 use App\Http\Resources\Api\V1\Common\SuccessResource;
 use App\Http\Resources\Api\V1\Profile\UserProfileResource;
+use Illuminate\Support\Facades\DB;
 
 class AdminUserController extends Controller
 {
@@ -33,10 +34,27 @@ class AdminUserController extends Controller
      */
     public function update(User $user, AdminUpdatesUserRequest $request)
     {
-        $user->first_name = $request->first_name;
-        $user->last_name  = $request->last_name;
-        $user->save();
+        try {
+            DB::beginTransaction();
 
-        return new SuccessResource();
+            $user->first_name = $request->first_name;
+            $user->last_name  = $request->last_name;
+            $user->active     = $request->active;
+            $user->save();
+
+            if ($request->active == false) {
+                $user->tokens()->delete();
+            }
+    
+            DB::commit();
+            
+            return new SuccessResource();
+        
+        } catch (\Throwable $th) {
+            
+            DB::rollBack();
+
+            throw $th;
+        }
     }
 }
