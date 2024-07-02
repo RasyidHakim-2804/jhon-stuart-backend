@@ -10,6 +10,7 @@ use App\Http\Requests\Api\V1\Product\CreateProductRequest;
 use App\Http\Requests\Api\V1\Product\UpdateProductRequest;
 use App\Http\Resources\Api\V1\Common\SuccessResource;
 use App\Http\Resources\Api\V1\Product\AdminProductResource;
+use App\Service\Services\ImageServices\ImageService;
 use Spatie\QueryBuilder\AllowedSort;
 use Spatie\QueryBuilder\QueryBuilder;
 use Illuminate\Support\Facades\DB;
@@ -131,14 +132,42 @@ class AdminProductController extends Controller
      */
     public function destroy(Product $product)
     {
-        DB::transaction( function () use ($product){
+        $imageServices = [];
+
+        try {
+            DB::beginTransaction();
+            
             $product->variants()->delete();
             $product->translations()->delete();
             $product->categories()->detach();
-            $product->delete();
-        });
+            
+            $images = $product->images();
+            
+            foreach ($images as $image ) {
+                $imageService = new ImageService($image);
+                $imageService->delete();
+                $imageServices[] = $imageService;
+                $image->delete();
+            }
 
-        return new SuccessResource();
+            $product->delete();
+    
+            DB::commit();
+            
+            return new SuccessResource();
+
+        } catch (\Throwable $th) {
+            
+            DB::rollBack();
+
+            if (!empty($imageServices)) {
+                foreach ($imageServices as $imageService) {
+                    $imageService->rollback();
+                }
+            }
+
+            throw $th;
+        }
     }
     
     ////////////////////
