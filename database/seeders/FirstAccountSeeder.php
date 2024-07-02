@@ -35,6 +35,7 @@ class FirstAccountSeeder extends Seeder
             'last_name'         => 'User',
             'email'             => 'test@email.com',
             'password'          => Hash::make('user#2022!'),
+            'active'            => 1,
             'email_verified_at' => now(),
             'created_at'        => now(),
             'updated_at'        => now(),
