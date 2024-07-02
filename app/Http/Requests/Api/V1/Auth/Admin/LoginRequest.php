@@ -43,7 +43,7 @@ class LoginRequest extends FormRequest
         $isVerified = new EmailVerified('admins');
         $isActive   = new IsActive('admins');
         return [
-            'email'     => ['bail','required','email','max:50','exists:admins,email', $isVerified, $isActive],
+            'email'     => ['bail','required','email','max:50', $isVerified, $isActive],
             'password'  => 'required|string|min:8',
         ];
     }
