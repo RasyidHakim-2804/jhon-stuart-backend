@@ -59,7 +59,12 @@ class Admin extends Authenticatable implements CanUploadImage
     public function profileImageUrl(): Attribute
     {
         return new Attribute(
-            get: fn (string $value) => config('app.frontend_url') . 'storage/' . $value
+            get: function ($value = null) {
+                if ($value == null) {
+                    return null;
+                }
+                return  config('app.frontend_url') . 'storage/' . $value;
+            }
         );
     }
 

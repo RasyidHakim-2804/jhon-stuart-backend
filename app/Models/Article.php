@@ -35,9 +35,14 @@ class Article extends Model implements CanUploadImage
     public function imageUrl(): Attribute
     {
         return new Attribute(
-            get: function(string $value) {
+            get: function($value = null) {
 
-                if (Str::contains($value, 'https://') || Str::contains($value,'http://')) {
+                if ($value == null) {
+                    
+                    return null;
+                    
+                } elseif ((Str::contains($value, 'https://')) || Str::contains($value,'http://')) {
+                    
                     return $value;
                 }
                 
