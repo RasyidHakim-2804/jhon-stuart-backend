@@ -115,6 +115,7 @@ Route::prefix('v1')->group(function(){
             Route::get('/products/{product:slug}/images', [AdminProductImageController::class, 'index']);
             Route::post('/products/{product:slug}/images', [AdminProductImageController::class,'store']);
             Route::post('/products/{product:slug}/save-images', [AdminProductImageController::class, 'saveImages']);
+            Route::delete('/products/{product:slug}/delete', [AdminProductImageController::class, 'delete']);
             
             //Admin
             Route::post('/', [AdminAdminController::class, 'store'])->middleware('ability:admin_master');

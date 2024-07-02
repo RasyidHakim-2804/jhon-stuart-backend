@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1\Product;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\V1\Product\Image\DeleteImagerequest;
 use App\Http\Requests\Api\V1\Product\Image\SaveImageRequest;
 use App\Http\Requests\Api\V1\Product\Image\StoreImageRequest;
 use App\Http\Resources\Api\V1\Product\ProductImageResource;
@@ -16,7 +17,7 @@ class AdminProductImageController extends Controller
 {
     public function index(Product $product)
     {
-        $images = $product->images;
+        $images = $product->images()->where('is_saved', '=', 1)->get();
 
         return ProductImageResource::collection($images);
     }
@@ -48,7 +49,38 @@ class AdminProductImageController extends Controller
         } catch (\Throwable $th) {
             
             DB::rollBack();
-            $imageService->rollback();
+
+            if (isset($imageService)) {
+                $imageService->rollback();
+            }
+
+            throw $th;
+        }
+    }
+
+    public function delete(DeleteImagerequest $request,Product $product)
+    {
+        try {
+            DB::beginTransaction();
+
+            $image = ProductImage::where('id', $request->image_id)
+                        ->where('product_id', $product->id)
+                        ->first();
+
+            $imageService = new ImageService($image);
+            $imageService->delete();
+            $image->delete();
+
+            DB::commit();
+
+            return new SuccessResource();
+        } catch (\Throwable $th) {
+            
+            DB::rollBack();
+            
+            if (isset($imageService)) {
+                $imageService->rollback();
+            }
 
             throw $th;
         }
