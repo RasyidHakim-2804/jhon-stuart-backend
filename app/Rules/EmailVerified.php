@@ -26,13 +26,15 @@ class EmailVerified implements ValidationRule
                         ->select('email_verified_at')
                         ->where('email', $value)
                         ->first();
-
-        if ($verified->email_verified_at == null && $this->isVerified == true) {
-            $fail('Email not verified');
-        }
-
-        if ($verified->email_verified_at != null && $this->isVerified == false) {
-            $fail('You have already verified your email');
+                        
+        if ($verified != null) {
+            if ($verified->email_verified_at == null && $this->isVerified == true) {
+                $fail('Email not verified');
+            }
+    
+            if ($verified->email_verified_at != null && $this->isVerified == false) {
+                $fail('You have already verified your email');
+            }
         }
     }
 }

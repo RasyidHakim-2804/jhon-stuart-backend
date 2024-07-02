@@ -24,8 +24,8 @@ class IsActive implements ValidationRule
                         ->where('email', $value)
                         ->first();
 
-        if ($verified->active == 0) {
-            $fail('Your account is not active');
+        if ($verified != null && $verified->active == 0) {
+            $fail('Your account is not active. Please contact us to activate your account');
         }
     }
 }
