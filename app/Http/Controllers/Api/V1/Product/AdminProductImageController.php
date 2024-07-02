@@ -60,6 +60,8 @@ class AdminProductImageController extends Controller
 
     public function delete(DeleteImagerequest $request,Product $product)
     {
+        $imageServices = [];
+
         try {
             DB::beginTransaction();
 
@@ -69,6 +71,8 @@ class AdminProductImageController extends Controller
 
             $imageService = new ImageService($image);
             $imageService->delete();
+            $imageServices[] = $imageService;
+
             $image->delete();
 
             DB::commit();
@@ -78,8 +82,10 @@ class AdminProductImageController extends Controller
             
             DB::rollBack();
             
-            if (isset($imageService)) {
-                $imageService->rollback();
+            if (!empty($imageServices)) {
+                foreach ($imageServices as $imageService) {
+                    $imageService->rollBack();
+                }
             }
 
             throw $th;
