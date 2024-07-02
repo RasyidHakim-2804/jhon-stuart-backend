@@ -23,10 +23,10 @@ class AdminProductImageController extends Controller
 
     public function store(Product $product,StoreImageRequest $request)
     {
-        $image              = new ProductImage();
+        try {
+            DB::beginTransaction();
 
-        DB::transaction(function() use ($product,$request, $image)
-        {
+            $image              = new ProductImage();
             $lastPosition       = ProductImage::where('product_id', $product->id)
             ->orderByDesc('id')
             ->value('position');
@@ -40,21 +40,31 @@ class AdminProductImageController extends Controller
             $image->position    = $lastPosition + 1;
             $image->is_saved    = false;
             $image->save();
-        });
 
-        return new ProductImageResource($image);
+            DB::commit();
+
+            return new ProductImageResource($image);
+
+        } catch (\Throwable $th) {
+            
+            DB::rollBack();
+            $imageService->rollback();
+
+            throw $th;
+        }
     }
 
     public function saveImages(SaveImageRequest $request, Product $product)
     {
         DB::transaction(function() use ($request, $product)
         {
-            $imagesid     = $request->validated()['images_id'];
+            $imagesId     = $request->validated()['images_id'];
             $position     = 1;
             $undeletedIds = [];
+            sort($imagesId);
 
-            if ( count($imagesid) != 0 ) {
-                foreach ( $imagesid as $key => $id ) {
+            if ( count($imagesId) != 0 ) {
+                foreach ( $imagesId as $key => $id ) {
                     $image           = ProductImage::findOrFail($id);
                     $image->is_saved = true;
                     $image->position = $position;

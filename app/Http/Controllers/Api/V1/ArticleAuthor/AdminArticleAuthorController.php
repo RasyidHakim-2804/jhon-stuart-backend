@@ -49,6 +49,7 @@ class AdminArticleAuthorController extends Controller
         } catch (\Throwable $th) {
 
             DB::rollBack();
+            $imageService->rollback();
             throw $th;
         }
     }
@@ -87,6 +88,9 @@ class AdminArticleAuthorController extends Controller
         } catch (\Throwable $th) {
             
             DB::rollBack();
+            if (isset($imageService)) {
+                $imageService->rollback();
+            }
             throw $th;
         }
     }
@@ -104,9 +108,11 @@ class AdminArticleAuthorController extends Controller
             $author->delete();
 
             DB::commit();
+
         } catch (\Throwable $th) {
             
             DB::rollBack();
+            $imageService->rollback();
             throw $th;
         }
     }

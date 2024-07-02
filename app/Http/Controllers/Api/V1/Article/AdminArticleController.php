@@ -56,7 +56,10 @@ class AdminArticleController extends Controller
             return new SuccessResource(JsonResponse::HTTP_CREATED);
 
         } catch (\Throwable $th) {
+            
             DB::rollBack();
+            $imageService->rollback();
+            
             throw $th;
         }
     }
@@ -88,6 +91,11 @@ class AdminArticleController extends Controller
 
         } catch (\Throwable $th) {
             DB::rollBack();
+
+            if (isset($imageService)) {
+                $imageService->rollback();
+            }
+
             throw $th;
         }    
     }
@@ -97,7 +105,8 @@ class AdminArticleController extends Controller
         try {
             DB::beginTransaction();
 
-            (new ImageService($article))->delete();
+            $imageService = new ImageService($article);
+            $imageService->delete();
             $article->translation()->delete();
             $article->delete();
             
@@ -107,6 +116,7 @@ class AdminArticleController extends Controller
 
         } catch (\Throwable $th) {
             DB::rollBack();
+            $imageService->rollback();
             throw $th;
         }
     }
