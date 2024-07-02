@@ -6,7 +6,7 @@ trait HasImage
     
     public function getDirPath():string
     {
-        return $this->dirPath;
+        return trim($this->dirPath, '/') . '/';
     }
 
     public function getDisk():string
@@ -16,7 +16,7 @@ trait HasImage
 
     public function getFormat():string
     {
-        return $this->format;
+        return '.' . trim($this->format, '.');
     }
 
     /**
