@@ -12,5 +12,5 @@ class Wishlist extends Model
 {
     use HasFactory;
 
-    protected $table = 'user_wishlists';
+    protected $table = 'wishlists';
 }
