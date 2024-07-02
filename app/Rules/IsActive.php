@@ -19,12 +19,12 @@ class IsActive implements ValidationRule
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        $verified = DB::table($this->tableName)
+        $user = DB::table($this->tableName)
                         ->select('active')
                         ->where('email', $value)
                         ->first();
 
-        if ($verified != null && $verified->active == 0) {
+        if ($user != null && $user->active == 0) {
             $fail('Your account is not active. Please contact us to activate your account');
         }
     }

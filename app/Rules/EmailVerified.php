@@ -22,17 +22,17 @@ class EmailVerified implements ValidationRule
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        $verified = DB::table($this->tableName)
+        $user = DB::table($this->tableName)
                         ->select('email_verified_at')
                         ->where('email', $value)
                         ->first();
                         
-        if ($verified != null) {
-            if ($verified->email_verified_at == null && $this->isVerified == true) {
+        if ($user != null) {
+            if ($user->email_verified_at == null && $this->isVerified == true) {
                 $fail('Email not verified');
             }
     
-            if ($verified->email_verified_at != null && $this->isVerified == false) {
+            if ($user->email_verified_at != null && $this->isVerified == false) {
                 $fail('You have already verified your email');
             }
         }
