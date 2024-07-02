@@ -29,8 +29,8 @@ class AdminProductImageController extends Controller
 
             $image              = new ProductImage();
             $lastPosition       = ProductImage::where('product_id', $product->id)
-            ->orderByDesc('id')
-            ->value('position');
+                                    ->orderByDesc('id')
+                                    ->value('position');
 
             $imageService       = new ImageService($image);
             $result             = $imageService->upload($request->images);            
@@ -60,8 +60,6 @@ class AdminProductImageController extends Controller
 
     public function delete(DeleteImagerequest $request,Product $product)
     {
-        $imageServices = [];
-
         try {
             DB::beginTransaction();
 
@@ -71,8 +69,6 @@ class AdminProductImageController extends Controller
 
             $imageService = new ImageService($image);
             $imageService->delete();
-            $imageServices[] = $imageService;
-
             $image->delete();
 
             DB::commit();
@@ -82,10 +78,8 @@ class AdminProductImageController extends Controller
             
             DB::rollBack();
             
-            if (!empty($imageServices)) {
-                foreach ($imageServices as $imageService) {
-                    $imageService->rollBack();
-                }
+            if (isset($imageService)) {
+                $imageService->rollback();
             }
 
             throw $th;
@@ -125,15 +119,36 @@ class AdminProductImageController extends Controller
 
     private function deleteById($productId, array $undeletedIds)
     {
-        $images = ProductImage::query()
-                    ->where('product_id', $productId)
-                    ->whereNotIn('id', $undeletedIds)
-                    ->get();
+        $imageServices = [];
 
-        foreach ($images as $image ) {
-            $imageService = new ImageService($image);
-            $imageService->delete();
-            $image->delete();
+        try {
+            DB::beginTransaction();
+
+            $images = ProductImage::query()
+                        ->where('product_id', $productId)
+                        ->whereNotIn('id', $undeletedIds)
+                        ->get();
+
+            foreach ($images as $image ) {
+                $imageService = new ImageService($image);
+                $imageService->delete();
+                $imageServices[] = $imageService;
+                $image->delete();
+            }
+
+            DB::commit();
+
+        } catch (\Throwable $th) {
+
+            DB::rollBack();
+
+            if (!empty($imageServices)) {
+                foreach ($$imageServices as $imageService) {
+                    $imageService->rollback();
+                }
+            }
+
+            throw $th;
         }
     }
 }
