@@ -9,11 +9,19 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use App\Models\Image\UserProfileImage;
+use App\Service\Contracts\Model\CanUploadImage;
+use App\Service\Traits\HasImage;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
-class User extends Authenticatable
+class User extends Authenticatable implements CanUploadImage
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable, HasImage;
+
+    protected $imageUrlColumn = 'profile_image_url';
+    protected $format         = 'webp';
+    protected $disk           = 'public';
+    protected $dirPath        = 'upload/images/profile/user/';
 
     /**
      * The attributes that are mass assignable.
@@ -24,6 +32,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'profile_image_url'
     ];
 
     /**
@@ -46,6 +55,13 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
+    public function profileImageUrl(): Attribute
+    {
+        return new Attribute(
+            get: fn (string $value) => config('app.frontend_url') . 'storage/' . $value
+        );
+    }
+
     public function resetPassword():HasOne
     {
         return $this->hasOne(UserResetPassword::class);
@@ -54,11 +70,6 @@ class User extends Authenticatable
     public function verifyEmail():HasOne
     {
         return $this->hasOne(UserVerifyEmail::class);
-    }
-
-    public function imageProfile():HasOne
-    {
-        return $this->hasOne(UserProfileImage::class);
     }
 
     public function wishlists(): BelongsToMany

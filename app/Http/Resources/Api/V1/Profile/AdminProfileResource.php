@@ -21,7 +21,7 @@ class AdminProfileResource extends JsonResource
             'last_name'     => $this->last_name,
             'email'         => $this->email,
             'active'        => $this->active,
-            'image'         => isset($this->imageProfile)? $this->imageProfile->path : null,
+            'image'         => $this->profile_image_url,
             'created_at'    => $this->created_at,
             'updated_at'    => $this->updated_at,
         ];

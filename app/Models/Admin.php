@@ -9,10 +9,18 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use App\Models\Image\AdminProfileImage;
+use App\Service\Contracts\Model\CanUploadImage;
+use App\Service\Traits\HasImage;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 
-class Admin extends Authenticatable
+class Admin extends Authenticatable implements CanUploadImage
 {
-    use HasFactory, HasApiTokens, Notifiable, SoftDeletes;
+    use HasFactory, HasApiTokens, Notifiable, SoftDeletes, HasImage;
+
+    protected $imageUrlColumn = 'profile_image_url';
+    protected $format         = 'webp';
+    protected $disk           = 'public';
+    protected $dirPath        = 'upload/images/profile/admin/';
 
     /**
      * The attributes that are mass assignable.
@@ -25,6 +33,7 @@ class Admin extends Authenticatable
         'phone',
         'email',
         'password',
+        'profile_image_url'
     ];
 
     /**
@@ -47,6 +56,13 @@ class Admin extends Authenticatable
         'password' => 'hashed',
     ];
 
+    public function profileImageUrl(): Attribute
+    {
+        return new Attribute(
+            get: fn (string $value) => config('app.frontend_url') . 'storage/' . $value
+        );
+    }
+
     public function resetPassword():HasOne
     {
         return $this->hasOne(AdminResetPassword::class);
@@ -56,10 +72,4 @@ class Admin extends Authenticatable
     {
         return $this->hasOne(AdminVerifyEmail::class);
     }
-
-    public function imageProfile():HasOne
-    {
-        return $this->hasOne(AdminProfileImage::class);
-    }
-
 }
