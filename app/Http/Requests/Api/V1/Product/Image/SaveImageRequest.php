@@ -4,7 +4,6 @@ namespace App\Http\Requests\Api\V1\Product\Image;
 
 use App\Models\Image\ProductImage;
 use Illuminate\Foundation\Http\FormRequest;
-use App\Rules\IsArray;
 use Illuminate\Validation\Rule;
 
 class SaveImageRequest extends FormRequest
@@ -31,9 +30,8 @@ class SaveImageRequest extends FormRequest
      */
     public function rules(): array
     {
-        $isArray = new IsArray;
         return [
-            'images_id'      => [ $isArray ],
+            'images_id'      => 'array',
             'images_id.*'    => [
                 'required',
                 'numeric',
