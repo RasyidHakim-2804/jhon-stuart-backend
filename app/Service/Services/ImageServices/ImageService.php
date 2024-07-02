@@ -9,19 +9,44 @@ use Illuminate\Support\Str;
 use Intervention\Image\Laravel\Facades\Image;
 
 /**
- * Baese image service for model can upload image
+ * Service class for handling image upload, update, and rollback operations.
  */
 class ImageService
 {
+    /**
+     * @var string The directory path where images are stored.
+     */
     private $modelDirPath;
+
+    /**
+     * @var string The disk used for storing images.
+     */
     private $modelDisk;
+
+    /**
+     * @var string|null The old image URL before update.
+     */
     private $modelOldImageUrl;
+
+    /**
+     * @var string The format of the image file.
+     */
     private $modelFormat;
 
-    private $newImageUrl        = null;
-    private $deletedImageUrl    = null;
-    private $deletedDirectory   = 'imageService/deleted/';
+    /**
+     * @var string|null The URL of the newly uploaded image.
+     */
+    private $newImageUrl;
 
+    /**
+     * @var string|null The URL of the deleted image before rollback.
+     */
+    private $deletedImageUrl;
+
+    /**
+     * @var string The directory path where deleted images are moved.
+     */
+    private $deletedDirectory = 'imageService/deleted/';
 
     public function __construct(CanUploadImage $model)
     {
@@ -35,6 +60,14 @@ class ImageService
     // public CRUD function //
     /////////////////////////
     
+    /**
+     * Uploads an image and returns information about the uploaded file.
+     *
+     * @param UploadedFile $image The image file to upload.
+     * @return object An object containing information about the uploaded file:
+     *                - path: The path where the file is stored.
+     *                - name: The generated name of the file.
+     */
     public function upload(UploadedFile $image)
     {
         $this->validateType($image);
@@ -51,14 +84,28 @@ class ImageService
         ];
     }
 
-    public function update(UploadedFile $content, ?string $name = null)
+    /**
+     * Updates the content with a new file upload.
+     *
+     * This method deletes any existing content and uploads a new file, returning information about the uploaded file.
+     *
+     * @param UploadedFile $content The new content file to upload.
+     * @return object An object containing information about the newly uploaded file:
+     *                - path: The path where the file is stored.
+     *                - name: The generated name of the file.
+     */
+    public function update(UploadedFile $content)
     {
         $this->delete();
-        return $this->upload($content, $name);
+        return $this->upload($content);
     }
 
     /**
-     * will return null if the file does not exist
+     * Deletes the old image file if it exists.
+     *
+     * Checks if the old image URL exists in the specified disk.
+     *
+     * @return bool|null True if the file was moved to the deleted directory, null otherwise.
      */
     public function delete(): bool|null
     {
@@ -67,7 +114,7 @@ class ImageService
 
             $this->deletedImageUrl = $this->deletedDirectory . $this->modelOldImageUrl;
         
-            Storage::disk($this->modelDisk)->move(
+            return Storage::disk($this->modelDisk)->move(
                 from: $this->modelOldImageUrl,
                 to: $this->deletedImageUrl
             );
@@ -75,28 +122,31 @@ class ImageService
         return null;
     }
 
+    /**
+     * Rolls back changes by deleting new image and restoring deleted image.
+     */
     public function rollback()
     {
-        if( $this->newImageUrl != null ) {
+        if( isset($this->newImageUrl) ) {
             Storage::disk($this->modelDisk)->delete($this->newImageUrl);
 
-            $this->newImageUrl = null;
+            unset($this->newImageUrl);
         }
 
-        if ( $this->deletedImageUrl != null ) {
+        if ( isset($this->deletedImageUrl) ) {
 
             Storage::disk($this->modelDisk)->move(
                 from: $this->deletedImageUrl,
                 to: $this->modelOldImageUrl
             );
 
-            $this->deletedImageUrl = null;
+            unset($this->deletedImageUrl);
         }
     }
 
     public function __destruct()
     {
-        if ($this->deletedImageUrl != null) {
+        if ( isset($this->deletedImageUrl) ) {
             Storage::disk($this->modelDisk)->delete($this->deletedImageUrl);
         }
     }
