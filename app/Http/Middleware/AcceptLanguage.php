@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
 use Symfony\Component\HttpFoundation\Response;
 
 class AcceptLanguage
@@ -17,13 +18,14 @@ class AcceptLanguage
     {
         $lang = $request->lang ?? 'en';
 
-        if (!in_array($lang, ['en', 'id'])) {
-            return response()->json([
-                'error' => 'Invalid language.'
-            ], 400);
+        if (in_array($lang, ['en', 'id'])) {
+            App::setLocale($lang);
+        } else {
+            App::setLocale('en');
         }
 
         $request->merge(['lang' => $lang]);
+
         return $next($request);
     }
 }
