@@ -128,7 +128,7 @@ Route::prefix('v1')->group(function(){
     });
     
     //User routes
-    Route::prefix('users')->group(function(){
+    Route::prefix('users')->middleware('language')->group(function(){
 
         //Authentication
         Route::post('/register', [UserAuthController::class,'register']);
@@ -162,15 +162,14 @@ Route::prefix('v1')->group(function(){
             
         });
     });
-
-    //Contacts
-    Route::post('/contacts', [ContactController::class,'store']);
-
-    //Subscriber
-    Route::post('/subscribers', [SubscriberController::class, 'store']);
-
     
     Route::middleware('language')->group(function(){
+
+        //Contacts
+        Route::post('/contacts', [ContactController::class,'store']);
+
+        //Subscriber
+        Route::post('/subscribers', [SubscriberController::class, 'store']);
 
         //ProductCategories
         Route::get('/product-categories', [ProductCategoryController::class, 'index']);
