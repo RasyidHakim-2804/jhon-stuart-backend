@@ -2,7 +2,6 @@
 
 namespace App\Http\Resources\Api\V1\ProductCategory;
 
-use App\Http\Resources\Api\V1\Product\ProductResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -20,13 +19,22 @@ class ProductCategoryResource extends JsonResource
             'name'          => $this->name,
             'type'          => $this->type,
             'slug'          => $this->slug,
+            
             $this->mergeWhen($this->relationLoaded('translate'), function() {
                 return [
                     'description' => $this->translate->description,
                 ];
             }),
-            'description'   => ProductCategoryTranslationResource::collection($this->whenLoaded('translations')),
-            'products'      => ProductResource::collection($this->whenLoaded('products')),
+            
+            $this->mergeWhen($this->relationLoaded('translations'), function() {
+                $translations = [];
+
+                foreach ($this->translations as $translation) {
+                    $translations[$translation->lang . '_description'] = $translation->description; 
+                }
+
+                return $translations;
+            }),
         ];
     }
 }

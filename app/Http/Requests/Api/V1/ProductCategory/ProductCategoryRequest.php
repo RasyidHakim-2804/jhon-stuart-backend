@@ -25,13 +25,16 @@ class ProductCategoryRequest extends FormRequest
     {
         return [
             'name'           => 'required|string|max:30',
-            'description.id' => 'required|string|max:255',
-            'description.en' => 'required|string|max:255',
+            'id_description' => 'required|string|max:255',
+            'en_description' => 'required|string|max:255',
             'type' => [
                 'required', 
                 'string',
-                Rule::in(ProductCategory::$categoryTypes)
-                ]
+                Rule::in([
+                    ProductCategory::MUSEUM_TYPE,
+                    ProductCategory::GALLERY_TYPE
+                ])
+            ]
         ];
     }
 }

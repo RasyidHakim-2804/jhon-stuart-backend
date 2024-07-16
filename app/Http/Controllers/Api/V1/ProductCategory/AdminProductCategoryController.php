@@ -35,9 +35,7 @@ class AdminProductCategoryController extends Controller
     
             $category->save();
     
-            foreach ( $request['description'] as $lang => $value) {
-                $this->setTranslation($request, $lang, $category->id);
-            }    
+            $this->setTranslation($request, $category->id);  
         });
 
         return new SuccessResource(201);
@@ -59,9 +57,7 @@ class AdminProductCategoryController extends Controller
     
             $category->save();
     
-            foreach ( $request['description'] as $lang => $value) {
-                $this->setTranslation($request, $lang, $category->id);
-            }     
+            $this->setTranslation($request, $category->id);  
         });
 
         return new SuccessResource();
@@ -83,16 +79,17 @@ class AdminProductCategoryController extends Controller
     // private functions//
     //////////////////////
 
-    private function setTranslation(array $request, $lang, $product_category_id)
+    private function setTranslation( array $request, $product_category_id)
     {
-        $translation = ProductCategoryTranslation::query()
-                        ->where('product_category_id', $product_category_id)
-                        ->where('lang', $lang)
-                        ->firstOrNew();
-        
-        $translation->product_category_id    = $product_category_id;
-        $translation->lang                   = $lang;
-        $translation->description            = $request['description'][$lang];
-        $translation->save();
+        foreach ( ['id', 'en'] as $lang) {
+            $translation                = ProductCategoryTranslation::where('lang', $lang)
+                                            ->where('product_category_id', $product_category_id)
+                                            ->firstOrNew();
+                                            
+            $translation->description           = $request[$lang . '_description'];
+            $translation->product_category_id   = $product_category_id;
+            $translation->lang                  = $lang;
+            $translation->save();
+        }
     }
 }
