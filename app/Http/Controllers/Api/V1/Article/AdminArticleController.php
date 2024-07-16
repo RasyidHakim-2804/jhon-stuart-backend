@@ -35,21 +35,19 @@ class AdminArticleController extends Controller
     {
         try {
             DB::beginTransaction();
-            $requestArr     = $request->validated();
+            $request        = $request->validated();
             $article        = new Article();
             $imageService   = new ImageService($article);
             $result         = $imageService->upload($request->image);
     
-            $article->title         = $requestArr['title'];
-            $article->author_id     = $requestArr['author_id'];
-            $article->category_id   = $requestArr['category_id'];
+            $article->title         = $request['title'];
+            $article->author_id     = $request['author_id'];
+            $article->category_id   = $request['category_id'];
             $article->image_url     = $result->path;
             $article->views         = 0;
             $article->save();
     
-            foreach ( $requestArr['body'] as $lang => $value) {
-                $this->setTranslation($requestArr, $lang, $article->id);
-            }
+            $this->setTranslation($request, $article->id);
 
             DB::commit();
 
@@ -68,15 +66,10 @@ class AdminArticleController extends Controller
     {
         try {
             DB::beginTransaction();
-            $requestArr = $request->validated();
-    
+            $requestArr             = $request->validated();
             $article->title         = $requestArr['title'];
             $article->author_id     = $requestArr['author_id'];
             $article->category_id   = $requestArr['category_id'];
-    
-            foreach ( $request['body'] as $lang => $value) {
-                $this->setTranslation($requestArr, $lang, $article->id);
-            }
     
             if ($request->has('image')) {
                 $imageService       = new ImageService($article);
@@ -84,6 +77,8 @@ class AdminArticleController extends Controller
             }
 
             $article->save();
+
+            $this->setTranslation($requestArr, $article->id);
             
             DB::commit();
 
@@ -116,7 +111,11 @@ class AdminArticleController extends Controller
 
         } catch (\Throwable $th) {
             DB::rollBack();
-            $imageService->rollback();
+
+            if (isset($imageService)) {
+                $imageService->rollback();
+            }
+            
             throw $th;
         }
     }
@@ -125,16 +124,17 @@ class AdminArticleController extends Controller
     // private functions//
     //////////////////////
 
-    private function setTranslation(array $request, $lang, $article_id)
+    private function setTranslation( array $request, $article_id)
     {
-        $translation = ArticleTranslation::query()
-                        ->where('article_id', $article_id)
-                        ->where('lang', $lang)
-                        ->firstOrNew();
-        
-        $translation->article_id    = $article_id;
-        $translation->lang          = $lang;
-        $translation->body          = $request['body'][$lang];
-        $translation->save();
+        foreach ( ['id', 'en'] as $lang) {
+            $translation                = ArticleTranslation::where('lang', $lang)
+                                            ->where('article_id', $article_id)
+                                            ->firstOrNew();
+                                            
+            $translation->body          = $request[$lang . '_body'];
+            $translation->product_id    = $article_id;
+            $translation->lang          = $lang;
+            $translation->save();
+        }
     }
 }

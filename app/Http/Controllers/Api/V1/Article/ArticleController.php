@@ -5,35 +5,26 @@ namespace App\Http\Controllers\Api\V1\Article;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Api\V1\Article\ArticleResource;
 use App\Models\Article;
-use Illuminate\Http\Request;
 
 class ArticleController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
-        $lang    = $request->lang;
-
         $article = Article::with([
             'author',
             'category',
-            'translations' => function($query) use ($lang){
-                $query->where('lang', $lang);
-            }
+            'translate'
         ])->paginate(25);
 
         return ArticleResource::collection($article);
     }
 
-    public function show(Article $article, Request $request)
+    public function show(Article $article)
     {
-        $lang    = $request->lang;
-
         $article = $article->load([
             'author',
             'category:id,name',
-            'translations' => function($query) use ($lang){
-                $query->where('lang', $lang);
-            }
+            'translate'
         ]);
 
         $article->views++;
@@ -42,16 +33,12 @@ class ArticleController extends Controller
         return new ArticleResource($article);
     }
 
-    public function topArticles(Request $request)
+    public function topArticles()
     {
-        $lang = $request->lang;
-
         $topArticles = Article::with([
             'author',
             'category',
-            'translations' => function($query) use ($lang){
-                $query->where('lang', $lang);
-            }
+            'translate'
         ])->orderBy('views', 'asc')->take(10)->get();
 
         return ArticleResource::collection($topArticles);
