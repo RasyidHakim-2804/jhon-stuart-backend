@@ -32,13 +32,10 @@ class AdminArticleAuthorController extends Controller
         try {
             DB::beginTransaction();
             $author             = new ArticleAuthor();
+            $imageService       = new ImageService($author);
             $author->first_name = $request->first_name;
             $author->last_name  = $request->last_name;
-
-            $imageService = new ImageService($author);
-            $result       = $imageService->upload($request->image);
-
-            $author->image_url = $result->path;
+            $author->image_url  = $imageService->upload($request->image)->path;
 
             $author->save();
 
@@ -49,7 +46,11 @@ class AdminArticleAuthorController extends Controller
         } catch (\Throwable $th) {
 
             DB::rollBack();
-            $imageService->rollback();
+
+            if (isset($imageService)) {
+                $imageService->rollback();
+            }
+
             throw $th;
         }
     }
@@ -74,13 +75,12 @@ class AdminArticleAuthorController extends Controller
             $author->last_name  = $request->last_name;
 
             if ($request->has('image')) {
-
-                $imageService = new ImageService($author);
-                $result       = $imageService->update($request->image);
-
-                $author->image_url = $result->path;
+                $imageService       = new ImageService($author);
+                $author->image_url  = $imageService->update($request->image)->path;
             }
+
             $author->save();
+
             DB::commit();
 
             return new SuccessResource();
@@ -88,9 +88,11 @@ class AdminArticleAuthorController extends Controller
         } catch (\Throwable $th) {
             
             DB::rollBack();
+
             if (isset($imageService)) {
                 $imageService->rollback();
             }
+            
             throw $th;
         }
     }
@@ -112,7 +114,11 @@ class AdminArticleAuthorController extends Controller
         } catch (\Throwable $th) {
             
             DB::rollBack();
-            $imageService->rollback();
+
+            if (isset($imageService)) {
+                $imageService->rollback();
+            }
+
             throw $th;
         }
     }
