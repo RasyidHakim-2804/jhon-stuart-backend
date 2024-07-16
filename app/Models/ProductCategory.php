@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
@@ -39,9 +38,9 @@ class ProductCategory extends Model
                 ->startSlugSuffixFrom(2);
     }
 
-    public function products(): BelongsToMany
+    public function products(): HasMany
     {
-        return $this->belongsToMany(Product::class, 'pivot_product_category',  'product_categories_id', 'product_id');
+        return $this->hasMany(Product::class);
     }
 
     public function translations(): HasMany

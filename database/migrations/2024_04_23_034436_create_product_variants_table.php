@@ -13,10 +13,13 @@ return new class extends Migration
     {
         Schema::create('product_variants', function (Blueprint $table) {
             $table->id();
-            $table->string('name', 255);
-            $table->boolean('is_default')->default(0);
+            $table->string('type');
             $table->foreignId('product_id')->constrained('products', 'id');
+            $table->string('code')->unique();
             $table->unsignedInteger('stock');
+            $table->boolean('is_default')->default(0);
+            $table->boolean('available');
+            $table->boolean('unique');
             $table->unsignedDecimal('idr_price', 10, 2);
             $table->unsignedDecimal('usd_price', 10, 2);
             $table->timestamps();

@@ -15,7 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('product_id')->constrained('products', 'id');
             $table->string('lang', 20);
-            $table->text('description');
+            $table->text('full_description');
+            $table->text('short_description');
             $table->timestamps();
             
             $table->foreign('lang')->references('code')->on('languages');

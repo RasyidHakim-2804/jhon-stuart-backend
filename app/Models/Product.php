@@ -4,12 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 use App\Models\Image\ProductImage;
 use App\Models\Translation\ProductTranslation;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Facades\DB;
 
@@ -35,9 +35,9 @@ class Product extends Model
         return $this->hasMany(ProductVariant::class);
     }
 
-    public function categories(): BelongsToMany
+    public function categories(): BelongsTo
     {
-        return $this->belongsToMany(ProductCategory::class, 'pivot_product_category',  'product_id', 'product_categories_id');
+        return $this->belongsTo(ProductCategory::class);
     }
 
     public function images(): HasMany
