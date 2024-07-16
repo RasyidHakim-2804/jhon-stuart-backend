@@ -5,11 +5,13 @@ namespace App\Models;
 use App\Models\Translation\ArticleTranslation;
 use App\Service\Contracts\Model\CanUploadImage;
 use App\Service\Traits\HasImage;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 use Illuminate\Support\Str;
@@ -54,6 +56,15 @@ class Article extends Model implements CanUploadImage
     public function translations() : HasMany 
     {
         return $this->hasMany(ArticleTranslation::class);
+    }
+
+    public function translate(): HasOne
+    {
+        return $this->hasOne(ArticleTranslation::class)->ofMany([
+            'id' => 'MAX', 
+        ], function(Builder $query){
+            $query->where('lang', '=', app()->getLocale());
+        });
     }
 
     public function category() : BelongsTo
