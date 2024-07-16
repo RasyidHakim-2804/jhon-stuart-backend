@@ -19,7 +19,6 @@ return new class extends Migration
             $table->unsignedInteger('stock');
             $table->boolean('is_default')->default(0);
             $table->boolean('available');
-            $table->boolean('unique');
             $table->unsignedDecimal('idr_price', 10, 2);
             $table->unsignedDecimal('usd_price', 10, 2);
             $table->timestamps();
