@@ -128,7 +128,7 @@ Route::prefix('v1')->group(function(){
     });
     
     //User routes
-    Route::prefix('users')->middleware('language')->group(function(){
+    Route::prefix('users')->group(function(){
 
         //Authentication
         Route::post('/register', [UserAuthController::class,'register']);
@@ -163,25 +163,22 @@ Route::prefix('v1')->group(function(){
         });
     });
     
-    Route::middleware('language')->group(function(){
+    //Contacts
+    Route::post('/contacts', [ContactController::class,'store']);
 
-        //Contacts
-        Route::post('/contacts', [ContactController::class,'store']);
+    //Subscriber
+    Route::post('/subscribers', [SubscriberController::class, 'store']);
 
-        //Subscriber
-        Route::post('/subscribers', [SubscriberController::class, 'store']);
-
-        //ProductCategories
-        Route::get('/product-categories', [ProductCategoryController::class, 'index']);
-        Route::get('/product-categories/{category:slug}', [ProductCategoryController::class, 'show']);
-        
-        //Article
-        Route::get('/articles', [ArticleController::class, 'index']);
-        Route::get('/articles/{article:slug}', [ArticleController::class, 'show']);
-        Route::get('/top-articles', [ArticleController::class, 'topArticles']);
-        
-        //Products
-        Route::get('/products/{slug}', [ProductController::class,'show']);
-        Route::get('/more-products/{category:slug}', [ProductController::class, 'moreProducts']);
-    });
+    //ProductCategories
+    Route::get('/product-categories', [ProductCategoryController::class, 'index']);
+    Route::get('/product-categories/{category:slug}', [ProductCategoryController::class, 'show']);
+    
+    //Article
+    Route::get('/articles', [ArticleController::class, 'index']);
+    Route::get('/articles/{article:slug}', [ArticleController::class, 'show']);
+    Route::get('/top-articles', [ArticleController::class, 'topArticles']);
+    
+    //Products
+    Route::get('/products/{slug}', [ProductController::class,'show']);
+    Route::get('/more-products/{category:slug}', [ProductController::class, 'moreProducts']);
 });
