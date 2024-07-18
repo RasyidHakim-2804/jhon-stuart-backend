@@ -10,10 +10,9 @@ class ArticleController extends Controller
 {
     public function index()
     {
-        $article = Article::with([
+        $article = Article::exceptBody()->with([
             'author',
-            'category',
-            'translate'
+            'category:id,name',
         ])->paginate(25);
 
         return ArticleResource::collection($article);
@@ -24,7 +23,6 @@ class ArticleController extends Controller
         $article = $article->load([
             'author',
             'category:id,name',
-            'translate'
         ]);
 
         $article->views++;
@@ -37,8 +35,7 @@ class ArticleController extends Controller
     {
         $topArticles = Article::with([
             'author',
-            'category',
-            'translate'
+            'category:id,name',
         ])->orderBy('views', 'asc')->take(10)->get();
 
         return ArticleResource::collection($topArticles);

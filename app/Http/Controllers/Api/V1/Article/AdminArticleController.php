@@ -5,10 +5,9 @@ namespace App\Http\Controllers\Api\V1\Article;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\Article\CreateArticleRequest;
 use App\Http\Requests\Api\V1\Article\UpdateArticleRequest;
-use App\Http\Resources\Api\V1\Article\AdminArticleResource;
+use App\Http\Resources\Api\V1\Article\ArticleResource;
 use App\Http\Resources\Api\V1\Common\SuccessResource;
 use App\Models\Article;
-use App\Models\Translation\ArticleTranslation;
 use App\Service\Services\ImageServices\ImageService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
@@ -17,18 +16,18 @@ class AdminArticleController extends Controller
 {
     public function index()
     {
-        $article = Article::paginate(25);
+        $article = Article::exceptBody()->paginate(25);
 
-        return AdminArticleResource::collection($article);
+        return ArticleResource::collection($article);
     }
 
     public function show(Article $article)
     {
         $article = $article->load([
-            'translations', 'author', 'category'
-            ]);
+            'author', 'category'
+        ]);
 
-        return new AdminArticleResource($article);
+        return new ArticleResource($article);
     }
 
     public function store(CreateArticleRequest $request)
@@ -38,16 +37,16 @@ class AdminArticleController extends Controller
             $request        = $request->validated();
             $article        = new Article();
             $imageService   = new ImageService($article);
-            $result         = $imageService->upload($request->image);
     
             $article->title         = $request['title'];
             $article->author_id     = $request['author_id'];
             $article->category_id   = $request['category_id'];
-            $article->image_url     = $result->path;
+            $article->body          = $request['body'];
+            $article->meta          = $request['meta'];
+            $article->image_url     = $imageService->upload($request->image)->path;
             $article->views         = 0;
+
             $article->save();
-    
-            $this->setTranslation($request, $article->id);
 
             DB::commit();
 
@@ -70,6 +69,8 @@ class AdminArticleController extends Controller
             $article->title         = $requestArr['title'];
             $article->author_id     = $requestArr['author_id'];
             $article->category_id   = $requestArr['category_id'];
+            $article->body          = $request['body'];
+            $article->meta          = $request['meta'];
     
             if ($request->has('image')) {
                 $imageService       = new ImageService($article);
@@ -77,8 +78,6 @@ class AdminArticleController extends Controller
             }
 
             $article->save();
-
-            $this->setTranslation($requestArr, $article->id);
             
             DB::commit();
 
@@ -102,7 +101,6 @@ class AdminArticleController extends Controller
 
             $imageService = new ImageService($article);
             $imageService->delete();
-            $article->translation()->delete();
             $article->delete();
             
             DB::commit();
@@ -117,24 +115,6 @@ class AdminArticleController extends Controller
             }
             
             throw $th;
-        }
-    }
-
-    //////////////////////
-    // private functions//
-    //////////////////////
-
-    private function setTranslation( array $request, $article_id)
-    {
-        foreach ( ['id', 'en'] as $lang) {
-            $translation                = ArticleTranslation::where('lang', $lang)
-                                            ->where('article_id', $article_id)
-                                            ->firstOrNew();
-                                            
-            $translation->body          = $request[$lang . '_body'];
-            $translation->product_id    = $article_id;
-            $translation->lang          = $lang;
-            $translation->save();
         }
     }
 }
