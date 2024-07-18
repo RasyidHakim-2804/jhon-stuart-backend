@@ -24,9 +24,8 @@ class ProductCategoryRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name'           => 'required|string|max:30',
-            'id_description' => 'required|string|max:255',
-            'en_description' => 'required|string|max:255',
+            'name'        => 'required|string|max:30',
+            'description' => 'required|string|max:255',
             'type' => [
                 'required', 
                 'string',

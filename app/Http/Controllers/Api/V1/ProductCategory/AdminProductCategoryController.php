@@ -7,7 +7,6 @@ use App\Http\Requests\Api\V1\ProductCategory\ProductCategoryRequest;
 use App\Http\Resources\Api\V1\ProductCategory\ProductCategoryResource;
 use App\Http\Resources\Api\V1\Common\SuccessResource;
 use App\Models\ProductCategory;
-use App\Models\Translation\ProductCategoryTranslation;
 use Illuminate\Support\Facades\DB;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
@@ -28,36 +27,32 @@ class AdminProductCategoryController extends Controller
     public function store(ProductCategoryRequest $request)
     {
         DB::transaction(function() use ($request) {
-            $request        = $request->validated();
-            $category       = new ProductCategory();
-            $category->name = $request['name'];
-            $category->type = $request['type'];
+            $request                = $request->validated();
+            $category               = new ProductCategory();
+            $category->name         = $request['name'];
+            $category->type         = $request['type'];
+            $category->description  = $request['description'];
     
             $category->save();
-    
-            $this->setTranslation($request, $category->id);  
         });
 
         return new SuccessResource(201);
     }
 
     public function show(ProductCategory $category)
-    {
-        $category = $category->load('translations');
-        
+    {   
         return new ProductCategoryResource($category);
     }
 
     public function update(ProductCategoryRequest $request, ProductCategory $category)
     {
         DB::transaction(function() use ($request, $category) {
-            $request        = $request->validated();
-            $category->type = $request['type'];
-            $category->name = $request['name'];
+            $request                = $request->validated();
+            $category->type         = $request['type'];
+            $category->name         = $request['name'];
+            $category->description  = $request['description'];
     
             $category->save();
-    
-            $this->setTranslation($request, $category->id);  
         });
 
         return new SuccessResource();
@@ -67,29 +62,10 @@ class AdminProductCategoryController extends Controller
     {
         DB::transaction(function() use ($category)
         {
-            $category->translations()->delete();
             $category->products()->detach();
             $category->delete();    
         });
         
         return new SuccessResource();
-    }
-
-    //////////////////////
-    // private functions//
-    //////////////////////
-
-    private function setTranslation( array $request, $product_category_id)
-    {
-        foreach ( ['id', 'en'] as $lang) {
-            $translation                = ProductCategoryTranslation::where('lang', $lang)
-                                            ->where('product_category_id', $product_category_id)
-                                            ->firstOrNew();
-                                            
-            $translation->description           = $request[$lang . '_description'];
-            $translation->product_category_id   = $product_category_id;
-            $translation->lang                  = $lang;
-            $translation->save();
-        }
     }
 }

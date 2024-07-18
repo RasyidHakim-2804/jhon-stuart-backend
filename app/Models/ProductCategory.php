@@ -42,18 +42,4 @@ class ProductCategory extends Model
     {
         return $this->hasMany(Product::class);
     }
-
-    public function translations(): HasMany
-    {
-        return $this->hasMany(ProductCategoryTranslation::class);
-    }
-
-    public function translate()
-    {
-        return $this->hasOne(ProductCategoryTranslation::class)->ofMany([
-            'id' => 'MAX'
-        ], function(Builder $query){
-            $query->where('lang', '=', app()->getLocale());
-        });
-    }
 }

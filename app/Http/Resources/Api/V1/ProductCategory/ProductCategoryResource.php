@@ -19,22 +19,7 @@ class ProductCategoryResource extends JsonResource
             'name'          => $this->name,
             'type'          => $this->type,
             'slug'          => $this->slug,
-            
-            $this->mergeWhen($this->relationLoaded('translate'), function() {
-                return [
-                    'description' => $this->translate->description,
-                ];
-            }),
-            
-            $this->mergeWhen($this->relationLoaded('translations'), function() {
-                $translations = [];
-
-                foreach ($this->translations as $translation) {
-                    $translations[$translation->lang . '_description'] = $translation->description; 
-                }
-
-                return $translations;
-            }),
+            'description'   => $this->description,
         ];
     }
 }
