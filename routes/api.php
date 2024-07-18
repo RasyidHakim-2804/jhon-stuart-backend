@@ -102,9 +102,9 @@ Route::prefix('v1')->group(function(){
             //Products
             Route::get('/products', [AdminProductController::class,'index']);
             Route::post('/products', [AdminProductController::class, 'store']);
-            Route::get('/products/{product:slug}', [AdminProductController::class,'show']);
-            Route::put('/products/{product:slug}', [AdminProductController::class,'update']);
-            Route::delete('/products/{product:slug}', [AdminProductController::class,'destroy']);
+            Route::get('/products/{product}', [AdminProductController::class,'show']);
+            Route::put('/products/{product}', [AdminProductController::class,'update']);
+            Route::delete('/products/{product}', [AdminProductController::class,'destroy']);
 
             //User
             Route::get('/users', [AdminUserController::class, 'index']);
@@ -112,10 +112,10 @@ Route::prefix('v1')->group(function(){
             Route::put('/users/{user}', [AdminUserController::class, 'update']);
             
             //ProductImage
-            Route::get('/products/{product:slug}/images', [AdminProductImageController::class, 'index']);
-            Route::post('/products/{product:slug}/images', [AdminProductImageController::class,'store']);
-            Route::post('/products/{product:slug}/save-images', [AdminProductImageController::class, 'saveImages']);
-            Route::delete('/products/{product:slug}/delete', [AdminProductImageController::class, 'delete']);
+            Route::get('/products/{product}/images', [AdminProductImageController::class, 'index']);
+            Route::post('/products/{product}/images', [AdminProductImageController::class,'store']);
+            Route::post('/products/{product}/save-images', [AdminProductImageController::class, 'saveImages']);
+            Route::delete('/products/{product}/delete', [AdminProductImageController::class, 'delete']);
             
             //Admin
             Route::post('/', [AdminAdminController::class, 'store'])->middleware('ability:admin_master');
