@@ -8,10 +8,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 use App\Models\Image\ProductImage;
-use App\Models\Translation\ProductTranslation;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Support\Facades\DB;
 
 class Product extends Model
 {
@@ -35,7 +33,7 @@ class Product extends Model
         return $this->hasMany(ProductVariant::class);
     }
 
-    public function categories(): BelongsTo
+    public function category(): BelongsTo
     {
         return $this->belongsTo(ProductCategory::class);
     }
@@ -43,16 +41,6 @@ class Product extends Model
     public function images(): HasMany
     {
         return $this->hasMany(ProductImage::class);
-    }
-
-    public function translations(): HasMany
-    {
-        return $this->hasMany(ProductTranslation::class);
-    }
-
-    public function translate()
-    {
-        return $this->hasOne(ProductTranslation::class);
     }
 
     public function minPriceVariant(): HasOne
