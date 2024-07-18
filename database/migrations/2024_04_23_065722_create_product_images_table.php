@@ -14,10 +14,8 @@ return new class extends Migration
         Schema::create('product_images', function (Blueprint $table) {
             $table->id();
             $table->foreignId('product_id')->constrained('products', 'id');
-            $table->string('name');
             $table->string('path');
-            $table->unsignedTinyInteger('position');
-            $table->boolean('is_saved');
+            $table->unsignedTinyInteger('position')->nullable();
             $table->timestamps();
         });
     }

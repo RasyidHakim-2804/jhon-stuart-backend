@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\Product;
 use App\Service\Contracts\Model\CanUploadImage;
 use App\Service\Traits\HasImage;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class ProductImage extends Model implements CanUploadImage
@@ -37,5 +38,10 @@ class ProductImage extends Model implements CanUploadImage
                 return  config('app.frontend_url') . 'storage/' . $value;
             }
         );
+    }
+
+    public function scopeSaved(Builder $query)
+    {
+        $query->where('position', '!=', null);
     }
 }
