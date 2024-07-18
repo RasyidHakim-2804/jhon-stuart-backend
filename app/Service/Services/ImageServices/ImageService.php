@@ -2,6 +2,7 @@
 namespace App\Service\Services\ImageServices;
 
 use App\Service\Contracts\Model\CanUploadImage;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -59,6 +60,11 @@ class ImageService
     //////////////////////////
     // public CRUD function //
     /////////////////////////
+
+    public static function  collection(Collection|array $collection)
+    {
+        return new ImageServiceCollection($collection);
+    }
     
     /**
      * Uploads an image and returns information about the uploaded file.
@@ -68,12 +74,17 @@ class ImageService
      *                - path: The path where the file is stored.
      *                - name: The generated name of the file.
      */
-    public function upload(UploadedFile $image)
+    public function upload(UploadedFile $image, ?string $suffix = null)
     {
         $this->validateType($image);
 
-        $name = str_replace(['.', '/', '\\'],'', Str::ulid()->toBase32())  . $this->modelFormat;
+        $name = Str::ulid()->toBase32()  . $this->modelFormat;
         $path = $this->modelDirPath . $name;
+
+        if ($suffix != null) {
+            $suffix = trim($suffix, '/') . '/';
+            $path   = $this->modelDirPath . $suffix . $name;
+        }
 
         $this->store($image, $path);
         $this->newImageUrl = $path;
@@ -94,10 +105,10 @@ class ImageService
      *                - path: The path where the file is stored.
      *                - name: The generated name of the file.
      */
-    public function update(UploadedFile $content)
+    public function update(UploadedFile $content, ?string $suffix = null)
     {
         $this->delete();
-        return $this->upload($content);
+        return $this->upload($content, $suffix);
     }
 
     /**
