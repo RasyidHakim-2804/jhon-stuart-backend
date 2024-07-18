@@ -16,13 +16,6 @@ class SaveImageRequest extends FormRequest
         return true;
     }
 
-    public function messages()
-    {
-        return [
-            'images_id.*.exists' => 'Id is not exist in product_image or this image does not belong to this product.'
-        ];
-    }
-
     /**
      * Get the validation rules that apply to the request.
      *
@@ -38,7 +31,7 @@ class SaveImageRequest extends FormRequest
                 'distinct',
                 'min:1',
                 Rule::exists(ProductImage::class, 'id')->where(function($query){
-                    $query->where('product_id', $this->route()->parameters()['product']->id);
+                    $query->where('product_id', $this->route('product')->id);
                 })
             ],
         ];

@@ -27,7 +27,7 @@ class DeleteImagerequest extends FormRequest
             'image_id' => [
                 'required',
                 Rule::exists(ProductImage::class, 'id')->where(function($query){
-                    $query->where('product_id', $this->route()->parameters()['product']->id);
+                    $query->where('product_id', $this->route('product')->id);
                 })
             ]
         ];

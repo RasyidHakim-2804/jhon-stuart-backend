@@ -17,7 +17,7 @@ class AdminProductImageController extends Controller
 {
     public function index(Product $product)
     {
-        $images = $product->images()->where('is_saved', '=', 1)->get();
+        $images = $product->images()->saved()->get();
 
         return ProductImageResource::collection($images);
     }
@@ -27,19 +27,12 @@ class AdminProductImageController extends Controller
         try {
             DB::beginTransaction();
 
-            $image              = new ProductImage();
-            $lastPosition       = ProductImage::where('product_id', $product->id)
-                                    ->orderByDesc('id')
-                                    ->value('position');
-
-            $imageService       = new ImageService($image);
-            $result             = $imageService->upload($request->images);            
+            $image         = new ProductImage();
+            $imageService  = new ImageService($image);          
 
             $image->product_id  = $product->id;
-            $image->name        = $result->name;
-            $image->path        = $result->path;
-            $image->position    = $lastPosition + 1;
-            $image->is_saved    = false;
+            $image->path        = $imageService->upload($request->images)->path;
+            $image->position    = null;
             $image->save();
 
             DB::commit();
@@ -63,10 +56,7 @@ class AdminProductImageController extends Controller
         try {
             DB::beginTransaction();
 
-            $image = ProductImage::where('id', $request->image_id)
-                        ->where('product_id', $product->id)
-                        ->first();
-
+            $image        = $product->images()->where('id', $request->image_id)->firstOrFail();
             $imageService = new ImageService($image);
             $imageService->delete();
             $image->delete();
@@ -88,67 +78,37 @@ class AdminProductImageController extends Controller
 
     public function saveImages(SaveImageRequest $request, Product $product)
     {
-        DB::transaction(function() use ($request, $product)
-        {
-            $imagesId     = $request->validated()['images_id'];
-            $position     = 1;
-            $undeletedIds = [];
-            sort($imagesId);
-
-            if ( count($imagesId) != 0 ) {
-                foreach ( $imagesId as $key => $id ) {
-                    $image           = ProductImage::findOrFail($id);
-                    $image->is_saved = true;
-                    $image->position = $position;
-                    $image->save();
-        
-                    $position++;
-                    $undeletedIds[] = $id;
-                }   
-            }
-
-            $this->deleteById($product->id, $undeletedIds);
-        });
-        
-        return new SuccessResource();
-    }
-
-    ////////////////////
-    // private methods//
-    ////////////////////
-
-    private function deleteById($productId, array $undeletedIds)
-    {
-        $imageServices = [];
-
         try {
             DB::beginTransaction();
 
-            $images = ProductImage::query()
-                        ->where('product_id', $productId)
-                        ->whereNotIn('id', $undeletedIds)
-                        ->get();
+            $imagesId       = $request->validated('images_id');
+            $savedImages    = $product->images()->whereIn('id', $imagesId)->get();
+            $unsavedImaged  = $product->images()->whereNotIn('id', $imagesId)->get();                                                                   
+            $imageServices  = ImageService::collection($unsavedImaged);
 
-            foreach ($images as $image ) {
-                $imageService = new ImageService($image);
-                $imageService->delete();
-                $imageServices[] = $imageService;
-                $image->delete();
+            $imageServices->delete();
+            $product->images()->whereNotIn('id', $imagesId)->delete(); 
+            
+            foreach ($imagesId as $position => $id) {
+                $image           = $savedImages->where('id', '=', $id)->firstOrFail();
+                $image->position = $position + 1;
+                $image->save();
             }
 
-            DB::commit();
+            DB::commit();            
+
+            return new SuccessResource();
 
         } catch (\Throwable $th) {
-
+            
             DB::rollBack();
 
-            if (!empty($imageServices)) {
-                foreach ($$imageServices as $imageService) {
-                    $imageService->rollback();
-                }
+            if (isset($imageServices)) {
+                $imageServices->rollback();
             }
-
+            
             throw $th;
         }
+            
     }
 }
