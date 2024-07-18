@@ -16,20 +16,13 @@ class AdminProductResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id'            => $this->id,
-            'name'          => $this->name,
-            'slug'          => $this->slug,
-            'is_varied'     => $this->is_varied,
-            'is_saleable'   => $this->is_saleable,
-            
-            'description'  => ProductTranslationResource::collection($this->whenLoaded('translations')),    
-
-            $this->mergeWhen( $this->relationLoaded('categories'),function(){
-                return [
-                    'category_type' => $this->categories->first()->type,
-                    'categories'    => ProductCategoryResource::collection($this->categories),    
-                ];
-            }),
+            'id'                 => $this->id,
+            'name'               => $this->name,
+            'slug'               => $this->slug,
+            'is_varied'          => $this->is_varied,
+            'available'          => $this->available,
+            'short_description'  => $this->short_description,
+            'full_description'   => $this->full_description,
 
             $this->mergeWhen( $this->relationLoaded('variants'), function(){
                 return [
