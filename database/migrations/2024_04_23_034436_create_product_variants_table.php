@@ -17,7 +17,6 @@ return new class extends Migration
             $table->foreignId('product_id')->constrained('products', 'id');
             $table->string('code')->unique();
             $table->unsignedInteger('stock');
-            $table->boolean('is_default')->default(0);
             $table->boolean('available');
             $table->unsignedDecimal('idr_price', 10, 2);
             $table->unsignedDecimal('usd_price', 10, 2);
