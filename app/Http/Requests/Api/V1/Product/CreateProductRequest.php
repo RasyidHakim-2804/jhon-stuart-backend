@@ -21,7 +21,10 @@ class CreateProductRequest extends FormRequest
     protected function prepareForValidation()
     {
         if ($this->input('category_type') == ProductCategory::MUSEUM_TYPE) {
-            $this->merge(['is_varied' => 0]);
+            $this->merge([
+                'is_varied' => 0,
+                'stock'     => 1
+            ]);
         }
     } 
 

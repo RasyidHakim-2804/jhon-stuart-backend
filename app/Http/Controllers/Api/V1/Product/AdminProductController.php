@@ -4,15 +4,12 @@ namespace App\Http\Controllers\Api\V1\Product;
 
 use App\Models\Product;
 use App\Models\ProductVariant;
-use App\Models\Translation\ProductTranslation;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\Product\CreateProductRequest;
 use App\Http\Requests\Api\V1\Product\UpdateProductRequest;
 use App\Http\Resources\Api\V1\Common\SuccessResource;
-use App\Http\Resources\Api\V1\Product\AdminProductResource;
-use App\Models\ProductCategory;
+use App\Http\Resources\Api\V1\Product\ProductResource;
 use App\Service\Services\ImageServices\ImageService;
-use Spatie\QueryBuilder\AllowedSort;
 use Spatie\QueryBuilder\QueryBuilder;
 use Illuminate\Support\Facades\DB;
 use Spatie\QueryBuilder\AllowedFilter;
@@ -26,18 +23,18 @@ class AdminProductController extends Controller
     {
         $products = QueryBuilder::for(Product::class)
                     ->defaultSort('-id')
-                    ->withMin('variants', 'usd_price')
+                    ->selectVariantPrice()
                     ->allowedSorts([
                         'name',
                         'popular',
-                        AllowedSort::field('price', 'variants_min_usd_price')
+                        'price'
                     ])
                     ->allowedFilters([
                         AllowedFilter::partial('search', 'name')
                     ])
                     ->paginate(25)->appends(request()->query());
 
-        return AdminProductResource::collection($products);
+        return ProductResource::collection($products);
     }
 
     /**
@@ -47,10 +44,10 @@ class AdminProductController extends Controller
     {
         $product = $product->load([
             'variants',
-            'category',
+            'category:id,name,slug,type',
             ]);
 
-        return new AdminProductResource($product);
+        return new ProductResource($product, true);
     }
 
     /**
@@ -58,7 +55,7 @@ class AdminProductController extends Controller
      */
     public function store(CreateProductRequest $request)
     {
-        $request = $request->validated();
+        $request = $request->validated();dd($request);
 
         DB::transaction(function() use ($request){
 
@@ -157,8 +154,11 @@ class AdminProductController extends Controller
         $variant->product_id    = $product->id;
         $variant->idr_price     = $request['idr_price'];
         $variant->usd_price     = $request['usd_price'];
-        $variant->stock         = $request['stock'];
         $variant->available     = $request['available'];
+
+        if ($request['stock'] != null) { //for update museum type
+            $variant->stock = $request['stock'];
+        }
 
         if ($variant->code != $request['code']) {
             $variant->code = $request['code'];

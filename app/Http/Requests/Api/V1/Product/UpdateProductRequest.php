@@ -22,7 +22,10 @@ class UpdateProductRequest extends FormRequest
     protected function prepareForValidation()
     {
         if ($this->input('category_type') == ProductCategory::MUSEUM_TYPE) {
-            $this->merge(['is_varied' => 0]);
+            $this->merge([
+                'is_varied' => 0,
+                'stock'     => null
+            ]);
         }
     } 
 
@@ -52,7 +55,7 @@ class UpdateProductRequest extends FormRequest
             ],
             'idr_price'             => 'exclude_if:is_varied,true|required|numeric|max:10000000',
             'usd_price'             => 'exclude_if:is_varied,true|required|numeric|max:10000000',
-            'stock'                 => 'exclude_if:is_varied,true|required|numeric|min:0',
+            'stock'                 => 'exclude_if:is_varied,true|nullable|numeric|min:0',
             'code'                  => [
                 'exclude_if:is_varied,true',
                 'required',
