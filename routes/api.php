@@ -155,7 +155,8 @@ Route::prefix('v1')->group(function(){
             Route::put('/profile', [UserProfileController::class, 'update']);
 
             //Wishlists
-            Route::get('/wishlists', [UserWishlistController::class, 'index'])->middleware('language');
+            Route::get('/wishlists-side', [UserWishlistController::class, 'side']);
+            Route::get('/wishlists', [UserWishlistController::class, 'index']);
             Route::post('/wishlists', [UserWishlistController::class,'store']);
             Route::delete('/wishlists', [UserWishlistController::class, 'destroy']);
             

@@ -8,6 +8,7 @@ use App\Http\Requests\Api\V1\Wishlist\DeleteWishlistRequest;
 use App\Http\Resources\Api\V1\Common\SuccessResource;
 use App\Http\Resources\Api\V1\Product\ProductResource;
 use App\Http\Resources\Api\V1\Product\ProductVariantResource;
+use App\Models\ProductVariant;
 use App\Models\Wishlist;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -58,5 +59,13 @@ class UserWishlistController extends Controller
         });
 
         return new SuccessResource(JsonResponse::HTTP_CREATED);
+    }
+
+    public function side(Request $request)
+    {
+        /** @var \App\Models\ProductVariant */
+        $productVariant = $request->user()->wishlists()->with(['product:id,name,available'])->paginate(5);
+        
+        return ProductVariantResource::collection($productVariant);
     }
 }

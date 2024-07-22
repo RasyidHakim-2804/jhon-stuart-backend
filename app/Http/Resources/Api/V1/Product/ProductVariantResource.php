@@ -20,8 +20,8 @@ class ProductVariantResource extends JsonResource
             'product_id'    => $this->product_id,
             $this->mergeWhen($this->relationLoaded('product'), function() {
                 return [
-                    'product_name'  => $this->product->name,
-                    'is_saleable'   => $this->product->is_saleable,
+                    'product_name'        => $this->product->name,
+                    'product_available'   => $this->product->available,
                 ];
             }),
             'type'          => $this->type,
