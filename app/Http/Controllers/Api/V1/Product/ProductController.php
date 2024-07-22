@@ -7,52 +7,66 @@ use App\Models\Product;
 use App\Http\Resources\Api\V1\Product\ProductResource;
 use App\Models\ProductCategory;
 use Illuminate\Http\Request;
+use Spatie\QueryBuilder\AllowedFilter;
+use Spatie\QueryBuilder\QueryBuilder;
 
 class ProductController extends Controller
 {
     /**
      * Display the specified resource.
      */
-    public function show($slug, Request $request)
+    public function show($slug)
     {
-        $lang = $request->lang;
-        
-        $product = Product::where([
-                ['slug', '=', $slug],
-                ['is_saleable', '=', true]
-            ])->with([
-            'variants',
-            'categories',
-            'translate' => function($query) use ($lang){
-                $query->where('lang', $lang);
-            },
-            'images' => function ($query) {
-                $query->where('is_saved', true);
-            }
-            ])->firstOrFail();
+        $product = Product::where('slug', '=', $slug)
+            ->with([
+                'variants',
+                'category:id,name,slug',
+                'images' => function ($query) {
+                    $query->where('position', '!=', null);
+                }
+            ])
+            ->available()
+            ->firstOrFail();
         
         return new ProductResource($product);
     }
 
     public function moreProducts(ProductCategory $category)
     {
-        $products = Product::query()
-                    ->join('pivot_product_category', 'pivot_product_category.product_id', 'products.id')
-                    ->where('is_saleable', '=', true)
-                    ->where('pivot_product_category.product_categories_id', '=', $category->id)
+        $products = Product::available()
+                    ->where('category_id', '=', $category->id)
                     ->with([
                         'images' => function ($query) {
-                            $query->where([
-                                [ 'is_saved', '=', true ],
-                                [ 'position', '=', 1]
-                            ]);
+                            $query->where('position', '=', 1);
                         },
-                        'minPriceVariant'
                     ])
+                    ->selectVariantPrice()
                     ->withMin('variants', 'usd_price')
                     ->orderBy('popular', 'desc')
                     ->paginate(3)->appends(request()->query());
 
         return ProductResource::collection($products);
+    }
+
+    public function index(ProductCategory $category)
+    {
+        $products = QueryBuilder::for(Product::class)
+                    ->selectVariantPrice()
+                    ->available()
+                    ->where('category_id', $category->id)
+                    ->with([
+                        'thumbnailImage',
+                    ])
+                    ->defaultSort('price')
+                    ->allowedSorts([
+                        'popular',
+                        'price'
+                    ])
+                    ->allowedFilters([
+                        AllowedFilter::partial('search', 'name'),
+                    ])
+                    ->paginate(12)->appends(request()->query());
+
+            return ProductResource::collection($products);
     }
 }

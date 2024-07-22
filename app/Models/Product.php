@@ -8,12 +8,16 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 use App\Models\Image\ProductImage;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Facades\DB;
 
 class Product extends Model
 {
     use HasFactory, HasSlug;
+
+    protected $table = 'products';
 
     protected $fillable = [
         'name','slug'
@@ -26,6 +30,23 @@ class Product extends Model
                 ->saveSlugsTo('slug')
                 ->slugsShouldBeNoLongerThan(100)
                 ->startSlugSuffixFrom(2);
+    }
+
+    public function scopeSelectVariantPrice(Builder $query)
+    {
+        $query->addSelect('*',DB::raw(
+            "(select usd_price from product_variants where product_id = products.id order by usd_price asc limit 1) as price"
+        ));
+    }
+
+    public function scopeAvailable(Builder $query, bool $available = true)
+    {
+        $query->where('available', '=', $available);
+    }
+
+    public function thumbnailImage(): HasOne
+    {
+        return $this->hasOne(ProductImage::class)->ofMany('position', 'MIN');
     }
 
     public function variants(): HasMany
