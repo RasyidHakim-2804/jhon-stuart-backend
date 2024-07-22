@@ -79,6 +79,6 @@ class User extends Authenticatable implements CanUploadImage
 
     public function wishlists(): BelongsToMany
     {
-        return $this->belongsToMany(ProductVariant::class, 'user_wishlists', 'user_id', 'product_variant_id');
+        return $this->belongsToMany(ProductVariant::class, 'wishlists', 'user_id', 'product_variant_id');
     }
 }
