@@ -26,7 +26,7 @@ class ProductVariant extends Model
     protected $table = 'product_variants';
 
     public const VARIANT_TYPE = [
-        's', 'l', 'm', 'set', 'jumbo'
+        'S', 'L', 'M', 'set', 'jumbo'
     ];
 
     public const DEFAULT_TYPE = 'default';
