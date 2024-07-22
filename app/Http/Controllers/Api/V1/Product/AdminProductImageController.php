@@ -51,31 +51,6 @@ class AdminProductImageController extends Controller
         }
     }
 
-    public function delete(DeleteImagerequest $request,Product $product)
-    {
-        try {
-            DB::beginTransaction();
-
-            $image        = $product->images()->where('id', $request->image_id)->firstOrFail();
-            $imageService = new ImageService($image);
-            $imageService->delete();
-            $image->delete();
-
-            DB::commit();
-
-            return new SuccessResource();
-        } catch (\Throwable $th) {
-            
-            DB::rollBack();
-            
-            if (isset($imageService)) {
-                $imageService->rollback();
-            }
-
-            throw $th;
-        }
-    }
-
     public function saveImages(SaveImageRequest $request, Product $product)
     {
         try {
