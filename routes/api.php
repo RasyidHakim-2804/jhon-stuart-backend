@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\V1\Profile\AdminProfileController;
 use App\Http\Controllers\Api\V1\ArticleAuthor\AdminArticleAuthorController;
 use App\Http\Controllers\Api\V1\Article\AdminArticleController;
 use App\Http\Controllers\Api\V1\Subscriber\AdminSubscriberController;
+use App\Http\Controllers\Api\V1\Event\AdminEventController;
 
 use App\Http\Controllers\Api\V1\Auth\User\UserAuthController;
 use App\Http\Controllers\Api\V1\Auth\User\UserPasswordController;
@@ -23,6 +24,7 @@ use App\Http\Controllers\Api\V1\ProductCategory\ProductCategoryController;
 use App\Http\Controllers\Api\V1\Contact\ContactController;
 use App\Http\Controllers\Api\V1\Product\ProductController;
 use App\Http\Controllers\Api\V1\Article\ArticleController;
+use App\Http\Controllers\Api\V1\Event\EventController;
 use App\Http\Controllers\Api\V1\Subscriber\SubscriberController;
 use Illuminate\Support\Facades\Route;
 
@@ -84,6 +86,13 @@ Route::prefix('v1')->group(function(){
             Route::get('/articles/{article:slug}', [AdminArticleController::class, 'show']);
             Route::put('/articles/{article:slug}', [AdminArticleController::class, 'update']);
             Route::delete('/articles/{article:slug}', [AdminArticleController::class, 'destroy']);
+
+            //Event
+            Route::get('/events', [AdminEventController::class, 'index']);
+            Route::post('/events', [AdminEventController::class, 'store']);
+            Route::get('/events/{event:slug}', [AdminEventController::class, 'show']);
+            Route::put('/events/{event:slug}', [AdminEventController::class, 'update']);
+            Route::delete('/events/{event:slug}', [AdminEventController::class, 'destroy']);
 
             //ProductCategory
             Route::get('/product-categories', [AdminProductCategoryController::class, 'index']);
@@ -176,6 +185,11 @@ Route::prefix('v1')->group(function(){
     Route::get('/articles', [ArticleController::class, 'index']);
     Route::get('/articles/{article:slug}', [ArticleController::class, 'show']);
     Route::get('/top-articles', [ArticleController::class, 'topArticles']);
+
+    //Event
+    Route::get('/events', [EventController::class, 'index']);
+    Route::get('/events/{article:slug}', [EventController::class, 'show']);
+    Route::get('/top-events', [EventController::class, 'topEvents']);
     
     //Products
     Route::get('/products/{slug}', [ProductController::class,'show']);
