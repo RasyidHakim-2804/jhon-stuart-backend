@@ -31,7 +31,7 @@ class AdminProductImageController extends Controller
             $imageService  = new ImageService($image);          
 
             $image->product_id  = $product->id;
-            $image->path        = $imageService->upload($request->images)->path;
+            $image->url         = $imageService->upload($request->images)->path;
             $image->position    = null;
             $image->save();
 

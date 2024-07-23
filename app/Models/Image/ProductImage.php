@@ -16,7 +16,7 @@ class ProductImage extends Model implements CanUploadImage
     use HasFactory, HasImage;
 
     protected $table            = 'product_images';
-    protected $imageUrlColumn   = 'path';
+    protected $imageUrlColumn   = 'url';
     protected $format           = '.webp';
     protected $disk             = 'public';
     protected $dirPath          = 'upload/images/product/';
@@ -28,7 +28,7 @@ class ProductImage extends Model implements CanUploadImage
     }
 
     //Accessor path
-    public function path(): Attribute
+    public function url(): Attribute
     {
         return new Attribute(
             get: function ($value = null) {
