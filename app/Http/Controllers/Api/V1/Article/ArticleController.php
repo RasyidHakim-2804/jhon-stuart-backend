@@ -10,7 +10,7 @@ class ArticleController extends Controller
 {
     public function index()
     {
-        $article = Article::exceptBody()->with([
+        $article = Article::with([
             'author',
             'category:id,name',
         ])->paginate(25);

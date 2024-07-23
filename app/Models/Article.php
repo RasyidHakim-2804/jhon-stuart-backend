@@ -50,11 +50,6 @@ class Article extends Model implements CanUploadImage
         );
     }
 
-    public function scopeExceptBody(Builder $query)
-    {
-        $query->select('id','title', 'slug', 'image_url', 'views', 'meta', 'category_id', 'author_id', 'created_at', 'updated_at');
-    }
-
     public function category() : BelongsTo
     {
         return $this->belongsTo(ArticleCategory::class);
