@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Resources\Api\V1\ArticleAuthor;
+namespace App\Http\Resources\ArticleAuthor;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;

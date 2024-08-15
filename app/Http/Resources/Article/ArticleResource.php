@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Http\Resources\Api\V1\Article;
+namespace App\Http\Resources\Article;
 
-use App\Http\Resources\Api\V1\ArticleAuthor\ArticleAuthorResource;
+use App\Http\Resources\ArticleAuthor\ArticleAuthorResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 

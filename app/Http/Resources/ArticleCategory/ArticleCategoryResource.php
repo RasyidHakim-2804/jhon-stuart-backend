@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Resources\Api\V1\Event;
+namespace App\Http\Resources\ArticleCategory;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class EventImageResource extends JsonResource
+class ArticleCategoryResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -15,10 +15,9 @@ class EventImageResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id'         => $this->id,
-            'position'   => $this->position,
-            'url'        => $this->url,
-            'name'       => $this->name,
+            'id'    => $this->id,
+            'name'  => $this->name,
+            'slug'  => $this->slug,
         ];
     }
 }

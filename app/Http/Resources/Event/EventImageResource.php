@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Resources\Api\V1\Product;
+namespace App\Http\Resources\Event;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class ProductImageResource extends JsonResource
+class EventImageResource extends JsonResource
 {
     /**
      * Transform the resource into an array.

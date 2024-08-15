@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Resources\Api\V1\Common;
+namespace App\Http\Resources\Common;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -11,8 +11,10 @@ class SuccessResource extends JsonResource
     public static $wrap = null;
 
     public function __construct(
-        private int $code       = JsonResponse::HTTP_OK,
-        private ?string $message = null)
+        private int $code        = JsonResponse::HTTP_OK,
+        private ?string $message = null,
+        private $data = null,
+    )
     {
         parent::__construct((object)[]);
     }
@@ -32,8 +34,13 @@ class SuccessResource extends JsonResource
     {
         return [
             'status' => 'success',
+
             $this->mergeWhen($this->message !== null, [
                 'message' => $this->message
+            ]),
+
+            $this->mergeWhen($this->data != null, [
+                'data' => $this->data
             ]),
         ];
     }

@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Resources\Api\V1\Product;
+namespace App\Http\Resources\Product;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use App\Http\Resources\Api\V1\ProductCategory\ProductCategoryResource;
+use App\Http\Resources\ProductCategory\ProductCategoryResource;
 
 class ProductResource extends JsonResource
 {
