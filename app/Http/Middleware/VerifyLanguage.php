@@ -2,29 +2,29 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Language;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
-use Symfony\Component\HttpFoundation\Response;
 
-class AcceptLanguage
+class VerifyLanguage
 {
     /**
      * Handle an incoming request.
      *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Closure(\Illuminate\Http\Request): (\Illuminate\Http\Response|\Illuminate\Http\RedirectResponse)  $next
+     * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
      */
     public function handle(Request $request, Closure $next)
     {
         $lang = $request->lang ?? 'en';
 
-        if (in_array($lang, ['en', 'id'])) {
+        if (in_array($lang, Language::code())) {
             App::setLocale($lang);
         } else {
             App::setLocale('en');
         }
-
-        $request->merge(['lang' => $lang]);
 
         return $next($request);
     }
