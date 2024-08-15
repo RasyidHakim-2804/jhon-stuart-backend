@@ -2,79 +2,80 @@
 
 namespace App\Models;
 
+// use Illuminate\Contracts\Auth\MustVerifyEmail;
+
+use App\Services\Logs\AdminLogService;
+use App\Traits\ImageStorageTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
-use App\Models\Image\AdminProfileImage;
-use App\Service\Contracts\Model\CanUploadImage;
-use App\Service\Traits\HasImage;
-use Illuminate\Database\Eloquent\Casts\Attribute;
+use Laravel\Passport\HasApiTokens;
+use Illuminate\Database\Eloquent\Builder;
 
-class Admin extends Authenticatable implements CanUploadImage
+class Admin extends Authenticatable
 {
-    use HasFactory, HasApiTokens, Notifiable, SoftDeletes, HasImage;
+    use HasApiTokens, ImageStorageTrait, HasFactory, Notifiable, SoftDeletes;
 
-    protected $imageUrlColumn = 'profile_image_url';
-    protected $format         = 'webp';
-    protected $disk           = 'public';
-    protected $dirPath        = 'upload/images/profile/admin/';
-
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
         'first_name',
         'last_name',
-        'phone',
         'email',
-        'password',
-        'profile_image_url'
+        'is_active',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
-     */
+    protected $imageSetting = [
+        'folder' => 'admin',
+        'field'  => [
+            'profile_picture',
+        ],
+    ];
+
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
     protected $casts = [
         'email_verified_at' => 'datetime',
-        'password' => 'hashed',
     ];
 
-    public function profileImageUrl(): Attribute
+    public function getRouteKeyName()
     {
-        return new Attribute(
-            get: function ($value = null) {
-                if ($value == null) {
-                    return null;
-                }
-                return  config('app.frontend_url') . 'storage/' . $value;
-            }
-        );
+        return 'uuid';
     }
 
-    public function resetPassword():HasOne
+    public function forgetPasswordResets()
     {
-        return $this->hasOne(AdminResetPassword::class);
+        return $this->hasMany(ForgetAdminPasswordReset::class, 'admin_id', 'id');
     }
 
-    public function verifyEmail():HasOne
+    public function permissions()
     {
-        return $this->hasOne(AdminVerifyEmail::class);
+        return $this->hasMany(AdminPermission::class, 'admin_id', 'id');
+    }
+
+    public function scopeSearch(Builder $query, $search): Builder
+    {
+        return $query->where('uuid', 'LIKE','%' . $search . '%')->orWhere('first_name', 'LIKE','%' . $search . '%')->orWhere('last_name', 'LIKE','%' . $search . '%');
+    }
+
+    public static function boot()
+    {
+        parent::boot();
+
+        $logService = new AdminLogService;
+  
+        static::created(function($data) use($logService) {
+            $logService->store('create', 'admin', $data->id);
+        });
+
+        static::updated(function($data) use($logService) {  
+            if ($logService) $logService->store('update', 'admin', $data->id);
+        });
+        
+        static::deleted(function($data) use($logService) { 
+            if ($logService) $logService->store('delete', 'admin', $data->id);
+        });
     }
 }
