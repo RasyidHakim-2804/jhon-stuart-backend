@@ -12,7 +12,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        (new FirstAccountSeeder)->run();
+        (new AdminSeeder)->run();
         (new LanguageSeeder)->run();
 
         //product
