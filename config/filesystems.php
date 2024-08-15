@@ -44,6 +44,22 @@ return [
             'throw' => false,
         ],
 
+        'public_upload' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/upload'),
+            'url' => env('APP_URL').'/storage/upload',
+            'visibility' => 'public',
+            'throw' => false,
+        ],
+
+        'private_upload' => [
+            'driver' => 'local',
+            'root' => storage_path('app/private/upload'),
+            'url' => env('APP_URL').'/images',
+            'visibility' => 'private',
+            'throw' => false,
+        ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),
