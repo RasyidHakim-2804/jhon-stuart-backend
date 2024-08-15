@@ -1,5 +1,5 @@
 <?php 
-namespace App\Service\Services\ImageServices;
+namespace App\Services\ImageServicesRasyid;
 
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\UploadedFile;
@@ -15,29 +15,7 @@ class ImageServiceCollection
     {
         $this->imageServices = $this->makeImageServices($collection);
     }
-
-    public function upload(UploadedFile $image)
-    {
-        $this->imageServices = array_map(function($imageService) use ($image){
-            
-            $imageService->upload($image);
-            
-            return $imageService;
-        
-        }, $this->imageServices);
-    }
-
-    public function update(UploadedFile $image)
-    {
-        $this->imageServices = array_map(function($imageService) use ($image){
-            
-            $imageService->update($image);
-
-            return $imageService;
-
-        }, $this->imageServices);
-    }
-
+    
     public function delete()
     {
         $this->imageServices = array_map(function($imageService){
