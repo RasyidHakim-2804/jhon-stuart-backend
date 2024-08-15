@@ -19,6 +19,7 @@ class ProductCategorySeeder extends Seeder
             'id'         => 1,
             'name'       => 'One-off',
             'slug'       => Str::slug('one off'),
+            'description'=> fake()->paragraph,
             'type'       => 'museum',
             'created_at' => now(),
         ]);
@@ -27,6 +28,7 @@ class ProductCategorySeeder extends Seeder
             'id'         => 2,
             'name'       => 'Limited',
             'slug'       => Str::slug('limited'),
+            'description'=> fake()->paragraph,
             'type'       => 'museum',
             'created_at' => now(),
         ]);
@@ -35,6 +37,7 @@ class ProductCategorySeeder extends Seeder
             'id'         => 3,
             'name'       => 'Seasons',
             'slug'       => Str::slug('seasons'),
+            'description'=> fake()->paragraph,
             'type'       => 'museum',
             'created_at' => now(),
         ]);
@@ -43,6 +46,7 @@ class ProductCategorySeeder extends Seeder
             'id'         => 4,
             'name'       => 'Year',
             'slug'       => Str::slug('year'),
+            'description'=> fake()->paragraph,
             'type'       => 'museum',
             'created_at' => now(),
         ]);
@@ -53,6 +57,7 @@ class ProductCategorySeeder extends Seeder
             'id'         => 5,
             'name'       => 'ANIMALS',
             'slug'       => Str::slug('animals'),
+            'description'=> fake()->paragraph,
             'type'       => 'gallery',
             'created_at' => now(),
         ]);
@@ -61,6 +66,7 @@ class ProductCategorySeeder extends Seeder
             'id'         => 6,
             'name'       => 'VESSELS',
             'slug'       => Str::slug('vessels'),
+            'description'=> fake()->paragraph,
             'type'       => 'gallery',
             'created_at' => now(),
         ]);
@@ -69,6 +75,7 @@ class ProductCategorySeeder extends Seeder
             'id'         => 7,
             'name'       => 'RAW CANES',
             'slug'       => Str::slug('raw canes'),
+            'description'=> fake()->paragraph,
             'type'       => 'gallery',
             'created_at' => now(),
         ]);
@@ -77,6 +84,7 @@ class ProductCategorySeeder extends Seeder
             'id'         => 8,
             'name'       => 'JEWELLERY',
             'slug'       => Str::slug('jewellery'),
+            'description'=> fake()->paragraph,
             'type'       => 'gallery',
             'created_at' => now(),
         ]);

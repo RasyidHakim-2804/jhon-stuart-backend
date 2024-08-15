@@ -22,6 +22,8 @@ class ArticleSeeder extends Seeder
             'image_url'     => 'https://source.unsplash.com/random/500x500',
             'category_id'   => 1,
             'author_id'     => 1,
+            'meta'          => fake()->paragraph,
+            'body'          => fake()->paragraph,
             'created_at'    => now(),
         ]);
 
@@ -33,6 +35,8 @@ class ArticleSeeder extends Seeder
             'image_url'     => 'https://source.unsplash.com/random/500x500',
             'category_id'   => 2,
             'author_id'     => 2,
+            'meta'          => fake()->paragraph,
+            'body'          => fake()->paragraph,
             'created_at'    => now(),
         ]);
 
@@ -44,6 +48,8 @@ class ArticleSeeder extends Seeder
             'image_url'     => 'https://source.unsplash.com/random/500x500',
             'category_id'   => 3,
             'author_id'     => 3,
+            'meta'          => fake()->paragraph,
+            'body'          => fake()->paragraph,
             'created_at'    => now(),
         ]);
     }

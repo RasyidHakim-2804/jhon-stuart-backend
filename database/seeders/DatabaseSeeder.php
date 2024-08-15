@@ -17,16 +17,15 @@ class DatabaseSeeder extends Seeder
 
         //product
         (new ProductCategorySeeder)->run();
-        (new ProductSeeder)->run();
-        (new ProductVariantSeeder)->run();
-        (new PivotProductCategorySeeder)->run();
-        (new ProductTranslationsSeeder)->run();
-        (new ProductCategoryTranslationSeeder)->run();
+        // (new ProductSeeder)->run();
+        // (new ProductVariantSeeder)->run();
+        // (new PivotProductCategorySeeder)->run();
+        // (new ProductTranslationsSeeder)->run();
+        // (new ProductCategoryTranslationSeeder)->run();
 
         //article
         (new ArticleAuthorSeeder)->run();
         (new ArticleCategorySeeder)->run();
         (new ArticleSeeder)->run();
-        (new ArticleTranslationSeeder)->run();
     }
 }
