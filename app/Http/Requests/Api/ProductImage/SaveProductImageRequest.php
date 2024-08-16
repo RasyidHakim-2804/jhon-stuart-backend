@@ -2,11 +2,11 @@
 
 namespace App\Http\Requests\Api\ProductImage;
 
-use App\Models\Image\ProductImage;
+use App\Models\ProductImage;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class SaveImageRequest extends FormRequest
+class SaveProductImageRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.

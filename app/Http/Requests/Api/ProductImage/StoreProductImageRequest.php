@@ -4,7 +4,7 @@ namespace App\Http\Requests\Api\ProductImage;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreImageRequest extends FormRequest
+class StoreProductImageRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
