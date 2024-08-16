@@ -2,21 +2,22 @@
 
 namespace App\Models;
 
+use App\Observers\AdminActionObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
-use App\Models\Translation\ProductCategoryTranslation;
 use Illuminate\Database\Eloquent\Builder;
 
+#[ObservedBy([AdminActionObserver::class])]
 class ProductCategory extends Model
 {
     use HasFactory, HasSlug;
 
-    protected $table          = 'product_categories';
-
     public const MUSEUM_TYPE  = 'museum';
+    
     public const GALLERY_TYPE = 'gallery';
 
     public function scopeGallery(Builder $query)
