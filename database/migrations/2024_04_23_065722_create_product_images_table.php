@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('product_images', function (Blueprint $table) {
             $table->id();
             $table->foreignId('product_id')->constrained('products', 'id');
-            $table->string('url');
+            $table->string('image');
             $table->unsignedTinyInteger('position')->nullable();
             $table->timestamps();
         });
