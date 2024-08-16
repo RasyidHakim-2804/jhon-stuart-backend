@@ -1,9 +1,5 @@
 <?php
 
-use App\Http\Controllers\Api\V1\Admin\AdminAdminController;
-use App\Http\Controllers\Api\V1\Admin\AdminUserController;
-use App\Http\Controllers\Api\V1\Auth\Admin\AdminAuthController;
-use App\Http\Controllers\Api\V1\Auth\Admin\AdminPasswordController;
 use App\Http\Controllers\Api\V1\ProductCategory\AdminProductCategoryController;
 use App\Http\Controllers\Api\V1\ArticleCategory\AdminArticleCategoryController;
 use App\Http\Controllers\Api\V1\Contact\AdminContactController;
@@ -28,73 +24,77 @@ use App\Http\Controllers\Api\V1\Event\EventController;
 use App\Http\Controllers\Api\V1\Subscriber\SubscriberController;
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\Api\V1\Admin\AdminController;
+use App\Http\Controllers\Api\V1\Admin\AuthAdminController;
+use App\Http\Controllers\Api\V1\Admin\AdminEmailChangesVerificationController;
+use App\Http\Controllers\Api\V1\Admin\AdminFeatureController;
+use App\Http\Controllers\Api\V1\Admin\ForgetAdminPasswordController;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
 |--------------------------------------------------------------------------
 |
 | Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "api" middleware group. Make something great!
+| routes are loaded by the RouteServiceProvider within a group which
+| is assigned the "api" middleware group. Enjoy building your API!
 |
 */
 
-Route::prefix('v1')->group(function(){
-    //Admin routes
-    Route::prefix('admins')->group(function (){
+Route::prefix('/v1')->middleware('verifyLanguage')->group(function () {
 
-        //Authentication
-        Route::post('/email-verify/confirm/{token}', [AdminAuthController::class, 'verifyEmail']);
-        Route::post('/email-verify/resend', [AdminAuthController::class, 'resendEmailVerification']);
-        Route::post('/sign-in', [AdminAuthController::class, 'login']);
+    Route::prefix('/admins')->group(function () {
 
-        //password controller
-        Route::post('/password/forget', [AdminPasswordController::class, 'forgetPassword']);
-        Route::post('/password/forget/verify-otp', [AdminPasswordController::class, 'verifyOtp']);
-        Route::post('/password/reset', [AdminPasswordController::class, 'resetPassword']);
-        Route::get('/password/forget/resend', [AdminPasswordController::class, 'forgetPassword']);
-        
-        Route::middleware(['auth:sanctum', 'verified', 'abilities:is_admin'])->group(function(){
-            
-            //Authentication
-            Route::post('/logout', [AdminAuthController::class, 'logout']);            
-            
-            //password controller
-            Route::post('/password/change', [AdminPasswordController::class, 'changePassword']);
-            
-            //Profile
-            Route::get('/profile', [AdminProfileController::class,'show']);
+        // Admin - Login
+        Route::post('/login', [AuthAdminController::class, 'login']);
+        Route::post('/resend-email-verification', [AuthAdminController::class, 'resendEmailVerification'])->middleware('throttle:limit_public_api_with_email_sending');
+        Route::post('/email-verification/{token}', [AuthAdminController::class, 'emailVerification']);
+
+        // Admin - Forget Password
+        Route::post('/forget-password', [ForgetAdminPasswordController::class, 'forgetPassword'])->middleware('throttle:limit_public_api_with_email_sending');
+        Route::post('/forget-password/verify-pin', [ForgetAdminPasswordController::class, 'verifyPin']);
+        Route::post('/forget-password/reset-password', [ForgetAdminPasswordController::class, 'resetPassword']);
+        Route::post('/verify-email-changes/{token}', AdminEmailChangesVerificationController::class);
+
+        Route::group(['middleware' => ['auth:api_admin', 'scopes:admin', 'verifyUserActive']], function(){
+
+            // Admin - Logout
+            Route::post('/logout', [AuthAdminController::class, 'logout']);
+
+            // Admin - Profile
+            Route::get('/profile', [AdminProfileController::class, 'index']);
             Route::put('/profile', [AdminProfileController::class, 'update']);
-            
-            //Contacts
+            Route::post('/change-password', [AdminProfileController::class, 'changePassword']);
+
+            // Admin - Contacts
             Route::get('/contacts', [AdminContactController::class,'index']);
             Route::get('/contacts/{contact}', [AdminContactController::class,'show']);
 
-            //Subscriber
+            // Admin - Subscriber
             Route::get('/subscribers', [AdminSubscriberController::class, 'index']);
 
-            //ArticleAuthor
+            // Admin - ArticleAuthor
             Route::get('/authors', [AdminArticleAuthorController::class, 'index']);
             Route::get('/authors/{author}', [AdminArticleAuthorController::class, 'show']);
             Route::post('/authors', [AdminArticleAuthorController::class, 'store']);
             Route::put('/authors/{author}', [AdminArticleAuthorController::class, 'update']);
             Route::delete('/authors/{author}', [AdminArticleAuthorController::class, 'destroy']);
 
-            //Article
+            // Admin - Article
             Route::get('/articles', [AdminArticleController::class, 'index']);
             Route::post('/articles', [AdminArticleController::class, 'store']);
             Route::get('/articles/{article:slug}', [AdminArticleController::class, 'show']);
             Route::put('/articles/{article:slug}', [AdminArticleController::class, 'update']);
             Route::delete('/articles/{article:slug}', [AdminArticleController::class, 'destroy']);
 
-            //Event
+            // Admin - Event
             Route::get('/events', [AdminEventController::class, 'index']);
             Route::post('/events', [AdminEventController::class, 'store']);
             Route::get('/events/{event:slug}', [AdminEventController::class, 'show']);
             Route::put('/events/{event:slug}', [AdminEventController::class, 'update']);
             Route::delete('/events/{event:slug}', [AdminEventController::class, 'destroy']);
 
-            //ProductCategory
+            // Admin - ProductCategory
             Route::get('/product-categories', [AdminProductCategoryController::class, 'index']);
             Route::post('/product-categories', [AdminProductCategoryController::class, 'store']);
             Route::get('/product-categories/{category:slug}', [AdminProductCategoryController::class,'show']);
@@ -108,35 +108,32 @@ Route::prefix('v1')->group(function(){
             Route::put('/article-categories/{category:slug}', [AdminArticleCategoryController::class, 'update']);
             Route::delete('/article-categories/{category:slug}', [AdminArticleCategoryController::class, 'destroy']);
   
-            //Products
+            // Admin - Products
             Route::get('/products', [AdminProductController::class,'index']);
             Route::post('/products', [AdminProductController::class, 'store']);
             Route::get('/products/{product}', [AdminProductController::class,'show']);
             Route::put('/products/{product}', [AdminProductController::class,'update']);
             Route::delete('/products/{product}', [AdminProductController::class,'destroy']);
 
-            //User
-            Route::get('/users', [AdminUserController::class, 'index']);
-            Route::get('/users/{user}', [AdminUserController::class, 'show']);
-            Route::put('/users/{user}', [AdminUserController::class, 'update']);
-            
-            //ProductImage
+            // Admin - ProductImage
             Route::get('/products/{product}/images', [AdminProductImageController::class, 'index']);
             Route::post('/products/{product}/images', [AdminProductImageController::class,'store']);
             Route::post('/products/{product}/save-images', [AdminProductImageController::class, 'saveImages']);
-            
-            //Admin
-            Route::post('/', [AdminAdminController::class, 'store'])->middleware('ability:admin_master');
-            Route::get('/', [AdminAdminController::class,'index']);
-            Route::put('/{admin}', [AdminAdminController::class, 'update'])->middleware('ability:admin_master');
-            Route::get('/{admin}',[AdminAdminController::class, 'show']);
-        });
 
-        
+            // Admin - Feature
+            Route::get('/admin-features', [AdminFeatureController::class, 'index']);
+
+            // Admin - Admin
+            Route::get('', [AdminController::class, 'index']);
+            Route::get('/{admin}', [AdminController::class, 'show']);
+            Route::post('', [AdminController::class, 'store']);
+            Route::put('/{admin}', [AdminController::class, 'update']);
+            Route::delete('/{admin}', [AdminController::class, 'destroy']);
+        });
     });
-    
+
     //User routes
-    Route::prefix('users')->group(function(){
+    Route::prefix('/users')->group(function(){
 
         //Authentication
         Route::post('/register', [UserAuthController::class,'register']);
@@ -149,10 +146,9 @@ Route::prefix('v1')->group(function(){
         Route::post('/password/forget/verify-otp', [UserPasswordController::class, 'verifyOtp']);
         Route::post('/password/reset/', [UserPasswordController::class, 'resetPassword']);
         Route::get('/password/forget/resend', [UserPasswordController::class,'forgetPassword']);
-    
 
-        Route::middleware(['auth:sanctum','verified', 'ability:is_user'])->group(function(){
-
+        Route::group(['middleware' => ['auth:api_user', 'scopes:user', 'verifyUserActive']], function(){
+            
             //Authentication
             Route::post('/logout', [UserAuthController::class, 'logout']);
 
@@ -168,9 +164,10 @@ Route::prefix('v1')->group(function(){
             Route::get('/wishlists', [UserWishlistController::class, 'index']);
             Route::post('/wishlists', [UserWishlistController::class,'store']);
             Route::delete('/wishlists', [UserWishlistController::class, 'destroy']);
-            
         });
     });
+
+    //======= PUBLIC =========
     
     //Contacts
     Route::post('/contacts', [ContactController::class,'store']);
@@ -196,3 +193,4 @@ Route::prefix('v1')->group(function(){
     Route::get('/product-categories/{category:slug}', [ProductController::class,'index']);
     Route::get('/more-products/{category:slug}', [ProductController::class, 'moreProducts']);
 });
+
