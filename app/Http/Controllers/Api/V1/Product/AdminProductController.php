@@ -9,7 +9,6 @@ use App\Http\Requests\Api\Product\CreateProductRequest;
 use App\Http\Requests\Api\Product\UpdateProductRequest;
 use App\Http\Resources\Common\SuccessResource;
 use App\Http\Resources\Product\ProductResource;
-use App\Service\Services\ImageServices\ImageService;
 use Spatie\QueryBuilder\QueryBuilder;
 use Illuminate\Support\Facades\DB;
 use Spatie\QueryBuilder\AllowedFilter;
@@ -55,7 +54,7 @@ class AdminProductController extends Controller
      */
     public function store(CreateProductRequest $request)
     {
-        $request = $request->validated();dd($request);
+        $request = $request->validated();
 
         DB::transaction(function() use ($request){
 
@@ -105,30 +104,7 @@ class AdminProductController extends Controller
      */
     public function destroy(Product $product)
     {
-        try {
-            DB::beginTransaction();
-            
-            $imageServices = ImageService::collection($product->images);
-            $imageServices->delete();
-
-            $product->images()->delete();
-            $product->variants()->delete();
-            $product->delete();
-    
-            DB::commit();
-            
-            return new SuccessResource();
-
-        } catch (\Throwable $th) {
-            
-            DB::rollBack();
-
-            if (isset($imageServices)) {
-                $imageServices->rollback();
-            }
-
-            throw $th;
-        }
+        
     }
     
     ////////////////////
