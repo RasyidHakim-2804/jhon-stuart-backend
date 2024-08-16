@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api\V1\Product;
 
 use App\Http\Controllers\Controller;
 use App\Models\Product;
-use App\Http\Resources\Api\V1\Product\ProductResource;
+use App\Http\Resources\Product\ProductResource;
 use App\Models\ProductCategory;
 use Illuminate\Http\Request;
 use Spatie\QueryBuilder\AllowedFilter;

@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Api\V1\Contact;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Api\V1\Contact\CreateContactRequest;
-use App\Http\Resources\Api\V1\Common\SuccessResource;
+use App\Http\Requests\Api\Contact\CreateContactRequest;
+use App\Http\Resources\Common\SuccessResource;
 use App\Mail\Api\V1\ContactMail;
 use App\Models\Contact;
 use Illuminate\Support\Facades\DB;

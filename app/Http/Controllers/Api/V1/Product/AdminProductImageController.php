@@ -3,11 +3,10 @@
 namespace App\Http\Controllers\Api\V1\Product;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Api\V1\Product\Image\DeleteImagerequest;
-use App\Http\Requests\Api\V1\Product\Image\SaveImageRequest;
-use App\Http\Requests\Api\V1\Product\Image\StoreImageRequest;
-use App\Http\Resources\Api\V1\Product\ProductImageResource;
-use App\Http\Resources\Api\V1\Common\SuccessResource;
+use App\Http\Requests\Api\ProductImage\SaveImageRequest;
+use App\Http\Requests\Api\ProductImage\StoreImageRequest;
+use App\Http\Resources\Product\ProductImageResource;
+use App\Http\Resources\Common\SuccessResource;
 use App\Models\Product;
 use App\Models\Image\ProductImage;
 use App\Service\Services\ImageServices\ImageService;

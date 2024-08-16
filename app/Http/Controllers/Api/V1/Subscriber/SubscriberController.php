@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Api\V1\Subscriber;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Api\V1\Subscriber\CreateSubscriberRequest;
-use App\Http\Resources\Api\V1\Common\SuccessResource;
+use App\Http\Requests\Api\Subscriber\CreateSubscriberRequest;
+use App\Http\Resources\Common\SuccessResource;
 use App\Models\Subscriber;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;

@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Api\V1\ArticleCategory;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Api\V1\ArticleCategory\ArticleCategoryRequest;
-use App\Http\Resources\Api\V1\ArticleCategory\ArticleCategoryResource;
-use App\Http\Resources\Api\V1\Common\SuccessResource;
+use App\Http\Requests\Api\ArticleCategory\ArticleCategoryRequest;
+use App\Http\Resources\ArticleCategory\ArticleCategoryResource;
+use App\Http\Resources\Common\SuccessResource;
 use App\Models\ArticleCategory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
