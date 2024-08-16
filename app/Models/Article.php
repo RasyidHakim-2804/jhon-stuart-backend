@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Service\Contracts\Model\CanUploadImage;
 use App\Service\Traits\HasImage;
+use App\Traits\ImageStorageTrait;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -13,14 +14,16 @@ use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 use Illuminate\Support\Str;
 
-class Article extends Model implements CanUploadImage
+class Article extends Model
 {
-    use HasFactory, HasSlug, HasImage;
+    use HasFactory, HasSlug, ImageStorageTrait;
 
-    protected $imageUrlColumn   = 'image_url';
-    protected $format           = '.webp';
-    protected $disk             = 'public';
-    protected $dirPath          = 'upload/images/article/';
+    protected $imageSetting = [
+        'folder' => 'article',
+        'field'  => [
+            'image',
+        ],
+    ];
 
     public function getSlugOptions(): SlugOptions
     {
@@ -29,25 +32,6 @@ class Article extends Model implements CanUploadImage
                 ->saveSlugsTo('slug')
                 ->slugsShouldBeNoLongerThan(100)
                 ->startSlugSuffixFrom(2);
-    }
-
-    public function imageUrl(): Attribute
-    {
-        return new Attribute(
-            get: function($value = null) {
-
-                if ($value == null) {
-                    
-                    return null;
-                    
-                } elseif ((Str::contains($value, 'https://')) || Str::contains($value,'http://')) {
-                    
-                    return $value;
-                }
-                
-                return config('app.frontend_url') . 'storage/' . $value;
-            }
-        );
     }
 
     public function category() : BelongsTo

@@ -12,8 +12,6 @@ class ArticleCategory extends Model
 {
     use HasFactory, HasSlug;
 
-    protected $table = 'article_categories';
-
     public function getSlugOptions(): SlugOptions
     {
         return SlugOptions::create()

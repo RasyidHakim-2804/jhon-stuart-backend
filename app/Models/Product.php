@@ -2,22 +2,22 @@
 
 namespace App\Models;
 
+use App\Observers\AdminActionObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
-use App\Models\Image\ProductImage;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Facades\DB;
 
+#[ObservedBy([AdminActionObserver::class])]
 class Product extends Model
 {
     use HasFactory, HasSlug;
-
-    protected $table = 'products';
 
     protected $fillable = [
         'name','slug'
