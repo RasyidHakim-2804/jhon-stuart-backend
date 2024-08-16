@@ -81,15 +81,19 @@ class UpdateProductRequest extends FormRequest
                 'string', 
                 'max:100',
                 function ($attribute, $value, $fail) {
-                    $variantId = $this->input(str_replace('code', 'id', $attribute));
+                    $variantId = $this->input(str_replace('code', 'id', $attribute)); // variants.*.code => variants.*.id
                     
-                    if ($variantId) {//old variant
-                        $exists    = DB::table('product_variants')->where('id', $variantId)->where('code', '!=', $value)->exists();
-                    } else {//new variant
+                    if ($variantId) { //old variant
+
+                        $exists    = DB::table('product_variants')->where('code', '=', $value)->where('id', '!=', $variantId)->exists();
+                    
+                    } else { //new variant
+
                         $exists    = DB::table('product_variants')->where('code', '=', $value)->exists();
                     }
     
                     if ($exists) {
+                        
                         $fail('The ' . $attribute . ' has beed already taken');
                     }
                 },

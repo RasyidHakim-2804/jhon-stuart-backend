@@ -56,7 +56,7 @@ class CreateProductRequest extends FormRequest
             ],
             'idr_price'             => 'exclude_if:is_varied,true|required|numeric|max:10000000',
             'usd_price'             => 'exclude_if:is_varied,true|required|numeric|max:10000000',
-            'stock'                 => 'exclude_if:is_varied,true|required|numeric|min:0',
+            'stock'                 => 'exclude_if:is_varied,true|required|integer|min:0',
             'code'                  => 'exclude_if:is_varied,true|required|string|unique:product_variants,code',
 
             'variants'              => 'exclude_if:is_varied,false|required|array|max:5',
