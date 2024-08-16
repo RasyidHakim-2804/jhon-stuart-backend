@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('title');
             $table->string('slug')->unique();
-            $table->string('image_url');
+            $table->string('image');
             $table->unsignedInteger('views');
             $table->text('meta');
             $table->text('body');
