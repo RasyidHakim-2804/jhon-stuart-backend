@@ -31,6 +31,7 @@ use App\Http\Controllers\Api\V1\Admin\AuthAdminController;
 use App\Http\Controllers\Api\V1\Admin\AdminEmailChangesVerificationController;
 use App\Http\Controllers\Api\V1\Admin\AdminFeatureController;
 use App\Http\Controllers\Api\V1\Admin\ForgetAdminPasswordController;
+use App\Http\Controllers\Api\V1\User\AdminUserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -149,6 +150,10 @@ Route::prefix('/v1')->middleware('verifyLanguage')->group(function () {
             Route::get('/products/{product}/images', [AdminProductImageController::class, 'index']);
             Route::post('/products/{product}/images', [AdminProductImageController::class,'store']);
             Route::post('/products/{product}/save-images', [AdminProductImageController::class, 'saveImages']);
+
+            // Admin - User
+            Route::get('/users', [AdminUserController::class, 'index']);
+            Route::put('/users/{user:uuid}', [AdminUserController::class, 'update']);
 
             // Admin - Feature
             Route::get('/admin-features', [AdminFeatureController::class, 'index']);
