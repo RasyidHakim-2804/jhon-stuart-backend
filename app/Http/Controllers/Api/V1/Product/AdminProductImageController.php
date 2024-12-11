@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api\V1\Product\Product;
+namespace App\Http\Controllers\Api\V1\Product;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\ProductImage\SaveProductImageRequest;
@@ -36,7 +36,7 @@ class AdminProductImageController extends Controller
 
             $productImage = new ProductImage();
             $imageService = new ImageService($productImage->imagePath(), $request->image);
-            $imageService->save();          
+            $imageService->save();
 
             $productImage->product_id  = $product->id;
             $productImage->image       = $imageService->getImageName();
@@ -50,7 +50,7 @@ class AdminProductImageController extends Controller
             );
 
         } catch (\Throwable $th) {
-            
+
             DB::rollBack();
 
             throw $th;
@@ -64,10 +64,10 @@ class AdminProductImageController extends Controller
 
             $imagesId       = $request->validated('images_id');
             $savedImages    = $product->images()->whereIn('id', $imagesId)->get();
-            $unsavedImages  = $product->images()->whereNotIn('id', $imagesId)->get();                                                                   
+            $unsavedImages  = $product->images()->whereNotIn('id', $imagesId)->get();
 
-            $product->images()->whereNotIn('id', $imagesId)->delete(); 
-            
+            $product->images()->whereNotIn('id', $imagesId)->delete();
+
             foreach ($imagesId as $position => $id) {
                 $image           = $savedImages->where('id', '=', $id)->firstOrFail();
                 $image->position = $position + 1;
@@ -79,16 +79,16 @@ class AdminProductImageController extends Controller
                 $imageService->delete($unsavedImage->image);
             }
 
-            DB::commit();            
+            DB::commit();
 
             return new SuccessResource();
 
         } catch (\Throwable $th) {
-            
+
             DB::rollBack();
-            
+
             throw $th;
         }
-            
+
     }
 }
