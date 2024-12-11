@@ -13,6 +13,8 @@ use App\Http\Controllers\Api\V1\Event\AdminEventController;
 
 use App\Http\Controllers\Api\V1\Auth\User\UserAuthController;
 use App\Http\Controllers\Api\V1\Auth\User\UserPasswordController;
+use App\Http\Controllers\Api\V1\User\Auth\AuthUserController;
+use App\Http\Controllers\Api\V1\User\ForgetPasswordController;
 use App\Http\Controllers\Api\V1\Profile\UserProfileController;
 use App\Http\Controllers\Api\V1\Wishlist\UserWishlistController;
 
@@ -42,6 +44,34 @@ use App\Http\Controllers\Api\V1\Admin\ForgetAdminPasswordController;
 */
 
 Route::prefix('/v1')->middleware('verifyLanguage')->group(function () {
+
+    //======= PUBLIC =========
+
+    //Contacts
+    Route::post('/contacts', [ContactController::class,'store']);
+
+    //Subscriber
+    Route::post('/subscribers', [SubscriberController::class, 'store']);
+
+    //ProductCategories
+    Route::get('/product-categories', [ProductCategoryController::class, 'index']);
+
+    //Article
+    Route::get('/articles', [ArticleController::class, 'index']);
+    Route::get('/articles/{article:slug}', [ArticleController::class, 'show']);
+    Route::get('/top-articles', [ArticleController::class, 'topArticles']);
+
+    //Event
+    Route::get('/events', [EventController::class, 'index']);
+    Route::get('/events/{article:slug}', [EventController::class, 'show']);
+    Route::get('/top-events', [EventController::class, 'topEvents']);
+
+    //Products
+    Route::get('/products/{slug}', [ProductController::class,'show']);
+    Route::get('/product-categories/{category:slug}', [ProductController::class,'index']);
+    Route::get('/more-products/{category:slug}', [ProductController::class, 'moreProducts']);
+
+    //======= END PUBLIC ROUTE ==========
 
     Route::prefix('/admins')->group(function () {
 
@@ -107,7 +137,7 @@ Route::prefix('/v1')->middleware('verifyLanguage')->group(function () {
             Route::get('/article-categories/{category:slug}', [AdminArticleCategoryController::class,'show']);
             Route::put('/article-categories/{category:slug}', [AdminArticleCategoryController::class, 'update']);
             Route::delete('/article-categories/{category:slug}', [AdminArticleCategoryController::class, 'destroy']);
-  
+
             // Admin - Products
             Route::get('/products', [AdminProductController::class,'index']);
             Route::post('/products', [AdminProductController::class, 'store']);
@@ -136,28 +166,29 @@ Route::prefix('/v1')->middleware('verifyLanguage')->group(function () {
     Route::prefix('/users')->group(function(){
 
         //Authentication
-        Route::post('/register', [UserAuthController::class,'register']);
-        Route::post('/email-verify/confirm/{token}', [UserAuthController::class, 'verifyEmail']);
-        Route::post('/email-verify/resend', [UserAuthController::class, 'resendEmailVerification']);
-        Route::post('/sign-in', [UserAuthController::class, 'login']);
+        Route::post('/register', [AuthUserController::class,'register']);
+        Route::post('/resend-email-verification', [AuthUserController::class, 'resendEmailVerification'])->middleware('throttle:limit_public_api_with_email_sending');
+        Route::post('/email-verification/{token}', [AuthUserController::class, 'emailVerification']);
+        Route::post('/login', [AuthUserController::class, 'login']);
 
         //password controller
-        Route::post('/password/forget', [UserPasswordController::class, 'forgetPassword']);
-        Route::post('/password/forget/verify-otp', [UserPasswordController::class, 'verifyOtp']);
-        Route::post('/password/reset/', [UserPasswordController::class, 'resetPassword']);
-        Route::get('/password/forget/resend', [UserPasswordController::class,'forgetPassword']);
+        Route::post('/password/forget', [ForgetPasswordController::class, 'forgetPassword']);
+        Route::post('/password/forget/verify-otp', [ForgetPasswordController::class, 'verifyPin']);
+        Route::post('/password/reset/', [ForgetPasswordController::class, 'resetPassword']);
+        Route::get('/password/forget/resend', [ForgetPasswordController::class,'forgetPassword']);
 
         Route::group(['middleware' => ['auth:api_user', 'scopes:user', 'verifyUserActive']], function(){
-            
+
             //Authentication
-            Route::post('/logout', [UserAuthController::class, 'logout']);
+            Route::post('/logout', [AuthUserController::class, 'logout']);
 
             //password controller
-            Route::post('/password/change', [UserPasswordController::class, 'changePassword']);
+            Route::post('/change-password', [UserProfileController::class, 'changePassword']);
 
             //User Profile
-            Route::get('/profile', [UserProfileController::class,'show']);
+            Route::get('/profile', [UserProfileController::class, 'index']);
             Route::put('/profile', [UserProfileController::class, 'update']);
+            Route::post('/change-password', [UserProfileController::class, 'changePassword']);
 
             //Wishlists
             Route::get('/wishlists-side', [UserWishlistController::class, 'side']);
@@ -166,31 +197,5 @@ Route::prefix('/v1')->middleware('verifyLanguage')->group(function () {
             Route::delete('/wishlists', [UserWishlistController::class, 'destroy']);
         });
     });
-
-    //======= PUBLIC =========
-    
-    //Contacts
-    Route::post('/contacts', [ContactController::class,'store']);
-
-    //Subscriber
-    Route::post('/subscribers', [SubscriberController::class, 'store']);
-
-    //ProductCategories
-    Route::get('/product-categories', [ProductCategoryController::class, 'index']);
-    
-    //Article
-    Route::get('/articles', [ArticleController::class, 'index']);
-    Route::get('/articles/{article:slug}', [ArticleController::class, 'show']);
-    Route::get('/top-articles', [ArticleController::class, 'topArticles']);
-
-    //Event
-    Route::get('/events', [EventController::class, 'index']);
-    Route::get('/events/{article:slug}', [EventController::class, 'show']);
-    Route::get('/top-events', [EventController::class, 'topEvents']);
-    
-    //Products
-    Route::get('/products/{slug}', [ProductController::class,'show']);
-    Route::get('/product-categories/{category:slug}', [ProductController::class,'index']);
-    Route::get('/more-products/{category:slug}', [ProductController::class, 'moreProducts']);
 });
 
