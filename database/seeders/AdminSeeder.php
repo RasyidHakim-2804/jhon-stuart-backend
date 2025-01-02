@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 
 class AdminSeeder extends Seeder
 {
@@ -15,7 +16,7 @@ class AdminSeeder extends Seeder
      */
     public function run()
     {
-        \DB::table('admins')->insert([
+        DB::table('admins')->insert([
             'first_name'        => 'Master',
             'last_name'         => 'Administration',
             'uuid'              => Str::random(12),
@@ -25,7 +26,7 @@ class AdminSeeder extends Seeder
             'is_active'         => 1
         ]);
 
-        \DB::table('admins')->insert([
+        DB::table('admins')->insert([
             'first_name'    => 'Second',
             'last_name'     => 'Administration',
             'uuid'          => Str::random(12),
@@ -33,7 +34,7 @@ class AdminSeeder extends Seeder
             'password'      => bcrypt('admin#2022!'),
         ]);
 
-        \DB::table('admins')->insert([
+        DB::table('admins')->insert([
             'first_name'    => 'Third',
             'last_name'     => 'Administration',
             'uuid'          => Str::random(12),
