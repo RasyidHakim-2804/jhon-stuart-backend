@@ -15,12 +15,11 @@ return new class extends Migration
             $table->id();
             $table->string('title');
             $table->string('slug')->unique();
-            $table->string('image');
+            $table->string('image')->nullable();
             $table->unsignedInteger('views');
-            $table->text('meta');
-            $table->text('body');
+            $table->string('type');
             $table->foreignId('category_id')->nullable()->constrained('article_categories', 'id');
-            $table->foreignId('author_id')->nullable()->constrained('article_authors', 'id');
+            $table->foreignId('admin_id')->nullable()->constrained('admins', 'id');
             $table->timestamps();
         });
     }
