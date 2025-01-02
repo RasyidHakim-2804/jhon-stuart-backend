@@ -14,42 +14,53 @@ class ArticleSeeder extends Seeder
      */
     public function run(): void
     {
+        // type-blog
         DB::table('articles')->insert([
             'id'            => 1,
-            'title'          => 'Polymer Art Magazines',
+            'type'          => 'blog',
+            'title'         => 'Polymer Art Magazines',
             'slug'          => Str::slug('Polymer Art Magazines'),
             'views'         => rand(50, 100),
-            'image_url'     => 'https://source.unsplash.com/random/500x500',
+            'image'         => 'https://picsum.photos/500/300',
             'category_id'   => 1,
-            'author_id'     => 1,
-            'meta'          => fake()->paragraph,
-            'body'          => fake()->paragraph,
+            'admin_id'      => 1,
             'created_at'    => now(),
         ]);
 
         DB::table('articles')->insert([
             'id'            => 2,
-            'title'          => 'Dramatic Color Blends for Canes',
+            'type'          => 'blog',
+            'title'         => 'Dramatic Color Blends for Canes',
             'slug'          => Str::slug('Dramatic Color Blends for Canes'),
             'views'         => rand(50, 100),
-            'image_url'     => 'https://source.unsplash.com/random/500x500',
-            'category_id'   => 2,
-            'author_id'     => 2,
-            'meta'          => fake()->paragraph,
-            'body'          => fake()->paragraph,
+            'image'         => 'https://picsum.photos/500/300',
+            'category_id'   => 1,
+            'admin_id'      => 1,
             'created_at'    => now(),
         ]);
 
         DB::table('articles')->insert([
             'id'            => 3,
-            'title'          => 'Painting with Polymer clay',
+            'type'          => 'blog',
+            'title'         => 'Painting with Polymer clay',
             'slug'          => Str::slug('Painting with Polymer clay'),
             'views'         => rand(50, 100),
-            'image_url'     => 'https://source.unsplash.com/random/500x500',
-            'category_id'   => 3,
-            'author_id'     => 3,
-            'meta'          => fake()->paragraph,
-            'body'          => fake()->paragraph,
+            'image'         => 'https://picsum.photos/500/300',
+            'category_id'   => 1,
+            'admin_id'      => 1,
+            'created_at'    => now(),
+        ]);
+
+        //type - event
+        DB::table('articles')->insert([
+            'id'            => 4,
+            'type'          => 'event',
+            'title'         => 'Cane making tutorial 2013, Ubud, Bali',
+            'slug'          => Str::slug('Cane making tutorial 2013, Ubud, Bali'),
+            'views'         => rand(50, 100),
+            // 'image'         => 'https://picsum.photos/500/300',
+            'category_id'   => 1,
+            'admin_id'      => 1,
             'created_at'    => now(),
         ]);
     }
