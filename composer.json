@@ -7,6 +7,7 @@
     "require": {
         "php": "^8.0.2",
         "arandilopez/laravel-profane": "^0.5.0",
+        "astrotomic/laravel-translatable": "^11.15",
         "barryvdh/laravel-dompdf": "^2.0",
         "doctrine/dbal": "^3.6",
         "guzzlehttp/guzzle": "^7.2",
