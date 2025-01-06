@@ -17,15 +17,10 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('article_id');
             $table->foreign('article_id')->references('id')->on('articles')->cascadeOnDelete();
-            $table->string('language')->index();
-            // --- content ---
-            $table->string('title');
-            $table->text('meta');
-            $table->text('body');
-            // --- end content ---
+            $table->string('language');
+            $table->string('field');
+            $table->text('translation');
             $table->timestamps();
-
-            $table->unique(['language','article_id']);
         });
     }
 

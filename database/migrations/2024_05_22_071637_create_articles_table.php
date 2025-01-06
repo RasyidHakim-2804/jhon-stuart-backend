@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('title');
             $table->string('slug')->unique();
             $table->string('image')->nullable();
-            $table->unsignedInteger('views');
+            $table->unsignedInteger('total_view');
             $table->string('type');
             $table->foreignId('category_id')->nullable()->constrained('article_categories', 'id');
             $table->foreignId('admin_id')->nullable()->constrained('admins', 'id');
