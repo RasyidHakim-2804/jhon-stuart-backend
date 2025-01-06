@@ -39,6 +39,10 @@ class ArticleRequest extends FormRequest
             $rules['body.' . $language]  = 'required|string';
         }
 
+        if (strtolower($this->method()) == 'put') { // for update
+            $rules['thumbnail'] = 'nullable|image|mimes:jpeg,png,jpg,svg|max:2000';
+        }
+
         return $rules;
     }
 }
