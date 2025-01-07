@@ -8,6 +8,7 @@ use App\Http\Resources\Article\AdminArticleResource;
 use App\Models\Article;
 use App\Models\ArticleImage;
 use App\Models\ArticleTranslation;
+use App\Models\Language;
 use App\Services\Admin\AdminPermissionService;
 use App\Services\Images\ImageService;
 use App\Traits\JsonResponsesTrait;
@@ -56,16 +57,11 @@ class AdminArticleController extends Controller
 
             $article->save();
 
-            foreach ($request->title as $lang => $title) {
-                $this->saveArticleTranslation($article->id, 'title', $lang, $title);
-            }
-
-            foreach ($request->body as $lang => $body) {
-                $this->saveArticleTranslation($article->id, 'body', $lang, $body);
-            }
-
-            foreach ($request->meta as $lang => $meta) {
-                $this->saveArticleTranslation($article->id, 'meta', $lang, $meta);
+            $request = $request->validated();
+            foreach (ArticleTranslation::BLOG_ATTRIBUTE as $field) {
+                foreach (Language::code() as $lang) {
+                    $this->saveArticleTranslation($article->id, $field, $lang, $request[$field][$lang]);
+                }
             }
 
             $this->saveImages($article, $request->body);
@@ -100,16 +96,11 @@ class AdminArticleController extends Controller
 
             $article->save();
 
-            foreach ($request->title as $lang => $title) {
-                $this->saveArticleTranslation($article->id, 'title', $lang, $title);
-            }
-
-            foreach ($request->body as $lang => $body) {
-                $this->saveArticleTranslation($article->id, 'body', $lang, $body);
-            }
-
-            foreach ($request->meta as $lang => $meta) {
-                $this->saveArticleTranslation($article->id, 'meta', $lang, $meta);
+            $request = $request->validated();
+            foreach (ArticleTranslation::BLOG_ATTRIBUTE as $field) {
+                foreach (Language::code() as $lang) {
+                    $this->saveArticleTranslation($article->id, $field, $lang, $request[$field][$lang]);
+                }
             }
 
             $this->saveImages($article, $request->body);
