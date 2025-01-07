@@ -6,6 +6,7 @@ use App\Services\Logs\AdminLogService;
 use App\Traits\ImageStorageTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 
@@ -13,8 +14,17 @@ class Article extends Model
 {
     use HasFactory, ImageStorageTrait, HasSlug;
 
+    public const TYPE = ['blog', 'event'];
+
     protected $fillable = [
         'type'
+    ];
+
+    protected $imageSetting = [
+        'folder' => 'articles',
+        'field'  => [
+            'image',
+        ],
     ];
 
     public function getSlugOptions() : SlugOptions
@@ -29,6 +39,8 @@ class Article extends Model
         return 'slug';
     }
 
+    // === RELATIONS ===
+
     public function category()
     {
         return $this->belongsTo(ArticleCategory::class, 'category_id', 'id');
@@ -38,6 +50,13 @@ class Article extends Model
     {
         return $this->belongsTo(Admin::class, 'admin_id', 'id');
     }
+
+    public function video(): HasOne
+    {
+        return $this->hasOne(ArticleVideo::class, 'article_id', 'id');
+    }
+
+    // === TRANSLATION RELATIONS ===
 
     public function titleTranslations()
     {
@@ -54,12 +73,7 @@ class Article extends Model
         return $this->hasMany(ArticleTranslation::class, 'article_id', 'id')->where('field', 'meta');
     }
 
-    protected $imageSetting = [
-        'folder' => 'articles',
-        'field'  => [
-            'image',
-        ],
-    ];
+    // === BOOT ===
 
     public static function boot()
     {
