@@ -2,41 +2,26 @@
 
 namespace App\Models;
 
-use App\Traits\ImageStorageTrait;
 use App\Services\Logs\AdminLogService;
-use Astrotomic\Translatable\Contracts\Translatable as TranslatableInterface;
-use Astrotomic\Translatable\Translatable;
-use Illuminate\Database\Eloquent\Builder;
+use App\Traits\ImageStorageTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 
-class Article extends Model implements TranslatableInterface
+class Article extends Model
 {
-    use HasFactory, HasSlug, ImageStorageTrait, Translatable;
+    use HasFactory, ImageStorageTrait, HasSlug;
 
-    protected $imageSetting = [
-        'folder' => 'article',
-        'field'  => [
-            'image',
-        ],
+    protected $fillable = [
+        'type'
     ];
 
-    public const TYPE = [
-        'blog', 'event'
-    ];
-
-    public function getSlugOptions(): SlugOptions
+    public function getSlugOptions() : SlugOptions
     {
         return SlugOptions::create()
-                ->generateSlugsFrom('title')
-                ->saveSlugsTo('slug')
-                ->slugsShouldBeNoLongerThan(100)
-                ->startSlugSuffixFrom(2);
+            ->generateSlugsFrom('title')
+            ->saveSlugsTo('slug');
     }
 
     public function getRouteKeyName()
@@ -44,43 +29,37 @@ class Article extends Model implements TranslatableInterface
         return 'slug';
     }
 
-    // === relation ===
-
-    public function author(): BelongsTo
-    {
-        return $this->belongsTo(Admin::class, 'admin_id', 'id');
-    }
-
-    public function category(): BelongsTo
+    public function category()
     {
         return $this->belongsTo(ArticleCategory::class, 'category_id', 'id');
     }
 
-    public function images(): HasMany
+    public function author()
     {
-        return $this->hasMany(ArticleImage::class, 'article_id', 'id');
+        return $this->belongsTo(Admin::class, 'admin_id', 'id');
     }
 
-    public function video(): HasOne
+    public function titleTranslations()
     {
-        return $this->hasOne(ArticleVideo::class, 'article_id', 'id');
+        return $this->hasMany(ArticleTranslation::class, 'article_id', 'id')->where('field', 'title');
     }
 
-    // public function translations(): HasMany -> in trait Translatalbe
-
-    // === scope ===
-
-    public function scopeEvent(Builder $query)
+    public function bodyTranslations()
     {
-        $query->where('type', '=', 'event');
+        return $this->hasMany(ArticleTranslation::class, 'article_id', 'id')->where('field', 'body');
     }
 
-    public function scopeBlog(Builder $query)
+    public function metaTranslations()
     {
-        $query->where('type', '=', 'blog');
+        return $this->hasMany(ArticleTranslation::class, 'article_id', 'id')->where('field', 'meta');
     }
 
-    // === boot ===
+    protected $imageSetting = [
+        'folder' => 'articles',
+        'field'  => [
+            'image',
+        ],
+    ];
 
     public static function boot()
     {
