@@ -3,118 +3,220 @@
 namespace App\Http\Controllers\Api\V1\Article;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Api\V1\Article\CreateArticleRequest;
-use App\Http\Requests\Api\V1\Article\UpdateArticleRequest;
-use App\Http\Resources\Api\V1\Article\ArticleResource;
-use App\Http\Resources\Api\V1\Common\SuccessResource;
+use App\Http\Requests\Api\Article\ArticleRequest;
+use App\Http\Resources\Article\AdminArticleResource;
 use App\Models\Article;
-use App\Service\Services\ImageServices\ImageService;
-use Illuminate\Http\JsonResponse;
+use App\Models\ArticleImage;
+use App\Models\ArticleTranslation;
+use App\Services\Admin\AdminPermissionService;
+use App\Services\Images\ImageService;
+use App\Traits\JsonResponsesTrait;
 use Illuminate\Support\Facades\DB;
 
 class AdminArticleController extends Controller
 {
+    use JsonResponsesTrait;
+
+    protected $permissionService;
+
+    public function __construct()
+    {
+        // $this->permissionService = (new AdminPermissionService('article'));
+    }
+
     public function index()
     {
-        $article = Article::exceptBody()->paginate(25);
-
-        return ArticleResource::collection($article);
+        return AdminArticleResource::collection(Article::latest()->with(['bodyTranslations', 'metaTranslations', 'author'])->paginate(25));
     }
 
     public function show(Article $article)
     {
-        $article = $article->load([
-            'author', 'category'
-        ]);
+        // $this->permissionService->check('view');
 
-        return new ArticleResource($article);
+        $article = new AdminArticleResource($article->load('titleTranslations', 'bodyTranslations', 'metaTranslations', 'author'));
+
+        return $this->successGet($article);
     }
 
-    public function store(CreateArticleRequest $request)
+    public function store(ArticleRequest $request)
     {
+        DB::beginTransaction();
         try {
-            DB::beginTransaction();
-            $request        = $request->validated();
-            $article        = new Article();
-            $imageService   = new ImageService($article);
-    
-            $article->title         = $request['title'];
-            $article->author_id     = $request['author_id'];
-            $article->category_id   = $request['category_id'];
-            $article->body          = $request['body'];
-            $article->meta          = $request['meta'];
-            $article->image_url     = $imageService->upload($request->image)->path;
-            $article->views         = 0;
+            // $this->permissionService->check('full');
+
+            $article                = new Article();
+            $article->title         = $request->title['en'];
+            $article->total_view    = 0;
+            $article->type          = 'blog';
+            $article->admin_id     = auth()->user()->id;
+
+            $article->fill($request->validated());
+
+            $article = $this->saveThumbnail($article, $request->thumbnail);
 
             $article->save();
 
+            foreach ($request->title as $lang => $title) {
+                $this->saveArticleTranslation($article->id, 'title', $lang, $title);
+            }
+
+            foreach ($request->body as $lang => $body) {
+                $this->saveArticleTranslation($article->id, 'body', $lang, $body);
+            }
+
+            foreach ($request->meta as $lang => $meta) {
+                $this->saveArticleTranslation($article->id, 'meta', $lang, $meta);
+            }
+
+            $this->saveImages($article, $request->body);
+
             DB::commit();
 
-            return new SuccessResource(JsonResponse::HTTP_CREATED);
-
-        } catch (\Throwable $th) {
-            
+            return $this->successStore();
+        } catch (\Exception $e) {
             DB::rollBack();
-            $imageService->rollback();
-            
-            throw $th;
+
+            return $this->errorServer($e->getMessage());
         }
     }
 
-    public function update(UpdateArticleRequest $request, Article $article)
+    public function update(ArticleRequest $request, Article $article)
     {
+        DB::beginTransaction();
         try {
-            DB::beginTransaction();
-            $requestArr             = $request->validated();
-            $article->title         = $requestArr['title'];
-            $article->author_id     = $requestArr['author_id'];
-            $article->category_id   = $requestArr['category_id'];
-            $article->body          = $request['body'];
-            $article->meta          = $request['meta'];
-    
-            if ($request->has('image')) {
-                $imageService       = new ImageService($article);
-                $article->image_url = $imageService->update($request->image)->path; 
+            // $this->permissionService->check('full');
+
+            $article->fill($request->validated());
+
+            if ($request->thumbnail) {
+                $this->deleteImage($article);
+
+                $article = $this->saveThumbnail($article, $request->thumbnail);
             }
+
+            $article->title    = $request->title['en'];
+            $article->type     = 'blog';
+            $article->admin_id = auth()->user()->id;
 
             $article->save();
-            
-            DB::commit();
 
-            return new SuccessResource();
-
-        } catch (\Throwable $th) {
-            DB::rollBack();
-
-            if (isset($imageService)) {
-                $imageService->rollback();
+            foreach ($request->title as $lang => $title) {
+                $this->saveArticleTranslation($article->id, 'title', $lang, $title);
             }
 
-            throw $th;
-        }    
+            foreach ($request->body as $lang => $body) {
+                $this->saveArticleTranslation($article->id, 'body', $lang, $body);
+            }
+
+            foreach ($request->meta as $lang => $meta) {
+                $this->saveArticleTranslation($article->id, 'meta', $lang, $meta);
+            }
+
+            $this->saveImages($article, $request->body);
+
+            DB::commit();
+
+            return $this->successStore();
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return $this->errorServer($e->getMessage());
+        }
     }
 
     public function destroy(Article $article)
     {
-        try {
-            DB::beginTransaction();
+        // $this->permissionService->check('full');
 
-            $imageService = new ImageService($article);
-            $imageService->delete();
-            $article->delete();
-            
-            DB::commit();
-            
-            return new SuccessResource();
+        $article->delete();
 
-        } catch (\Throwable $th) {
-            DB::rollBack();
+        if ($article->image) $this->deleteImage($article);
 
-            if (isset($imageService)) {
-                $imageService->rollback();
+        return $this->successStore();
+    }
+
+    protected function saveThumbnail($articleImage, $uploadedImage)
+    {
+        $image = (new ImageService($articleImage->imagePath(), $uploadedImage));
+
+        $image->save();
+
+        $articleImage->image = $image->getImageName();
+
+        return $articleImage;
+    }
+
+    protected function saveImages($article, $bodies)
+    {
+        $uploadedImages = $this->getUsedImagesName($bodies);
+
+        $this->deleteOldImages($article, $uploadedImages);
+
+        ArticleImage::whereIn('image', $uploadedImages)->update(['article_id' => $article->id]);
+
+        $this->deleteUnusedImage();
+    }
+
+    protected function getUsedImagesName($bodies)
+    {
+        $imagesName = [];
+
+        foreach ($bodies as $lang => $body) {
+            $imageUrls = explode('img', $body);
+            $regex     = "/[\w\-]+\.(jpg|png|gif|jpeg)/";
+
+            if (isset($imageUrls)) {
+                foreach ($imageUrls as $key => $imageUrl) {
+                    if(preg_match($regex, $imageUrl, $fileName)) {
+                        $imagesName[] = $fileName[0];
+                    }
+                }
             }
-            
-            throw $th;
         }
+
+        return $imagesName;
+    }
+
+    protected function deleteOldImages($article, $uploadedImages)
+    {
+        $oldImages = ArticleImage::where('article_id', $article->id)->whereNotIn('image', $uploadedImages)->get();
+
+        if (isset($oldImages)) {
+            foreach ($oldImages as $key => $oldImage) {
+                $this->deleteImage($oldImage);
+            }
+        }
+    }
+
+    protected function deleteUnusedImage()
+    {
+        $unusedImages = ArticleImage::where('article_id', null)->get();
+
+        if (isset($unusedImages)) {
+            foreach ($unusedImages as $key => $unusedImage) {
+                $this->deleteImage($unusedImage);
+            }
+        }
+    }
+
+    protected function deleteImage($dataImage)
+    {
+        $image = (new ImageService($dataImage->imagePath()));
+
+        $image->delete($dataImage->image);
+    }
+
+    protected function saveArticleTranslation($articleId, $field, $lang, $translation)
+    {
+        $newTranslation = ArticleTranslation::where('article_id', $articleId)->where('field', $field)->where('language', $lang)->first();
+
+        if (!$newTranslation) $newTranslation = new ArticleTranslation();
+
+        $newTranslation->article_id    = $articleId;
+        $newTranslation->field         = $field;
+        $newTranslation->language      = $lang;
+        $newTranslation->translation   = $translation;
+
+        $newTranslation->save();
     }
 }

@@ -3,41 +3,49 @@
 namespace App\Http\Controllers\Api\V1\Article;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\Api\V1\Article\ArticleResource;
+use App\Http\Resources\Article\ArticleResource;
+use App\Http\Resources\Article\ListArticleResource;
 use App\Models\Article;
+use App\Traits\JsonResponsesTrait;
+use Illuminate\Support\Facades\DB;
 
 class ArticleController extends Controller
 {
+    use JsonResponsesTrait;
+
     public function index()
     {
-        $article = Article::with([
-            'author',
-            'category:id,name',
-        ])->paginate(25);
-
-        return ArticleResource::collection($article);
+        return ListArticleResource::collection(Article::latest()->with([
+            'metaTranslations'  => fn($translation) => $translation->where('language', config('app.locale')),
+            'titleTranslations' => fn($translation) => $translation->where('language', config('app.locale')),
+            'tagTranslations'   => fn($translation) => $translation->where('language', config('app.locale')),
+            'author'
+        ])->paginate(15));
     }
 
     public function show(Article $article)
     {
-        $article = $article->load([
-            'author',
-            'category:id,name',
-        ]);
+        $article->total_view = $article->total_view + 1;
 
-        $article->views++;
         $article->save();
 
-        return new ArticleResource($article);
+        $article = new ArticleResource($article->load('metaTranslations', 'titleTranslations', 'tagTranslations', 'bodyTranslations', 'author'));
+    
+        return $this->successGet($article);
     }
 
-    public function topArticles()
+    public function top()
     {
-        $topArticles = Article::with([
-            'author',
-            'category:id,name',
-        ])->orderBy('views', 'asc')->take(10)->get();
+        $type = request()->query('type');
 
-        return ArticleResource::collection($topArticles);
+        if (!$type) $type = 'travel';
+
+        if (($type != 'travel') || ($type != 'about_bali')) $type = 'travel';
+
+        return ListArticleResource::collection(Article::orderBy('total_view', 'DESC')->with([
+            'metaTranslations'  => fn($translation) => $translation->where('language', config('app.locale')),
+            'titleTranslations' => fn($translation) => $translation->where('language', config('app.locale')),
+            'tagTranslations'   => fn($translation) => $translation->where('language', config('app.locale')),
+        ])->where('type', $type)->limit(3)->get());
     }
 }
