@@ -14,6 +14,7 @@ class AdminArticleResource extends JsonResource
             'slug'          => $this->slug,
             'title'         => ArticleTranslationResource::collection($this->titleTranslations),
             'type'          => $this->type,
+            'video'         => new ArticleVideoResource($this->video),
             'body'          => ArticleTranslationResource::collection($this->bodyTranslations),
             'meta'          => ArticleTranslationResource::collection($this->metaTranslations),
             'total_view'    => $this->total_view,

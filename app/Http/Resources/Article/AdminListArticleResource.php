@@ -14,7 +14,7 @@ class AdminListArticleResource extends JsonResource
             'slug'          => $this->slug,
             'title'         => $this->title,
             'type'          => $this->type,
-            'meta'          => $this->meta,
+            'meta'          => new ArticleTranslationResource($this->metaTranslations->first()),
             'total_view'    => $this->total_view,
             'image'         => $this->imageUrl('image'),
             'author'        => new AdminResource($this->author),
