@@ -2,29 +2,26 @@
 
 namespace App\Http\Resources\Article;
 
-use App\Http\Resources\ArticleAuthor\ArticleAuthorResource;
-use Illuminate\Http\Request;
+use App\Http\Resources\Admin\AdminResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class ArticleResource extends JsonResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @return array<string, mixed>
-     */
-    public function toArray($request): array
+    public function toArray($request)
     {
         return [
             'id'            => $this->id,
             'slug'          => $this->slug,
-            'category'      => $this->category->name,
-            'title'         => $this->title,
-            'body'          => $this->body,
-            'meta'          => $this->meta,
-            'author'        => new ArticleAuthorResource($this->author),
-            'image'         => $this->image_url,
-            'created_at'    => $this->created_at,
+            'title'         => ArticleTranslationResource::collection($this->titleTranslations),
+            'type'          => $this->type,
+            'tag'           => ArticleTranslationResource::collection($this->tagTranslations),
+            'body'          => ArticleTranslationResource::collection($this->bodyTranslations),
+            'meta'          => ArticleTranslationResource::collection($this->metaTranslations),
+            'total_view'    => $this->total_view,
+            'image'         => $this->imageUrl('image'),
+            'author'        => new AdminResource($this->author),
+            // 'comments'      => ArticleCommentResource::collection($this->comments),
+            'created_at'    => date("d F Y", strtotime($this->created_at)),
             'updated_at'    => $this->updated_at,
         ];
     }
