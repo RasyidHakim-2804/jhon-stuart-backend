@@ -73,6 +73,13 @@ class Article extends Model
         return $this->hasMany(ArticleTranslation::class, 'article_id', 'id')->where('field', 'meta');
     }
 
+    // === SCOPE ===
+
+    public function scopeSearch($query, $search)
+    {
+        return $query->where('title', 'LIKE','%' . $search . '%');
+    }
+
     // === BOOT ===
 
     public static function boot()
