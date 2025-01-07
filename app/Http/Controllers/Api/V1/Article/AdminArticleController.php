@@ -5,14 +5,18 @@ namespace App\Http\Controllers\Api\V1\Article;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Article\ArticleRequest;
 use App\Http\Resources\Article\AdminArticleResource;
+use App\Http\Resources\Article\AdminListArticleResource;
 use App\Models\Article;
 use App\Models\ArticleImage;
 use App\Models\ArticleTranslation;
+use App\Models\ArticleVideo;
 use App\Models\Language;
 use App\Services\Admin\AdminPermissionService;
 use App\Services\Images\ImageService;
 use App\Traits\JsonResponsesTrait;
 use Illuminate\Support\Facades\DB;
+use Spatie\QueryBuilder\AllowedFilter;
+use Spatie\QueryBuilder\QueryBuilder;
 
 class AdminArticleController extends Controller
 {
@@ -27,14 +31,29 @@ class AdminArticleController extends Controller
 
     public function index()
     {
-        return AdminArticleResource::collection(Article::latest()->with(['bodyTranslations', 'metaTranslations', 'author'])->paginate(25));
+        return AdminListArticleResource::collection(
+            QueryBuilder::for(Article::class)
+            ->allowedFilters([
+                'type',
+                AllowedFilter::scope('search')
+            ])
+            ->latest()->with([
+                'metaTranslations' => fn($query) => $query->where('language', '=', 'en'),
+                'author'
+            ])->paginate(25));
     }
 
     public function show(Article $article)
     {
         // $this->permissionService->check('view');
 
-        $article = new AdminArticleResource($article->load('titleTranslations', 'bodyTranslations', 'metaTranslations', 'author'));
+        $article = new AdminArticleResource($article->load([
+            'bodyTranslations',
+            'metaTranslations',
+            'titleTranslations',
+            'author',
+            'video',
+        ]));
 
         return $this->successGet($article);
     }
@@ -47,15 +66,18 @@ class AdminArticleController extends Controller
 
             $article                = new Article();
             $article->title         = $request->title['en'];
+            $article->category_id   = $request->category_id;
+            $article->type          = $request->type;
             $article->total_view    = 0;
-            $article->type          = 'blog';
-            $article->admin_id     = auth()->user()->id;
-
-            $article->fill($request->validated());
+            $article->admin_id      = auth()->user()->id;
 
             $article = $this->saveThumbnail($article, $request->thumbnail);
 
             $article->save();
+
+            if ($article->type == 'event') {
+                $this->saveVideo($article, $request->video);
+            }
 
             $request = $request->validated();
             foreach (ArticleTranslation::BLOG_ATTRIBUTE as $field) {
@@ -64,7 +86,7 @@ class AdminArticleController extends Controller
                 }
             }
 
-            $this->saveImages($article, $request->body);
+            $this->saveImages($article, $request['body']);
 
             DB::commit();
 
@@ -82,19 +104,22 @@ class AdminArticleController extends Controller
         try {
             // $this->permissionService->check('full');
 
-            $article->fill($request->validated());
-
             if ($request->thumbnail) {
                 $this->deleteImage($article);
 
                 $article = $this->saveThumbnail($article, $request->thumbnail);
             }
 
-            $article->title    = $request->title['en'];
-            $article->type     = 'blog';
-            $article->admin_id = auth()->user()->id;
+            $article->title         = $request->title['en'];
+            $article->category_id   = $request->category_id;
+            $article->type          = $request->type;
+            $article->admin_id      = auth()->user()->id;
 
             $article->save();
+
+            if ($article->type == 'event') {
+                $this->saveVideo($article, $request->url);
+            }
 
             $request = $request->validated();
             foreach (ArticleTranslation::BLOG_ATTRIBUTE as $field) {
@@ -103,7 +128,7 @@ class AdminArticleController extends Controller
                 }
             }
 
-            $this->saveImages($article, $request->body);
+            $this->saveImages($article, $request['body']);
 
             DB::commit();
 
@@ -125,6 +150,8 @@ class AdminArticleController extends Controller
 
         return $this->successStore();
     }
+
+    // === PROTECTED METHOD ===
 
     protected function saveThumbnail($articleImage, $uploadedImage)
     {
@@ -209,5 +236,13 @@ class AdminArticleController extends Controller
         $newTranslation->translation   = $translation;
 
         $newTranslation->save();
+    }
+
+    protected function saveVideo(Article $article, $url)
+    {
+        $articleVideo             = ArticleVideo::where('article_id', '=', $article->id)->firstOrNew();
+        $articleVideo->video      = $url;
+        $articleVideo->article_id = $article->id;
+        $articleVideo->save();
     }
 }
