@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Api\Article;
 
+use App\Models\Article;
 use App\Models\Language;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -29,6 +30,14 @@ class ArticleRequest extends FormRequest
             'title'         => 'array',
             'meta'          => 'array',
             'body'          => 'array',
+            'type'          => [
+                'required',
+                Rule::in(Article::TYPE),
+            ],
+            'video'         => [
+                'required_if:type,event',
+                'url',
+            ],
             'category_id'   => 'required|exists:article_categories,id',
             'thumbnail'     => 'required|image|mimes:jpeg,png,jpg,svg|max:2000',
         ];
