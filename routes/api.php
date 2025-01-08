@@ -60,7 +60,7 @@ Route::prefix('/v1')->middleware('verifyLanguage')->group(function () {
     //Article
     Route::get('/articles', [ArticleController::class, 'index']);
     Route::get('/articles/{article:slug}', [ArticleController::class, 'show']);
-    Route::get('/top-articles', [ArticleController::class, 'topArticles']);
+    Route::get('/top-articles', [ArticleController::class, 'top']);
 
     //Event
     Route::get('/events', [EventController::class, 'index']);
