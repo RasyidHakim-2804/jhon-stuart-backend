@@ -5,17 +5,15 @@ use App\Http\Controllers\Api\V1\ArticleCategory\AdminArticleCategoryController;
 use App\Http\Controllers\Api\V1\Contact\AdminContactController;
 use App\Http\Controllers\Api\V1\Product\AdminProductController;
 use App\Http\Controllers\Api\V1\Product\AdminProductImageController;
-use App\Http\Controllers\Api\V1\Profile\AdminProfileController;
+use App\Http\Controllers\Api\V1\Admin\AdminProfileController;
 use App\Http\Controllers\Api\V1\ArticleAuthor\AdminArticleAuthorController;
 use App\Http\Controllers\Api\V1\Article\AdminArticleController;
 use App\Http\Controllers\Api\V1\Subscriber\AdminSubscriberController;
 use App\Http\Controllers\Api\V1\Event\AdminEventController;
 
-use App\Http\Controllers\Api\V1\Auth\User\UserAuthController;
-use App\Http\Controllers\Api\V1\Auth\User\UserPasswordController;
 use App\Http\Controllers\Api\V1\User\Auth\AuthUserController;
 use App\Http\Controllers\Api\V1\User\ForgetPasswordController;
-use App\Http\Controllers\Api\V1\Profile\UserProfileController;
+use App\Http\Controllers\Api\V1\User\UserProfileController;
 use App\Http\Controllers\Api\V1\Wishlist\UserWishlistController;
 
 use App\Http\Controllers\Api\V1\ProductCategory\ProductCategoryController;
@@ -158,12 +156,12 @@ Route::prefix('/v1')->middleware('verifyLanguage')->group(function () {
             // Admin - Feature
             Route::get('/admin-features', [AdminFeatureController::class, 'index']);
 
-            // Admin - Admin
-            Route::get('', [AdminController::class, 'index']);
-            Route::get('/{admin}', [AdminController::class, 'show']);
-            Route::post('', [AdminController::class, 'store']);
-            Route::put('/{admin}', [AdminController::class, 'update']);
-            Route::delete('/{admin}', [AdminController::class, 'destroy']);
+           // Admin - Admin
+           Route::get('/', [AdminController::class, 'index']);
+           Route::get('/{admin}', [AdminController::class, 'show']);
+           Route::post('', [AdminController::class, 'store']);
+           Route::put('/{admin}', [AdminController::class, 'update']);
+           Route::delete('/{admin}', [AdminController::class, 'destroy']);
         });
     });
 
@@ -182,24 +180,32 @@ Route::prefix('/v1')->middleware('verifyLanguage')->group(function () {
         Route::post('/password/reset/', [ForgetPasswordController::class, 'resetPassword']);
         Route::get('/password/forget/resend', [ForgetPasswordController::class,'forgetPassword']);
 
-        Route::group(['middleware' => ['auth:api_user', 'scopes:user', 'verifyUserActive']], function(){
-
-            //Authentication
-            Route::post('/logout', [AuthUserController::class, 'logout']);
-
-            //password controller
-            Route::post('/change-password', [UserProfileController::class, 'changePassword']);
-
+        Route::middleware(['auth:api_user'])->group(function(){
             //User Profile
             Route::get('/profile', [UserProfileController::class, 'index']);
             Route::put('/profile', [UserProfileController::class, 'update']);
             Route::post('/change-password', [UserProfileController::class, 'changePassword']);
+            Route::post('/change-language', [UserProfileController::class, 'changeLanguage']);
 
-            //Wishlists
-            Route::get('/wishlists-side', [UserWishlistController::class, 'side']);
-            Route::get('/wishlists', [UserWishlistController::class, 'index']);
-            Route::post('/wishlists', [UserWishlistController::class,'store']);
-            Route::delete('/wishlists', [UserWishlistController::class, 'destroy']);
+            // Promo
+            // Route::post('/apply-promo', UserPromoController::class);
+        });
+
+        Route::prefix('/{user}')->scopeBindings()->group(function () {
+            Route::middleware(['auth:api_user'])->group(function(){
+
+                //Authentication
+                Route::post('/logout', [AuthUserController::class, 'logout']);
+
+                //password controller
+                Route::post('/change-password', [UserProfileController::class, 'changePassword']);
+
+                //Wishlists
+                Route::get('/wishlists-side', [UserWishlistController::class, 'side']);
+                Route::get('/wishlists', [UserWishlistController::class, 'index']);
+                Route::post('/wishlists', [UserWishlistController::class,'store']);
+                Route::delete('/wishlists', [UserWishlistController::class, 'destroy']);
+            });
         });
     });
 });
