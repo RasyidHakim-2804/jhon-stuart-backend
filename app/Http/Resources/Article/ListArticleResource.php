@@ -12,10 +12,9 @@ class ListArticleResource extends JsonResource
         return [
             'id'            => $this->id,
             'slug'          => $this->slug,
-            'title'         => $this->titleTranslations[0]?->translation,
+            'title'         => $this->titleTranslations->first()?->translation,
             'type'          => $this->type,
-            'tag'           => $this->tagTranslations[0]?->translation,
-            'meta'          => $this->metaTranslations[0]?->translation,
+            'meta'          => $this->metaTranslations->first()?->translation,
             'total_view'    => $this->total_view,
             'image'         => $this->imageUrl('image'),
             'author'        => new AdminResource($this->author),
