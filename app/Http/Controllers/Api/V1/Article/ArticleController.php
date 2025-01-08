@@ -8,6 +8,7 @@ use App\Http\Resources\Article\ListArticleResource;
 use App\Models\Article;
 use App\Traits\JsonResponsesTrait;
 use Illuminate\Support\Facades\DB;
+use Spatie\QueryBuilder\QueryBuilder;
 
 class ArticleController extends Controller
 {
@@ -15,12 +16,17 @@ class ArticleController extends Controller
 
     public function index()
     {
-        return ListArticleResource::collection(Article::latest()->with([
-            'metaTranslations'  => fn($translation) => $translation->where('language', config('app.locale')),
-            'titleTranslations' => fn($translation) => $translation->where('language', config('app.locale')),
-            'tagTranslations'   => fn($translation) => $translation->where('language', config('app.locale')),
-            'author'
-        ])->paginate(15));
+        return ListArticleResource::collection(
+            QueryBuilder::for(Article::class)
+            ->allowedFilters([
+                'type'
+            ])
+            ->latest()->with([
+                'metaTranslations'  => fn($translation) => $translation->where('language', config('app.locale')),
+                'titleTranslations' => fn($translation) => $translation->where('language', config('app.locale')),
+                'author'
+            ])->paginate(15)
+        );
     }
 
     public function show(Article $article)
@@ -29,23 +35,32 @@ class ArticleController extends Controller
 
         $article->save();
 
-        $article = new ArticleResource($article->load('metaTranslations', 'titleTranslations', 'tagTranslations', 'bodyTranslations', 'author'));
-    
-        return $this->successGet($article);
+        $relations = [
+            'metaTranslations'  => fn($translation) => $translation->where('language', config('app.locale')),
+            'titleTranslations' => fn($translation) => $translation->where('language', config('app.locale')),
+            'bodyTranslations'  => fn($translation) => $translation->where('language', config('app.locale')),
+            'author',
+            'video'
+        ];
+
+        if ($article->type == 'event') {
+            $relations[] = 'images';
+        }
+        return $this->successGet(new ArticleResource($article->load($relations)));
     }
 
     public function top()
     {
-        $type = request()->query('type');
-
-        if (!$type) $type = 'travel';
-
-        if (($type != 'travel') || ($type != 'about_bali')) $type = 'travel';
-
-        return ListArticleResource::collection(Article::orderBy('total_view', 'DESC')->with([
-            'metaTranslations'  => fn($translation) => $translation->where('language', config('app.locale')),
-            'titleTranslations' => fn($translation) => $translation->where('language', config('app.locale')),
-            'tagTranslations'   => fn($translation) => $translation->where('language', config('app.locale')),
-        ])->where('type', $type)->limit(3)->get());
+        return ListArticleResource::collection(
+            QueryBuilder::for(Article::class)
+            ->allowedFilters([
+                'type'
+            ])
+            ->orderBy('total_view', 'DESC')->with([
+                'metaTranslations'  => fn($translation) => $translation->where('language', config('app.locale')),
+                'titleTranslations' => fn($translation) => $translation->where('language', config('app.locale')),
+                'author'
+            ])->limit(3)->get()
+        );
     }
 }
