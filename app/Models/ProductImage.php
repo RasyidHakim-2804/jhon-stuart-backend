@@ -10,7 +10,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 
-#[ObservedBy([AdminActionObserver::class])]
 class ProductImage extends Model
 {
     use HasFactory, ImageStorageTrait;
@@ -21,7 +20,9 @@ class ProductImage extends Model
             'image',
         ],
     ];
-    
+
+    // === RELATIONS ===
+
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
