@@ -6,6 +6,7 @@ use App\Services\Logs\AdminLogService;
 use App\Traits\ImageStorageTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
@@ -54,6 +55,11 @@ class Article extends Model
     public function video(): HasOne
     {
         return $this->hasOne(ArticleVideo::class, 'article_id', 'id');
+    }
+
+    public function images(): HasMany
+    {
+        return $this->hasMany(ArticleImage::class, 'article_id', 'id');
     }
 
     // === TRANSLATION RELATIONS ===
