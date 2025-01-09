@@ -29,7 +29,7 @@ class ProductRequest extends FormRequest
         $rules = [
             'name'                  => 'required|max:100',
             'short_description'     => 'required|string',
-            'full_description'      => 'required|string',
+            'description'           => 'required|string',
             'is_varied'             => 'required|boolean',
             'is_active'             => 'required|boolean',
             'category_type'         => [
