@@ -90,7 +90,7 @@ class ProductRequest extends FormRequest
             $rules['code'] = [
                 'required',
                 'string',
-                Rule::unique('products', 'code')->ignore($this->route('product')->id, 'product_id')
+                Rule::unique('products', 'code')->ignore($this->route('product')->id, 'id')
             ];
         }
 
