@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('code');
             $table->unsignedInteger('stock');
             $table->boolean('is_active');
-            $table->unsignedDecimal('idr_price', 10, 2);
+            $table->unsignedDecimal('price', 10, 2);
             $table->unsignedDecimal('usd_price', 10, 2);
             $table->timestamps();
             $table->softDeletes();
