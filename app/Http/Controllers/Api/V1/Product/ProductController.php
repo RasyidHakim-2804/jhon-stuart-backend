@@ -12,9 +12,29 @@ use Spatie\QueryBuilder\QueryBuilder;
 
 class ProductController extends Controller
 {
-    /**
-     * Display the specified resource.
-     */
+    public function index(ProductCategory $category)
+    {
+        $products = QueryBuilder::for(Product::class)
+                    ->selectVariantPrice()
+                    ->active()
+                    ->where('category_id', $category->id)
+                    ->with([
+                        'thumbnailImage',
+                    ])
+                    ->defaultSort('price')
+                    ->allowedSorts([
+                        'popular',
+                        'price',
+                        'rating',
+                    ])
+                    ->allowedFilters([
+                        AllowedFilter::partial('search', 'name'),
+                    ])
+                    ->paginate(12)->appends(request()->query());
+
+            return ProductResource::collection($products);
+    }
+
     public function show($slug)
     {
         $product = Product::where('slug', '=', $slug)
@@ -25,20 +45,18 @@ class ProductController extends Controller
                     $query->where('position', '!=', null);
                 }
             ])
-            ->available()
+            ->active()
             ->firstOrFail();
-        
+
         return new ProductResource($product);
     }
 
     public function moreProducts(ProductCategory $category)
     {
-        $products = Product::available()
+        $products = Product::active()
                     ->where('category_id', '=', $category->id)
                     ->with([
-                        'images' => function ($query) {
-                            $query->where('position', '=', 1);
-                        },
+                        'thumbnailImage'
                     ])
                     ->selectVariantPrice()
                     ->withMin('variants', 'usd_price')
@@ -46,27 +64,5 @@ class ProductController extends Controller
                     ->paginate(3)->appends(request()->query());
 
         return ProductResource::collection($products);
-    }
-
-    public function index(ProductCategory $category)
-    {
-        $products = QueryBuilder::for(Product::class)
-                    ->selectVariantPrice()
-                    ->available()
-                    ->where('category_id', $category->id)
-                    ->with([
-                        'thumbnailImage',
-                    ])
-                    ->defaultSort('price')
-                    ->allowedSorts([
-                        'popular',
-                        'price'
-                    ])
-                    ->allowedFilters([
-                        AllowedFilter::partial('search', 'name'),
-                    ])
-                    ->paginate(12)->appends(request()->query());
-
-            return ProductResource::collection($products);
     }
 }
