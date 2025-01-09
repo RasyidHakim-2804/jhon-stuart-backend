@@ -28,7 +28,7 @@ class ProductRequest extends FormRequest
     {
         $rules = [
             'name'                  => 'required|max:100',
-            'short_description'     => 'required|string',
+            'meta'                  => 'required|string',
             'description'           => 'required|string',
             'is_varied'             => 'required|boolean',
             'is_active'             => 'required|boolean',
