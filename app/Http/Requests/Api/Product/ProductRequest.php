@@ -42,7 +42,7 @@ class ProductRequest extends FormRequest
                 ],
             'category_id'           => [
                 'required   ',
-                Rule::exists('product_categories', 'id')->where('type', $this->input('category_type'))
+                Rule::exists('product_categories', 'id')->where('type', $this->input('type'))
             ],
             'price'                 => 'exclude_if:is_varied,true|required|numeric|max:10000000',
             'usd_price'             => 'exclude_if:is_varied,true|required|numeric|max:10000000',
