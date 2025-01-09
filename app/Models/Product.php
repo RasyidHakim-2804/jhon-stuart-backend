@@ -12,11 +12,12 @@ use Spatie\Sluggable\SlugOptions;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
 
 class Product extends Model
 {
-    use HasFactory, HasSlug;
+    use HasFactory, HasSlug, SoftDeletes;
 
     public function getSlugOptions() : SlugOptions
     {
