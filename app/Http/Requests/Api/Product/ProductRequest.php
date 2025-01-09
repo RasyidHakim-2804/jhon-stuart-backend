@@ -32,11 +32,7 @@ class ProductRequest extends FormRequest
             'description'           => 'required|string',
             'is_varied'             => 'required|boolean',
             'is_active'             => 'required|boolean',
-            'code'                  => [
-                'required',
-                'string',
-                Rule::unique('products', 'code')->ignore($this->route('product')->id, 'product_id')
-            ],
+            'code'                  => 'required|string|unique:products,code',
             'category_type'         => [
                 'required',
                 Rule::in([
@@ -89,6 +85,12 @@ class ProductRequest extends FormRequest
                 'nullable',
                 'distinct',
                 Rule::exists('product_variants', 'id')->where('product_id', $this->route('product')->id)
+            ];
+
+            $rules['code'] = [
+                'required',
+                'string',
+                Rule::unique('products', 'code')->ignore($this->route('product')->id, 'product_id')
             ];
         }
 
