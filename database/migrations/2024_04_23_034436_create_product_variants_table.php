@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('code');
             $table->unsignedInteger('stock')->nullable();
             $table->boolean('is_active');
+            $table->boolean('is_default')->default(true);
             $table->unsignedDecimal('price', 10, 2);
             $table->unsignedDecimal('usd_price', 10, 2);
             $table->timestamps();
