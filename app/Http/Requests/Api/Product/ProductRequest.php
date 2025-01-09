@@ -53,7 +53,7 @@ class ProductRequest extends FormRequest
 
             'variants'              => 'exclude_if:is_varied,false|required|array|max:5',
             'variants.*.name'       => ['exclude_if:is_varied,false', 'required', Rule::in(ProductVariant::NAME), 'distinct'],
-            'variants.*.idr_price'  => ['exclude_if:is_varied,false', 'required', 'numeric', 'max:10000000'],
+            'variants.*.price'      => ['exclude_if:is_varied,false', 'required', 'numeric', 'max:10000000'],
             'variants.*.usd_price'  => ['exclude_if:is_varied,false', 'required', 'numeric', 'max:10000000'],
             'variants.*.stock'      => ['exclude_if:is_varied,false', 'required', 'numeric','min:0', 'max:10000000'],
             'variants.*.available'  => ['exclude_if:is_varied,false', 'required', 'boolean'],
