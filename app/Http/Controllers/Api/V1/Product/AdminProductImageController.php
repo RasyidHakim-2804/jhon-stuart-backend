@@ -77,6 +77,7 @@ class AdminProductImageController extends Controller
             foreach ($unsavedImages as $unsavedImage) {
                 $imageService = new ImageService($unsavedImage->imagePath());
                 $imageService->delete($unsavedImage->image);
+                $unsavedImage->delete();
             }
 
             DB::commit();
