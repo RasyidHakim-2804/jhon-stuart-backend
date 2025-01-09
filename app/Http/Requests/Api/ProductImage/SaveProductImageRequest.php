@@ -24,12 +24,11 @@ class SaveProductImageRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'images_id'      => 'array',
+            'images_id'      => 'array|max:4',
             'images_id.*'    => [
                 'required',
                 'numeric',
                 'distinct',
-                'min:1',
                 Rule::exists(ProductImage::class, 'id')->where(function($query){
                     $query->where('product_id', $this->route('product')->id);
                 })
