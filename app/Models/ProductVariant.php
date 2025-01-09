@@ -11,6 +11,10 @@ class ProductVariant extends Model
 {
     use HasFactory;
 
+    public const NAME = [
+        's', 'l', 'm', 'set', 'jumbo'
+    ];
+
     // === RELATIONS ===
 
     public function product(): BelongsTo
