@@ -21,7 +21,7 @@ return new class extends Migration
             $table->boolean('is_active');
             $table->boolean('is_varied');
             $table->text('description');
-            $table->text('short_description');
+            $table->text('meta');
             $table->unsignedInteger('popular')->default(0);
             $table->unsignedDecimal('rating',3, 1)->nullable();
             $table->timestamps();
