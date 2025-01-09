@@ -19,7 +19,9 @@ class ProductController extends Controller
                     ->active()
                     ->where('category_id', $category->id)
                     ->with([
-                        'thumbnailImage',
+                        'images' => function ($query) {
+                            $query->where('position', '!=', null);
+                        }
                     ])
                     ->defaultSort('price')
                     ->allowedSorts([
@@ -56,7 +58,9 @@ class ProductController extends Controller
         $products = Product::active()
                     ->where('category_id', '=', $category->id)
                     ->with([
-                        'thumbnailImage'
+                        'images' => function ($query) {
+                            $query->where('position', '!=', null);
+                        }
                     ])
                     ->selectVariantPrice()
                     ->withMin('variants', 'usd_price')
