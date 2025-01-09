@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->foreignId('product_id')->constrained('products', 'id');
             $table->string('code');
-            $table->unsignedInteger('stock');
+            $table->unsignedInteger('stock')->nullable();
             $table->boolean('is_active');
             $table->unsignedDecimal('price', 10, 2);
             $table->unsignedDecimal('usd_price', 10, 2);
