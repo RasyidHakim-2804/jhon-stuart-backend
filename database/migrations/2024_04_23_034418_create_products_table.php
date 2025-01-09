@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('products', function (Blueprint $table) {
             $table->id();
-            $table->string('code')->unique();
+            $table->string('code');
             $table->foreignId('category_id')->constrained('product_categories', 'id');
             $table->string('type');
             $table->string('name', 255);
@@ -25,6 +25,7 @@ return new class extends Migration
             $table->unsignedInteger('popular')->default(0);
             $table->unsignedDecimal('rating',3, 1);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

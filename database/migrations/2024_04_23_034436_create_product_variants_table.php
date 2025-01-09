@@ -15,12 +15,13 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->foreignId('product_id')->constrained('products', 'id');
-            $table->string('code')->unique();
+            $table->string('code');
             $table->unsignedInteger('stock');
             $table->boolean('is_active');
             $table->unsignedDecimal('idr_price', 10, 2);
             $table->unsignedDecimal('usd_price', 10, 2);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
