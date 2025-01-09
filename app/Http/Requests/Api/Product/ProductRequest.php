@@ -33,7 +33,7 @@ class ProductRequest extends FormRequest
             'is_varied'             => 'required|boolean',
             'is_active'             => 'required|boolean',
             'code'                  => 'required|string|unique:products,code',
-            'category_type'         => [
+            'type'                  => [
                 'required',
                 Rule::in([
                     ProductCategory::MUSEUM_TYPE,
