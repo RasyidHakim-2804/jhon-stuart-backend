@@ -23,7 +23,7 @@ return new class extends Migration
             $table->text('description');
             $table->text('short_description');
             $table->unsignedInteger('popular')->default(0);
-            $table->unsignedDecimal('rating',3, 1);
+            $table->unsignedDecimal('rating',3, 1)->nullable();
             $table->timestamps();
             $table->softDeletes();
         });
