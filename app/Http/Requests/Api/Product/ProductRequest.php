@@ -52,7 +52,7 @@ class ProductRequest extends FormRequest
             'variants.*.price'      => ['exclude_if:is_varied,false', 'required', 'numeric', 'max:10000000'],
             'variants.*.usd_price'  => ['exclude_if:is_varied,false', 'required', 'numeric', 'max:10000000'],
             'variants.*.stock'      => ['exclude_if:is_varied,false', 'required', 'numeric','min:0', 'max:10000000'],
-            'variants.*.available'  => ['exclude_if:is_varied,false', 'required', 'boolean'],
+            'variants.*.is_active'  => ['exclude_if:is_varied,false', 'required', 'boolean'],
             'variants.*.code'       => [
                 'exclude_if:is_varied,false',
                 'required',
