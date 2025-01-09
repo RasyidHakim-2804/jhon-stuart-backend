@@ -58,7 +58,9 @@ class Product extends Model
     public function scopeSelectVariantPrice(Builder $query)
     {
         $query->addSelect('*',DB::raw(
-            "(select usd_price from product_variants where product_id = products.id order by usd_price asc limit 1) as price"
+            "(select usd_price from product_variants " .
+            "where product_id = products.id " .
+            "order by usd_price asc limit 1) as price"
         ));
     }
 
