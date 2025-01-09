@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('slug')->unique();
             $table->boolean('is_active');
             $table->boolean('is_varied');
+            $table->boolean('is_default')->default(true);
             $table->text('description');
             $table->text('short_description');
             $table->unsignedInteger('popular')->default(0);
