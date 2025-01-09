@@ -18,8 +18,8 @@ class VerifyLanguage
      */
     public function handle(Request $request, Closure $next)
     {
-        // $lang = $request->lang ?? 'en';
-        $lang = $request->header('Accept-Language') ?? 'en';
+        $lang = $request->lang ?? 'en';
+        // $lang = $request->header('Accept-Language') ?? 'en';
 
         if (in_array($lang, Language::code())) {
             App::setLocale($lang);
