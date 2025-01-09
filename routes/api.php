@@ -140,8 +140,8 @@ Route::prefix('/v1')->middleware('verifyLanguage')->group(function () {
             // Admin - Products
             Route::get('/products', [AdminProductController::class,'index']);
             Route::post('/products', [AdminProductController::class, 'store']);
-            Route::get('/products/{product}', [AdminProductController::class,'show']);
-            Route::put('/products/{product}', [AdminProductController::class,'update']);
+            Route::get('/products/{product:slug}', [AdminProductController::class,'show']);
+            Route::put('/products/{product:slug}', [AdminProductController::class,'update']);
             Route::delete('/products/{product}', [AdminProductController::class,'destroy']);
 
             // Admin - ProductImage
