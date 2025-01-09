@@ -64,11 +64,18 @@ class ProductRequest extends FormRequest
 
                     if ($variantId) { //for update
 
-                        $exists    = DB::table('product_variants')->where('code', '=', $value)->where('id', '!=', $variantId)->exists();
+                        $exists    = DB::table('product_variants')
+                                    ->where('code', '=', $value)
+                                    ->where('id', '!=', $variantId)
+                                    ->where('deleted_at', null)
+                                    ->exists();
 
                     } else { //for store
 
-                        $exists    = DB::table('product_variants')->where('code', '=', $value)->exists();
+                        $exists    = DB::table('product_variants')
+                                    ->where('code', '=', $value)
+                                    ->where('deleted_at', null)
+                                    ->exists();
                     }
 
                     if ($exists) {
