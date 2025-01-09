@@ -5,19 +5,18 @@ namespace App\Http\Controllers\Api\V1\Product;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Api\Product\CreateProductRequest;
-use App\Http\Requests\Api\Product\UpdateProductRequest;
+use App\Http\Requests\Api\Product\ProductRequest;
 use App\Http\Resources\Common\SuccessResource;
 use App\Http\Resources\Product\ProductResource;
+use App\Traits\JsonResponsesTrait;
 use Spatie\QueryBuilder\QueryBuilder;
 use Illuminate\Support\Facades\DB;
 use Spatie\QueryBuilder\AllowedFilter;
 
 class AdminProductController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    use JsonResponsesTrait;
+
     public function index()
     {
         $products = QueryBuilder::for(Product::class)
@@ -26,19 +25,19 @@ class AdminProductController extends Controller
                     ->allowedSorts([
                         'name',
                         'popular',
-                        'price'
+                        'price',
+                        'rating',
                     ])
                     ->allowedFilters([
-                        AllowedFilter::partial('search', 'name')
+                        AllowedFilter::scope('search')
                     ])
-                    ->paginate(25)->appends(request()->query());
+                    ->with([
+                        'category:id,name',
+                    ])->paginate(25)->appends(request()->query());
 
         return ProductResource::collection($products);
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Product $product)
     {
         $product = $product->load([
@@ -49,141 +48,143 @@ class AdminProductController extends Controller
         return new ProductResource($product, true);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(CreateProductRequest $request)
+    public function store(ProductRequest $request)
     {
         $request = $request->validated();
 
-        DB::transaction(function() use ($request){
+        DB::beginTransaction();
+        try {
 
-            $product = $this->setProduct(new Product(), $request);
-    
+            $product = $this->saveProduct(new Product(), $request);
+
             if ($product->is_varied) {
-                
-                foreach ($request['variants'] as $key => $variantRequest) {
-
-                    $this->setVariant($variantRequest, new ProductVariant(), $product);   
+                foreach ($request['variants'] as $key => $value) {
+                    $this->saveVariant($product, $value, false);
                 }
             } else {
-                $this->setVariant($request, new ProductVariant(), $product);            
+                $this->saveVariant($product, $request, true);
             }
-        });
-        
-        return new SuccessResource(201);
+
+            DB::commit();
+
+            return $this->successStore();
+        } catch (\Throwable $th) {
+
+            DB::rollBack();
+
+            throw $th;
+        }
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdateProductRequest $request, Product $product)
+    public function update(ProductRequest $request, Product $product)
     {
         $request = $request->validated();
 
-        DB::transaction( function() use ($request, $product)
-        {
-            $oldProductIsVaried = $product->is_varied;
-            $newProduct         = $this->setProduct($product, $request);
+        DB::beginTransaction();
+        try {
 
-            if ($request['is_varied']) {
+            $product     = $this->saveProduct($product, $request);
+            $variant_ids = [];
 
-                $this->updateProductToManyVariant($request['variants'], $newProduct);
+            if ($product->is_varied == 1) {
+                foreach ($request['variants'] as $key => $value) {
+                    $variant_ids[] = $this->saveVariant($product, $value, false);
+                }
             } else {
-
-                $this->updateProductToSingelVariant($request, $newProduct, $oldProductIsVaried);        
+                $variant_ids[] = $this->saveVariant($product, $request, true);
             }
-            
-        });
-        
-        return new SuccessResource(200);
+
+            $this->deleteExcludedVariants($product, $variant_ids);
+
+            DB::commit();
+
+            return $this->successResponse();
+
+        } catch (\Throwable $th) {
+
+            DB::rollBack();
+
+            throw $th;
+        }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Product $product)
     {
-        
-    }
-    
-    ////////////////////
-    //private function//
-    ////////////////////
+        return $this->errorMessage('Product cannot deleted');
 
-    private function setProduct(Product $product, array $request)
+        DB::beginTransaction();
+        try {
+            DB::commit();
+        } catch (\Throwable $th) {
+            Db::rollBack();
+            throw $th;
+        }
+    }
+
+    // === PRIVATE FUNCTION ===
+
+    private function saveProduct(Product $product, array $request)
     {
-        $product->name                  = $request['name'];
-        $product->available             = $request['available'];
-        $product->category_id           = $request['category_id'];
-        $product->full_description      = $request['full_description'];
-        $product->short_description     = $request['short_description'];
-        $product->is_varied             = $request['is_varied'];
+        $product->name          = $request['name'];
+        $product->meta          = $request['meta'];
+        $product->description   = $request['description'];
+        $product->type          = $request['type'];
+        $product->category_id   = $request['category_id'];
+        $product->code          = $request['code'];
+        $product->is_varied     = $request['is_varied'];
+        $product->is_active     = $request['is_active'];
 
         $product->save();
 
         return $product;
     }
 
-    private function setVariant(array $request, ProductVariant $variant, Product $product)
+    private function saveVariant(Product $product, array $request, bool $default)
     {
+        if ($default) { // for default variant
+
+            $variant = $product->variants()->default()->withTrashed()->firstOrNew();
+
+        } else if (!isset($request['id'])){ // for create new variant in product is_varied
+
+            $variant = new ProductVariant();
+
+        } else { // for update variant in product is_varied
+
+            $variant = $product->variants()->where('id', '=', $request['id'])->default(false)->firstOrFail();
+
+        }
+
+        if (!isset($request['stock'])) {
+            $request['stock'] = null;
+        }
+
+        $variant->code          = $request['code'];
         $variant->product_id    = $product->id;
-        $variant->idr_price     = $request['idr_price'];
+        $variant->name          = $request['name'];
+        $variant->price         = $request['price'];
         $variant->usd_price     = $request['usd_price'];
-        $variant->available     = $request['available'];
-
-        if ($request['stock'] != null) { //for update museum type
-            $variant->stock = $request['stock'];
-        }
-
-        if ($variant->code != $request['code']) {
-            $variant->code = $request['code'];
-        }
-
-        if ($product->is_varied) {
-            $variant->type = $request['type'];
-        } else {
-            $variant->type = $variant::DEFAULT_TYPE;
-        }
-        
+        $variant->code          = $request['code'];
+        $variant->stock         = $request['stock'];
+        $variant->is_active     = $request['is_active'];
+        $variant->is_default    = $default;
         $variant->save();
-    }
 
-    /**
-     * update product to just has one variant
-     */
-    private function updateProductToSingelVariant(array $request, Product $product, bool $oldProductIsVaried)
-    {
-        if ($oldProductIsVaried) {
-            $product->variants()->delete();
+        if ($variant->trashed() && $default) {
+            $variant->restore();
         }
 
-        $variant = $product->variants()->default()->firstOrNew();
-
-        $this->setVariant($request, $variant, $product);
+        return $variant->id;
     }
 
-    /**
-     * update product to many variants
-     */
-    private function updateProductToManyVariant($requestVariants, Product $product)
+    private function deleteExcludedVariants(Product $product, array $variant_ids)
     {
-        $updateRequest = collect($requestVariants)->whereNotNull('id');
-        $newRequest    = collect($requestVariants)->whereNull('id');
+        $variants = $product->variants()->whereNotIn('id', $variant_ids)->get();
 
-        foreach ($product->variants as $variant) { // update old variant
-
-            $request = $updateRequest->where('id', $variant->id)->first();
-            
-            if ($request != null) {
-                $this->setVariant($request, $variant, $product);
-            } else {
+        if ($variants != null) {
+            foreach ($variants as $variant) {
                 $variant->delete();
             }
-        }
-
-        foreach ($newRequest as $request) { // make new variant
-            $this->setVariant($request, new ProductVariant(), $product);
         }
     }
 }
