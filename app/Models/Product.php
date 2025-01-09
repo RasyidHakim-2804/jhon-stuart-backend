@@ -64,9 +64,14 @@ class Product extends Model
         ));
     }
 
-    public function scopeAvailable(Builder $query, bool $available = true)
+    public function scopeActive(Builder $query, bool $active = true)
     {
-        $query->where('available', '=', $available);
+        $query->where('is_active', '=', $active);
+    }
+
+    public function scopeSearch($query, $search)
+    {
+        return $query->where('name', 'LIKE','%' . $search . '%');
     }
 
     // === BOOT ===
