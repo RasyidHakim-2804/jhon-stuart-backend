@@ -15,11 +15,12 @@ return new class extends Migration
             $table->id();
             $table->string('code')->unique();
             $table->foreignId('category_id')->constrained('product_categories', 'id');
+            $table->string('type');
             $table->string('name', 255);
             $table->string('slug')->unique();
             $table->boolean('is_active');
             $table->boolean('is_varied');
-            $table->text('full_description');
+            $table->text('description');
             $table->text('short_description');
             $table->unsignedInteger('popular')->default(0);
             $table->unsignedDecimal('rating',3, 1);
