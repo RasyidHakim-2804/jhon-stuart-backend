@@ -145,9 +145,9 @@ Route::prefix('/v1')->middleware('verifyLanguage')->group(function () {
             Route::delete('/products/{product}', [AdminProductController::class,'destroy']);
 
             // Admin - ProductImage
-            Route::get('/products/{product}/images', [AdminProductImageController::class, 'index']);
-            Route::post('/products/{product}/images', [AdminProductImageController::class,'store']);
-            Route::post('/products/{product}/save-images', [AdminProductImageController::class, 'saveImages']);
+            Route::get('/products/{product:slug}/images', [AdminProductImageController::class, 'index']);
+            Route::post('/products/{product:slug}/images', [AdminProductImageController::class,'store']);
+            Route::post('/products/{product:slug}/save-images', [AdminProductImageController::class, 'saveImages']);
 
             // Admin - User
             Route::get('/users', [AdminUserController::class, 'index']);
