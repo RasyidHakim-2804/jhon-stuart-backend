@@ -20,7 +20,7 @@ class UserWishlistController extends Controller
     {
         /** @var \App\Models\User */
         $user = $request->user()->load('wishlists.product');
-        
+
         return ProductVariantResource::collection($user->wishlists);
     }
 
@@ -30,7 +30,7 @@ class UserWishlistController extends Controller
     public function store(CreateWishlistRequest $request)
     {
         DB::transaction(function() use ($request) {
-            
+
             /** @var \App\Models\User */
             $user = $request->user();
             $user->wishlists()->syncWithoutDetaching([
@@ -47,7 +47,7 @@ class UserWishlistController extends Controller
     public function destroy(DeleteWishlistRequest $request)
     {
         DB::transaction(function() use ($request) {
-            
+
             /** @var \App\Models\User */
             $user = $request->user();
             $user->wishlists()->detach([
@@ -61,8 +61,8 @@ class UserWishlistController extends Controller
     public function side(Request $request)
     {
         /** @var \App\Models\ProductVariant */
-        $productVariant = $request->user()->wishlists()->with(['product:id,name,available'])->paginate(5);
-        
+        $productVariant = $request->user()->wishlists()->with(['product:id,name,is_active'])->limit(5)->get();
+
         return ProductVariantResource::collection($productVariant);
     }
 }
