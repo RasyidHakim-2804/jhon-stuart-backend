@@ -33,6 +33,7 @@ class ProductRequest extends FormRequest
             'is_varied'             => 'required|boolean',
             'is_active'             => 'required|boolean',
             'code'                  => 'required|string|unique:products,code',
+            'stock'                 => 'required|numeric|min:0|max:10000000',
             'type'                  => [
                 'required',
                 Rule::in([
@@ -111,6 +112,7 @@ class ProductRequest extends FormRequest
                     }
                 }
             ];
+            $rules['stock'] == 'required|numeric|min:0|max:1';
         }
 
         return $rules;
