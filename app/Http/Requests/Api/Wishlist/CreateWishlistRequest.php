@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Api\Wishlist;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class CreateWishlistRequest extends FormRequest
 {
@@ -22,7 +23,12 @@ class CreateWishlistRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'product_variant_id' => 'required|exists:product_variants,id'
+            'product_id'         => 'required|exists:products,id',
+            'product_variant_id' => [
+                'required',
+                Rule::exists('product_variants', 'id')
+                ->where('product_id', $this->input('product_id'))
+            ]
         ];
     }
 }
