@@ -6,9 +6,7 @@ use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Product\ProductRequest;
-use App\Http\Resources\Common\SuccessResource;
 use App\Http\Resources\Product\ProductResource;
-use App\Models\ProductCategory;
 use App\Traits\JsonResponsesTrait;
 use Spatie\QueryBuilder\QueryBuilder;
 use Illuminate\Support\Facades\DB;
@@ -154,10 +152,6 @@ class AdminProductController extends Controller
 
             $variant = $product->variants()->where('id', '=', $request['id'])->default(false)->firstOrFail();
 
-        }
-
-        if ($product->type == ProductCategory::MUSEUM_TYPE) {
-            $request['stock'] = 1;
         }
 
         $variant->code          = $request['code'];
