@@ -74,6 +74,16 @@ class Product extends Model
         return $query->where('name', 'LIKE','%' . $search . '%');
     }
 
+    public function scopeInWishlist(Builder $query, $user_id = 0)
+    {
+        $query->addSelect('*',DB::raw(
+            "(select user_id from wishlists " .
+            "where product_id = products.id " .
+            "and user_id = " . intval($user_id) . " " .
+            "limit 1) as in_wishlist"
+        ));
+    }
+
     // === BOOT ===
 
     public static function boot()
