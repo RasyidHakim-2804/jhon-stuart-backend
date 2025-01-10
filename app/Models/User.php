@@ -13,6 +13,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class User extends Authenticatable
 {
@@ -56,6 +57,11 @@ class User extends Authenticatable
     public function forgetPasswordResets()
     {
         return $this->hasMany(ForgetUserPasswordReset::class, 'user_id', 'id');
+    }
+
+    public function wishlists(): BelongsToMany
+    {
+        return $this->belongsToMany(ProductVariant::class, 'wishlists', 'user_id', 'product_variant_id');
     }
 
     // public function cart()
