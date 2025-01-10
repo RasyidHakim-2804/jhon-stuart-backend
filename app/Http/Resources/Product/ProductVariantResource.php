@@ -24,6 +24,8 @@ class ProductVariantResource extends JsonResource
             'price'         => $this->price,
             'usd_price'     => $this->usd_price,
             'stock'         => $this->stock,
+            'product'       => new ProductResource($this->whenLoaded('product')),
+            'in_wishlist'   => $this->in_wishlist? true : false,
             'created_at'    => $this->created_at,
             'updated_at'    => $this->updated_at,
         ];
