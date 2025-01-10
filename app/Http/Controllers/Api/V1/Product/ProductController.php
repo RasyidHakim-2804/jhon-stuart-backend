@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Http\Resources\Product\ProductResource;
 use App\Models\ProductCategory;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilder;
 
@@ -39,9 +41,15 @@ class ProductController extends Controller
 
     public function show($slug)
     {
+        $user_id = 0;
+
+        if ($user = auth()->guard('api_user')->user()) {
+            $user_id = $user->id;
+        }
+
         $product = Product::where('slug', '=', $slug)
             ->with([
-                'variants',
+                'variants'  => fn($query) => $query->inWishlist($user_id)->active(),
                 'category:id,name,slug',
                 'images' => function ($query) {
                     $query->where('position', '!=', null);
