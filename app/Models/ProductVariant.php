@@ -37,6 +37,11 @@ class ProductVariant extends Model
         return $query->where('is_default', '=', $default);
     }
 
+    public function scopeActive(Builder $query, bool $active = true)
+    {
+        return $query->where('is_active', '=', $active);
+    }
+
     public function scopeInWishlist(Builder $query, $user_id = 0)
     {
         $query->addSelect('*',DB::raw(
