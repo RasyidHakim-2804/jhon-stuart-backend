@@ -73,5 +73,21 @@ class UserSeeder extends Seeder
                 'updated_at'        => now()
             ]
         );
+
+        DB::table('users')->insert(
+            [
+                'uuid'              => Str::random(12),
+                'first_name'        => $firstname,
+                'last_name'         => $lastName,
+                'email'             => 'test2@email.com',
+                'phone'             => fake()->phoneNumber(),
+                'email_verified_at' => now(),
+                'password'          => bcrypt('user#2022!'),
+                'is_active'         => 1,
+                'address'           => fake()->address,
+                'created_at'        => now(),
+                'updated_at'        => now()
+            ]
+        );
     }
 }
