@@ -24,11 +24,12 @@ class DeleteWishlistRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'product_id'         => 'required|exists:products,id',
             'product_variant_id' => [
                 'required',
-                Rule::exists(Wishlist::class, 'product_variant_id')->where(function($query) {
-                    $query->where('user_id', '=', $this->user()->id);
-                })
+                Rule::exists('product_variants', 'id')
+                ->where('user_id', '=', $this->user()->id)
+                ->where('product_id', $this->input('product_id'))
             ]
         ];
     }
