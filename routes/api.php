@@ -187,25 +187,20 @@ Route::prefix('/v1')->middleware('verifyLanguage')->group(function () {
             Route::post('/change-password', [UserProfileController::class, 'changePassword']);
             Route::post('/change-language', [UserProfileController::class, 'changeLanguage']);
 
+             //Authentication
+             Route::post('/logout', [AuthUserController::class, 'logout']);
+
+             //password controller
+             Route::post('/change-password', [UserProfileController::class, 'changePassword']);
+
+             //Wishlists
+             Route::get('/wishlists-side', [UserWishlistController::class, 'side']);
+             Route::get('/wishlists', [UserWishlistController::class, 'index']);
+             Route::post('/wishlists', [UserWishlistController::class,'store']);
+             Route::delete('/wishlists', [UserWishlistController::class, 'destroy']);
+
             // Promo
             // Route::post('/apply-promo', UserPromoController::class);
-        });
-
-        Route::prefix('/{user}')->scopeBindings()->group(function () {
-            Route::middleware(['auth:api_user'])->group(function(){
-
-                //Authentication
-                Route::post('/logout', [AuthUserController::class, 'logout']);
-
-                //password controller
-                Route::post('/change-password', [UserProfileController::class, 'changePassword']);
-
-                //Wishlists
-                Route::get('/wishlists-side', [UserWishlistController::class, 'side']);
-                Route::get('/wishlists', [UserWishlistController::class, 'index']);
-                Route::post('/wishlists', [UserWishlistController::class,'store']);
-                Route::delete('/wishlists', [UserWishlistController::class, 'destroy']);
-            });
         });
     });
 });
