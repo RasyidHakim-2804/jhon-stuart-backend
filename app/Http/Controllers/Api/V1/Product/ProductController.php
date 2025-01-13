@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1\Product;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Http\Resources\Product\ProductResource;
+use App\Http\Resources\Product\ProductListResource;
 use App\Models\ProductCategory;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -42,7 +43,7 @@ class ProductController extends Controller
                     ])
                     ->inWishlist($user_id)->paginate(12)->appends(request()->query());
 
-            return ProductResource::collection($products);
+            return ProductListResource::collection($products);
     }
 
     public function show($slug)
