@@ -26,7 +26,7 @@ class DeleteWishlistRequest extends FormRequest
         return [
             'product_variant_id' => [
                 'required',
-                Rule::exists('wishlists', 'id')
+                Rule::exists('wishlists', 'product_variant_id')
                 ->where('user_id', '=', $this->user()->id)
             ]
         ];
