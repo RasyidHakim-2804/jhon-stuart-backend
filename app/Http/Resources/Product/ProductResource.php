@@ -33,6 +33,7 @@ class ProductResource extends JsonResource
             'category'          => new ProductCategoryResource($this->whenLoaded('category')),
             'images'            => ProductImageResource::collection($this->whenLoaded('images')),
             'variants'          => ProductVariantResource::collection($this->whenLoaded('variants')),
+            'thumbnail_image'   => new ProductImageResource($this->whenLoaded('thumbnailImage')),
             'created_at'        => $this->created_at,
             'updated_at'        => $this->updated_at,
         ];
