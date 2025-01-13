@@ -5,23 +5,23 @@ namespace App\Http\Controllers\Api\V1\Wishlist;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Wishlist\CreateWishlistRequest;
 use App\Http\Requests\Api\Wishlist\DeleteWishlistRequest;
-use App\Http\Resources\Common\SuccessResource;
 use App\Http\Resources\Product\ProductVariantResource;
-use Illuminate\Http\JsonResponse;
+use App\Traits\JsonResponsesTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class UserWishlistController extends Controller
 {
+    use JsonResponsesTrait;
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function index()
     {
         /** @var \App\Models\User */
-        $user = $request->user()->load('wishlists.product');
+        $user = auth()->user();
 
-        return ProductVariantResource::collection($user->wishlists);
+        return ProductVariantResource::collection($user->load('wishlists.product')->wishlists);
     }
 
     /**
@@ -32,13 +32,16 @@ class UserWishlistController extends Controller
         DB::transaction(function() use ($request) {
 
             /** @var \App\Models\User */
-            $user = $request->user();
+            $user = auth()->user();
             $user->wishlists()->syncWithoutDetaching([
-                $request->validated('product_variant_id') => ['created_at' => now()]
+                $request->validated('product_variant_id') => [
+                    'created_at' => now(),
+                    'product_id' => $request->product_id,
+                ]
             ]);
         });
 
-        return new SuccessResource(JsonResponse::HTTP_CREATED);
+        return $this->successStore();
     }
 
     /**
@@ -49,19 +52,19 @@ class UserWishlistController extends Controller
         DB::transaction(function() use ($request) {
 
             /** @var \App\Models\User */
-            $user = $request->user();
+            $user = auth()->user();
             $user->wishlists()->detach([
                 $request->validated('product_variant_id')
             ]);
         });
 
-        return new SuccessResource(JsonResponse::HTTP_CREATED);
+        return $this->successResponse();
     }
 
     public function side(Request $request)
     {
         /** @var \App\Models\ProductVariant */
-        $productVariant = $request->user()->wishlists()->with(['product:id,name,is_active'])->limit(5)->get();
+        $productVariant = $request->user()->wishlists()->with(['product:id,name,is_active'])->paginate(5);
 
         return ProductVariantResource::collection($productVariant);
     }
