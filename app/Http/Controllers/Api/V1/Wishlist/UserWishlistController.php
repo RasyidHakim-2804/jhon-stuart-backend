@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\DB;
 class UserWishlistController extends Controller
 {
     use JsonResponsesTrait;
+
     /**
      * Display a listing of the resource.
      */
@@ -21,7 +22,11 @@ class UserWishlistController extends Controller
         /** @var \App\Models\User */
         $user = auth()->user();
 
-        return ProductVariantResource::collection($user->load('wishlists.product')->wishlists);
+        return ProductVariantResource::collection(
+            $user->load(
+                'wishlists.product.thumbnailImage'
+            )->wishlists
+        );
     }
 
     /**
@@ -64,7 +69,9 @@ class UserWishlistController extends Controller
     public function side(Request $request)
     {
         /** @var \App\Models\ProductVariant */
-        $productVariant = $request->user()->wishlists()->with(['product:id,name,is_active'])->paginate(5);
+        $productVariant = $request->user()->wishlists()->with([
+            'product.thumbnailImage'
+        ])->paginate(5);
 
         return ProductVariantResource::collection($productVariant);
     }
