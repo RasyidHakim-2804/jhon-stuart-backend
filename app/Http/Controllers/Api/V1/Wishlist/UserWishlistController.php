@@ -5,7 +5,10 @@ namespace App\Http\Controllers\Api\V1\Wishlist;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Wishlist\CreateWishlistRequest;
 use App\Http\Requests\Api\Wishlist\DeleteWishlistRequest;
+use App\Http\Resources\Product\ProductResource;
 use App\Http\Resources\Product\ProductVariantResource;
+use App\Http\Resources\Wishlist\WishlistResource;
+use App\Models\Wishlist;
 use App\Traits\JsonResponsesTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -22,10 +25,11 @@ class UserWishlistController extends Controller
         /** @var \App\Models\User */
         $user = auth()->user();
 
-        return ProductVariantResource::collection(
-            $user->load(
-                'wishlists.product.thumbnailImage'
-            )->wishlists
+        return WishlistResource::collection(
+            Wishlist::with([
+                'product.variants',
+                'variant'
+            ])->where('user_id', '=', $user->id)->get()
         );
     }
 
@@ -69,7 +73,7 @@ class UserWishlistController extends Controller
     public function side(Request $request)
     {
         /** @var \App\Models\ProductVariant */
-        $productVariant = $request->user()->wishlists()->with([
+        $productVariant = $request->user()->variantWishlists()->with([
             'product.thumbnailImage'
         ])->paginate(5);
 
