@@ -16,6 +16,12 @@ class ProductController extends Controller
 {
     public function index(ProductCategory $category)
     {
+        $user_id = 0;
+
+        if ($user = auth()->guard('api_user')->user()) {
+            $user_id = $user->id;
+        }
+
         $products = QueryBuilder::for(Product::class)
                     ->selectVariantPrice()
                     ->active()
@@ -34,7 +40,7 @@ class ProductController extends Controller
                     ->allowedFilters([
                         AllowedFilter::partial('search', 'name'),
                     ])
-                    ->paginate(12)->appends(request()->query());
+                    ->inWishlist($user_id)->paginate(12)->appends(request()->query());
 
             return ProductResource::collection($products);
     }
