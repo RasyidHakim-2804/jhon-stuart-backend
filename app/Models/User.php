@@ -59,9 +59,14 @@ class User extends Authenticatable
         return $this->hasMany(ForgetUserPasswordReset::class, 'user_id', 'id');
     }
 
-    public function wishlists(): BelongsToMany
+    public function variantWishlists(): BelongsToMany
     {
         return $this->belongsToMany(ProductVariant::class, 'wishlists', 'user_id', 'product_variant_id');
+    }
+
+    public function productWishlists(): BelongsToMany
+    {
+        return $this->belongsToMany(Product::class, 'wishlists', 'user_id', 'product_id');
     }
 
     // public function cart()
