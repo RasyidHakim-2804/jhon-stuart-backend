@@ -27,7 +27,7 @@ class ProductVariant extends Model
 
     public function wishlistBy(): BelongsToMany
     {
-        return $this->belongsToMany(User::class, 'user_wishlists', 'product_variant_id', 'user_id');
+        return $this->belongsToMany(User::class, 'wishlists', 'product_variant_id', 'user_id');
     }
 
     // === SCOPE ===
