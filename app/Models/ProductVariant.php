@@ -30,6 +30,11 @@ class ProductVariant extends Model
         return $this->belongsToMany(User::class, 'wishlists', 'product_variant_id', 'user_id');
     }
 
+    public function cartBy(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'carts', 'product_variant_id', 'user_id');
+    }
+
     // === SCOPE ===
 
     public function scopeDefault(Builder $query, bool $default = true)
