@@ -27,7 +27,6 @@ class ProductResource extends JsonResource
             'rating'            => $this->rating,
             'is_varied'         => $this->is_varied,
             'is_active'         => $this->is_active,
-            'in_wishlist'       => $this->in_wishlist? true : false,
             'meta'              => $this->meta,
             'description'       => $this->description,
             'thumbnail_price'   => $this->price,
