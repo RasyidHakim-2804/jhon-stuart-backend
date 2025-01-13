@@ -42,7 +42,7 @@ class UserWishlistController extends Controller
 
             /** @var \App\Models\User */
             $user = auth()->user();
-            $user->wishlists()->syncWithoutDetaching([
+            $user->variantWishlists()->syncWithoutDetaching([
                 $request->validated('product_variant_id') => [
                     'created_at' => now(),
                     'product_id' => $request->product_id,
@@ -62,7 +62,7 @@ class UserWishlistController extends Controller
 
             /** @var \App\Models\User */
             $user = auth()->user();
-            $user->wishlists()->detach([
+            $user->variantWishlists()->detach([
                 $request->validated('product_variant_id')
             ]);
         });
