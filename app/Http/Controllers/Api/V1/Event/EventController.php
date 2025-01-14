@@ -3,36 +3,61 @@
 namespace App\Http\Controllers\Api\V1\Event;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\Api\V1\Event\EventResource;
+use App\Http\Resources\Event\EventResource;
+use App\Http\Resources\Event\ListEventResource;
 use App\Models\Event;
-use Illuminate\Http\Request;
+use App\Traits\JsonResponsesTrait;
+use Illuminate\Support\Facades\DB;
+use Spatie\QueryBuilder\AllowedFilter;
+use Spatie\QueryBuilder\QueryBuilder;
 
 class EventController extends Controller
 {
+    use JsonResponsesTrait;
+
     public function index()
     {
-        $events = Event::paginate(25);
-
-        return EventResource::collection($events);
+        return ListEventResource::collection(
+            QueryBuilder::for(Event::class)
+            ->allowedFilters([
+                AllowedFilter::scope('seacrh'),
+            ])
+            ->latest()->with([
+                'metaTranslations'  => fn($translation) => $translation->where('language', config('app.locale')),
+                'titleTranslations' => fn($translation) => $translation->where('language', config('app.locale')),
+                'author'
+            ])->paginate(15)
+        );
     }
 
-    public function show(Event $event)
+    public function show(Event $article)
     {
-        $event->views++;
-        $event->save();
-        
-        $event =$event->load(['images', 'author']);
-        
-        return new EventResource($event);
+        $article->total_view = $article->total_view + 1;
+
+        $article->save();
+
+        return $this->successGet(new EventResource(
+            $article->load([
+                'metaTranslations'  => fn($translation) => $translation->where('language', config('app.locale')),
+                'titleTranslations' => fn($translation) => $translation->where('language', config('app.locale')),
+                'bodyTranslations'  => fn($translation) => $translation->where('language', config('app.locale')),
+                'author',
+            ])
+        ));
     }
 
-    public function topEvents()
+    public function top()
     {
-        $topArticles = Event::with([
-            'author',
-            'images'
-        ])->orderBy('views', 'asc')->take(5)->get();
-
-        return EventResource::collection($topArticles);
+        return ListEventResource::collection(
+            QueryBuilder::for(Event::class)
+            ->allowedFilters([
+                AllowedFilter::scope('seacrh'),
+            ])
+            ->orderBy('total_view', 'DESC')->with([
+                'metaTranslations'  => fn($translation) => $translation->where('language', config('app.locale')),
+                'titleTranslations' => fn($translation) => $translation->where('language', config('app.locale')),
+                'author'
+            ])->limit(3)->get()
+        );
     }
 }
