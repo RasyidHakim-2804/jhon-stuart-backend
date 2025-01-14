@@ -69,13 +69,7 @@ class AdminEventController extends Controller
             $article->total_view    = 0;
             $article->admin_id      = auth()->user()->id;
 
-            $article = $this->saveThumbnail($article, $request->thumbnail);
-
             $article->save();
-
-            if ($article->type == 'event') {
-                $this->saveVideo($article, $request->video);
-            }
 
             $request = $request->validated();
             foreach (EventTranslation::ATTRIBUTE as $field) {
@@ -83,8 +77,6 @@ class AdminEventController extends Controller
                     $this->saveEventTranslation($article->id, $field, $lang, $request[$field][$lang]);
                 }
             }
-
-            // $this->saveImages($article, $request['body']);
 
             DB::commit();
 
@@ -102,12 +94,6 @@ class AdminEventController extends Controller
         try {
             // $this->permissionService->check('full');
 
-            if ($request->thumbnail) {
-                $this->deleteImage($article);
-
-                $article = $this->saveThumbnail($article, $request->thumbnail);
-            }
-
             $article->title         = $request->title['en'];
             $article->category_id   = $request->category_id;
             $article->video         = $request->video;
@@ -115,18 +101,12 @@ class AdminEventController extends Controller
 
             $article->save();
 
-            if ($article->type == 'event') {
-                $this->saveVideo($article, $request->url);
-            }
-
             $request = $request->validated();
             foreach (EventTranslation::ATTRIBUTE as $field) {
                 foreach (Language::code() as $lang) {
                     $this->saveEventTranslation($article->id, $field, $lang, $request[$field][$lang]);
                 }
             }
-
-            // $this->saveImages($article, $request['body']);
 
             DB::commit();
 
