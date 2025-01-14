@@ -30,6 +30,7 @@ use App\Http\Controllers\Api\V1\Admin\AdminEmailChangesVerificationController;
 use App\Http\Controllers\Api\V1\Admin\AdminFeatureController;
 use App\Http\Controllers\Api\V1\Admin\ForgetAdminPasswordController;
 use App\Http\Controllers\Api\V1\Cart\UserCartController;
+use App\Http\Controllers\Api\V1\Event\AdminEventImagesController;
 use App\Http\Controllers\Api\V1\User\AdminUserController;
 
 /*
@@ -102,6 +103,7 @@ Route::prefix('/v1')->middleware('verifyLanguage')->group(function () {
 
             // Admin - Subscriber
             Route::get('/subscribers', [AdminSubscriberController::class, 'index']);
+            Route::delete('/subscribers/{subscriber:id}', [AdminSubscriberController::class, 'destroy']);
 
             // Admin - ArticleAuthor
             Route::get('/authors', [AdminArticleAuthorController::class, 'index']);
@@ -123,6 +125,11 @@ Route::prefix('/v1')->middleware('verifyLanguage')->group(function () {
             Route::get('/events/{event:slug}', [AdminEventController::class, 'show']);
             Route::put('/events/{event:slug}', [AdminEventController::class, 'update']);
             Route::delete('/events/{event:slug}', [AdminEventController::class, 'destroy']);
+
+            // Admin - EventImage
+            Route::get('/events/{event:slug}/images', [AdminEventImagesController::class, 'index']);
+            Route::post('/events/{event:slug}/images', [AdminEventImagesController::class,'store']);
+            Route::post('/events/{event:slug}/save-images', [AdminEventImagesController::class, 'saveImages']);
 
             // Admin - ProductCategory
             Route::get('/product-categories', [AdminProductCategoryController::class, 'index']);
