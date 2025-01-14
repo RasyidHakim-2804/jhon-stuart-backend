@@ -50,18 +50,5 @@ class ArticleSeeder extends Seeder
             'admin_id'      => 1,
             'created_at'    => now(),
         ]);
-
-        //type - event
-        DB::table('articles')->insert([
-            'id'            => 4,
-            'type'          => 'event',
-            'title'         => 'Cane making tutorial 2013, Ubud, Bali',
-            'slug'          => Str::slug('Cane making tutorial 2013, Ubud, Bali'),
-            'total_view'         => rand(50, 100),
-            // 'image'         => 'https://picsum.photos/500/300',
-            'category_id'   => 1,
-            'admin_id'      => 1,
-            'created_at'    => now(),
-        ]);
     }
 }
