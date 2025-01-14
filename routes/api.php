@@ -29,6 +29,7 @@ use App\Http\Controllers\Api\V1\Admin\AuthAdminController;
 use App\Http\Controllers\Api\V1\Admin\AdminEmailChangesVerificationController;
 use App\Http\Controllers\Api\V1\Admin\AdminFeatureController;
 use App\Http\Controllers\Api\V1\Admin\ForgetAdminPasswordController;
+use App\Http\Controllers\Api\V1\Article\AdminArticleImagesController;
 use App\Http\Controllers\Api\V1\Cart\UserCartController;
 use App\Http\Controllers\Api\V1\Event\AdminEventImagesController;
 use App\Http\Controllers\Api\V1\User\AdminUserController;
@@ -118,6 +119,7 @@ Route::prefix('/v1')->middleware('verifyLanguage')->group(function () {
             Route::get('/articles/{article:slug}', [AdminArticleController::class, 'show']);
             Route::put('/articles/{article:slug}', [AdminArticleController::class, 'update']);
             Route::delete('/articles/{article:slug}', [AdminArticleController::class, 'destroy']);
+            Route::post('/article-images', [AdminArticleImagesController::class, 'store']);
 
             // Admin - Event
             Route::get('/events', [AdminEventController::class, 'index']);
