@@ -25,8 +25,9 @@ class UserCartController extends Controller
 
         return CartResource::collection(
             Cart::with([
+                'product' => fn($query) => $query->withTrashed(),
+                'variant' => fn($query) => $query->withTrashed(),
                 'product.variants',
-                'variant'
             ])->where('user_id', '=', $user->id)->get()
         );
     }
@@ -34,8 +35,8 @@ class UserCartController extends Controller
     public function listSide()
     {
         return CartResource::collection(Cart::with([
-            'product',
-            'variant',
+            'product' => fn($query) => $query->withTrashed(),
+            'variant' => fn($query) => $query->withTrashed(),
         ])->where('user_id', '=', auth()->user()->id)->get());
     }
 
