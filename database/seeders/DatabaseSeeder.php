@@ -27,6 +27,6 @@ class DatabaseSeeder extends Seeder
         //article
         (new ArticleCategorySeeder)->run();
         (new ArticleSeeder)->run();
-        (new ArticleImagesSeeder)->run();
+        // (new ArticleImagesSeeder)->run();
     }
 }
