@@ -22,7 +22,7 @@ class Article extends Model
     ];
 
     protected $imageSetting = [
-        'folder' => 'articles',
+        'folder' => 'article_thumbnail',
         'field'  => [
             'image',
         ],
