@@ -3,152 +3,236 @@
 namespace App\Http\Controllers\Api\V1\Event;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Api\V1\Event\CreateEventRequest;
-use App\Http\Requests\Api\V1\Event\UpdateEventRequest;
-use App\Http\Resources\Api\V1\Common\SuccessResource;
-use App\Http\Resources\Api\V1\Event\EventResource;
+use App\Http\Requests\Api\Event\EventRequest;
+use App\Http\Resources\Event\AdminEventResource;
+use App\Http\Resources\Event\AdminListEventResource;
 use App\Models\Event;
-use App\Models\Image\EventImage;
-use App\Service\Services\ImageServices\ImageService;
+use App\Models\EventImage;
+use App\Models\EventTranslation;
+use App\Models\EventVideo;
+use App\Models\Language;
+use App\Services\Admin\AdminPermissionService;
+use App\Services\Images\ImageService;
+use App\Traits\JsonResponsesTrait;
 use Illuminate\Support\Facades\DB;
+use Spatie\QueryBuilder\AllowedFilter;
+use Spatie\QueryBuilder\QueryBuilder;
 
 class AdminEventController extends Controller
 {
+    use JsonResponsesTrait;
+
+    protected $permissionService;
+
+    public function __construct()
+    {
+        // $this->permissionService = (new AdminPermissionService('article'));
+    }
+
     public function index()
     {
-        $events = Event::paginate(25);
-
-        return EventResource::collection($events);
+        return AdminListEventResource::collection(
+            QueryBuilder::for(Event::class)
+            ->allowedFilters([
+                AllowedFilter::scope('search')
+            ])
+            ->latest()->with([
+                'metaTranslations' => fn($query) => $query->where('language', '=', 'en'),
+                'author'
+            ])->paginate(25));
     }
 
-    public function show(Event $event)
+    public function show(Event $article)
     {
-        $event =$event->load(['images', 'author']);
+        // $this->permissionService->check('view');
 
-        return new EventResource($event);
+        $article = new AdminEventResource($article->load([
+            'bodyTranslations',
+            'metaTranslations',
+            'titleTranslations',
+            'author',
+        ]));
+
+        return $this->successGet($article);
     }
 
-    public function store(CreateEventRequest $request)
+    public function store(EventRequest $request)
     {
+        DB::beginTransaction();
         try {
-            DB::beginTransaction();
+            // $this->permissionService->check('full');
+
+            $article                = new Event();
+            $article->title         = $request->title['en'];
+            $article->category_id   = $request->category_id;
+            $article->video         = $request->video;
+            $article->total_view    = 0;
+            $article->admin_id      = auth()->user()->id;
+
+            $article = $this->saveThumbnail($article, $request->thumbnail);
+
+            $article->save();
+
+            if ($article->type == 'event') {
+                $this->saveVideo($article, $request->video);
+            }
 
             $request = $request->validated();
-            $event   = new Event();
-
-            $event->title       = $request['title'];
-            $event->meta        = $request['meta'];
-            $event->body        = $request['body'];
-            $event->video_url   = $request['video_url'];
-            $event->author_id   = $request['author_id'];
-            $event->views       = 0;
-
-            $event->save();
-            $imageServices = [];
-            $position      = 1;
-
-            foreach ($request['images'] as $key => $image) {
-                $eventImage   = new EventImage();
-                $imageService = new ImageService($eventImage);
-                
-                $eventImage->position = $position;
-                $eventImage->url      = $imageService->upload($image)->path;
-                $eventImage->event_id = $event->id;
-                $imageServices[]      = $imageService;
-
-                $eventImage->save();
-
-                $position++;
+            foreach (EventTranslation::ATTRIBUTE as $field) {
+                foreach (Language::code() as $lang) {
+                    $this->saveEventTranslation($article->id, $field, $lang, $request[$field][$lang]);
+                }
             }
+
+            $this->saveImages($article, $request['body']);
 
             DB::commit();
 
-            return new SuccessResource(201);
-
-        } catch (\Throwable $th) {
-            
+            return $this->successStore();
+        } catch (\Exception $e) {
             DB::rollBack();
 
-            if (!empty($imageServices)) {
-                foreach ($imageServices as $imageService) {
-                    $imageService->rollback();
-                }
-            }
-            
-            throw $th;
+            return $this->errorServer($e->getMessage());
         }
     }
 
-    public function update(UpdateEventRequest $request, Event $event)
+    public function update(EventRequest $request, Event $article)
     {
+        DB::beginTransaction();
         try {
-            DB::beginTransaction();
+            // $this->permissionService->check('full');
+
+            if ($request->thumbnail) {
+                $this->deleteImage($article);
+
+                $article = $this->saveThumbnail($article, $request->thumbnail);
+            }
+
+            $article->title         = $request->title['en'];
+            $article->category_id   = $request->category_id;
+            $article->video         = $request->video;
+            $article->admin_id      = auth()->user()->id;
+
+            $article->save();
+
+            if ($article->type == 'event') {
+                $this->saveVideo($article, $request->url);
+            }
 
             $request = $request->validated();
-
-            $event->title       = $request['title'];
-            $event->meta        = $request['meta'];
-            $event->body        = $request['body'];
-            $event->video_url   = $request['video_url'];
-            $event->author_id   = $request['author_id'];
-
-            $event->save();
-            $imageServices = [];
-
-            if (isset($request['images'])) {
-                foreach ($request['images'] as $images) {
-                    $eventImage   = $event->images()->where('position', $images['position'])->firstOrNew();
-                    $imageService = new ImageService($eventImage);
-                    
-                    $eventImage->position = $images['position'];
-                    $eventImage->url      = $imageService->update($images['image'])->path;
-                    $eventImage->event_id = $event->id;
-                    $imageServices[]      = $imageService;
-    
-                    $eventImage->save();
-                }
-            }            
-
-            DB::commit();
-
-            return new SuccessResource();
-
-        } catch (\Throwable $th) {
-
-            DB::rollBack();
-            
-            if (!empty($imageServices)) {
-                foreach ($imageServices as $imageService) {
-                    $imageService->rollback();
+            foreach (EventTranslation::ATTRIBUTE as $field) {
+                foreach (Language::code() as $lang) {
+                    $this->saveEventTranslation($article->id, $field, $lang, $request[$field][$lang]);
                 }
             }
 
-            throw $th;
+            $this->saveImages($article, $request['body']);
+
+            DB::commit();
+
+            return $this->successStore();
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+            return $this->errorServer($e->getMessage());
         }
     }
 
-    public function destroy(Event $event)
+    public function destroy(Event $article)
     {
-        try {
-            DB::beginTransaction();
+        // $this->permissionService->check('full');
 
-            $imageServices = ImageService::collection($event->images);
-            $imageServices->delete();
-            $event->images()->delete();
-            $event->delete();
+        $article->delete();
 
-            DB::commit();
+        if ($article->image) $this->deleteImage($article);
 
-            return new SuccessResource();
+        return $this->successStore();
+    }
 
-        } catch (\Throwable $th) {
-            DB::rollBack();
+    // === PROTECTED METHOD ===
 
-            if (isset($imageServices)) {
-                $imageServices->rollback();
+    protected function saveThumbnail($articleImage, $uploadedImage)
+    {
+        $image = (new ImageService($articleImage->imagePath(), $uploadedImage));
+
+        $image->save();
+
+        $articleImage->image = $image->getImageName();
+
+        return $articleImage;
+    }
+
+    protected function saveImages($article, $bodies)
+    {
+        $uploadedImages = $this->getUsedImagesName($bodies);
+
+        $this->deleteOldImages($article, $uploadedImages);
+
+        EventImage::whereIn('image', $uploadedImages)->update(['article_id' => $article->id]);
+
+        $this->deleteUnusedImage();
+    }
+
+    protected function getUsedImagesName($bodies)
+    {
+        $imagesName = [];
+
+        foreach ($bodies as $lang => $body) {
+            $imageUrls = explode('img', $body);
+            $regex     = "/[\w\-]+\.(jpg|png|gif|jpeg)/";
+
+            if (isset($imageUrls)) {
+                foreach ($imageUrls as $key => $imageUrl) {
+                    if(preg_match($regex, $imageUrl, $fileName)) {
+                        $imagesName[] = $fileName[0];
+                    }
+                }
             }
-            
-            throw $th;
-        }   
+        }
+
+        return $imagesName;
+    }
+
+    protected function deleteOldImages($article, $uploadedImages)
+    {
+        $oldImages = EventImage::where('article_id', $article->id)->whereNotIn('image', $uploadedImages)->get();
+
+        if (isset($oldImages)) {
+            foreach ($oldImages as $key => $oldImage) {
+                $this->deleteImage($oldImage);
+            }
+        }
+    }
+
+    protected function deleteUnusedImage()
+    {
+        $unusedImages = EventImage::where('article_id', null)->get();
+
+        if (isset($unusedImages)) {
+            foreach ($unusedImages as $key => $unusedImage) {
+                $this->deleteImage($unusedImage);
+            }
+        }
+    }
+
+    protected function deleteImage($dataImage)
+    {
+        $image = (new ImageService($dataImage->imagePath()));
+
+        $image->delete($dataImage->image);
+    }
+
+    protected function saveEventTranslation($articleId, $field, $lang, $translation)
+    {
+        $newTranslation = EventTranslation::where('article_id', $articleId)->where('field', $field)->where('language', $lang)->first();
+
+        if (!$newTranslation) $newTranslation = new EventTranslation();
+
+        $newTranslation->article_id    = $articleId;
+        $newTranslation->field         = $field;
+        $newTranslation->language      = $lang;
+        $newTranslation->translation   = $translation;
+
+        $newTranslation->save();
     }
 }
