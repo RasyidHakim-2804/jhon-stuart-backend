@@ -64,7 +64,6 @@ class AdminEventController extends Controller
 
             $event                = new Event();
             $event->title         = $request->title['en'];
-            $event->category_id   = $request->category_id;
             $event->video         = $request->video;
             $event->total_view    = 0;
             $event->admin_id      = auth()->user()->id;
@@ -95,7 +94,6 @@ class AdminEventController extends Controller
             // $this->permissionService->check('full');
 
             $event->title         = $request->title['en'];
-            $event->category_id   = $request->category_id;
             $event->video         = $request->video;
             $event->admin_id      = auth()->user()->id;
 
