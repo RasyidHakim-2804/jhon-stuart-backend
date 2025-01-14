@@ -195,13 +195,13 @@ Route::prefix('/v1')->middleware('verifyLanguage')->group(function () {
              Route::post('/change-password', [UserProfileController::class, 'changePassword']);
 
              //Wishlists
-             Route::get('/wishlists-side', [UserWishlistController::class, 'side']);
+             Route::get('/wishlists-side', [UserWishlistController::class, 'listSide']);
              Route::get('/wishlists', [UserWishlistController::class, 'index']);
              Route::post('/wishlists', [UserWishlistController::class,'store']);
              Route::delete('/wishlists', [UserWishlistController::class, 'destroy']);
 
             // Cart
-            Route::get('/carts-side', [UserCartController::class, 'side']);
+            Route::get('/carts-side', [UserCartController::class, 'listSide']);
             Route::get('/carts', [UserCartController::class, 'index']);
             Route::post('/carts', [UserCartController::class,'store']);
             Route::delete('/carts', [UserCartController::class, 'destroy']);
