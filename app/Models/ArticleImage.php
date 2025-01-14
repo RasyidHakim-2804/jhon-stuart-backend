@@ -16,7 +16,7 @@ class ArticleImage extends Model
     ];
 
     protected $imageSetting = [
-        'folder' => 'article',
+        'folder' => 'article_images',
         'field'  => [
             'image',
         ],
