@@ -16,7 +16,7 @@ class ListEventResource extends JsonResource
             'type'          => $this->type,
             'meta'          => $this->metaTranslations->first()?->translation,
             'total_view'    => $this->total_view,
-            'image'         => $this->imageUrl('image'),
+            'images'        => EventImageResource::collection($this->whenLoaded('images')),
             'author'        => new AdminResource($this->author),
             'created_at'    => date("d F Y", strtotime($this->created_at)),
             'updated_at'    => $this->updated_at,
