@@ -94,7 +94,7 @@ class ProductRequest extends FormRequest
                 'distinct',
                 Rule::exists('product_variants', 'id')
                     ->where('product_id', $this->route('product')->id)
-                    ->where('deleted_at', '=', null)
+                    ->where('deleted_at', '!=', null)
             ];
 
             $rules['code'] = [
