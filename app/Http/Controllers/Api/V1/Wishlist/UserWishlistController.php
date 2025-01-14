@@ -8,6 +8,8 @@ use App\Http\Requests\Api\Wishlist\DeleteWishlistRequest;
 use App\Http\Resources\Product\ProductResource;
 use App\Http\Resources\Product\ProductVariantResource;
 use App\Http\Resources\Wishlist\WishlistResource;
+use App\Models\Product;
+use App\Models\ProductVariant;
 use App\Models\Wishlist;
 use App\Traits\JsonResponsesTrait;
 use Illuminate\Http\Request;
@@ -24,37 +26,43 @@ class UserWishlistController extends Controller
 
         return WishlistResource::collection(
             Wishlist::with([
+                'product' => fn($query) => $query->withTrashed(),
+                'variant' => fn($query) => $query->withTrashed(),
                 'product.variants',
-                'variant'
             ])->where('user_id', '=', $user->id)->get()
         );
     }
 
     public function listSide(Request $request)
     {
-        /** @var \App\Models\ProductVariant */
-        $productVariant = $request->user()->variantWishlists()->with([
-            'product.thumbnailImage'
-        ])->paginate(5);
-
-        return ProductVariantResource::collection($productVariant);
+        return WishlistResource::collection(Wishlist::with([
+            'product' => fn($query) => $query->withTrashed(),
+            'variant' => fn($query) => $query->withTrashed(),
+        ])->where('user_id', '=', auth()->user()->id)->get());
     }
 
     public function store(CreateWishlistRequest $request)
     {
-        DB::transaction(function() use ($request) {
+        DB::beginTransaction();
+        try {
 
-            /** @var \App\Models\User */
-            $user = auth()->user();
-            $user->variantWishlists()->syncWithoutDetaching([
-                $request->validated('product_variant_id') => [
-                    'created_at' => now(),
-                    'product_id' => $request->product_id,
-                ]
-            ]);
-        });
+            $wishlist    = Wishlist::where('product_variant_id', '=', $request->product_variant_id)->firstOrNew();
 
-        return $this->successStore();
+            $wishlist->user_id            = auth()->user()->id;
+            $wishlist->product_active     = Product::where('id', $request->product_id)->value('is_active');
+            $wishlist->variant_active     = ProductVariant::where('id', $request->product_variant_id)->value('is_active');
+            $wishlist->product_id         = $request->product_id;
+            $wishlist->product_variant_id = $request->product_variant_id;
+            $wishlist->save();
+
+            DB::commit();
+
+            return $this->successStore();
+
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            throw $th;
+        }
     }
 
     public function destroy(DeleteWishlistRequest $request)
