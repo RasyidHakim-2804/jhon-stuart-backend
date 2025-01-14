@@ -17,9 +17,6 @@ class UserWishlistController extends Controller
 {
     use JsonResponsesTrait;
 
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         /** @var \App\Models\User */
@@ -33,9 +30,16 @@ class UserWishlistController extends Controller
         );
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+    public function listSide(Request $request)
+    {
+        /** @var \App\Models\ProductVariant */
+        $productVariant = $request->user()->variantWishlists()->with([
+            'product.thumbnailImage'
+        ])->paginate(5);
+
+        return ProductVariantResource::collection($productVariant);
+    }
+
     public function store(CreateWishlistRequest $request)
     {
         DB::transaction(function() use ($request) {
@@ -53,9 +57,6 @@ class UserWishlistController extends Controller
         return $this->successStore();
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(DeleteWishlistRequest $request)
     {
         DB::transaction(function() use ($request) {
@@ -68,15 +69,5 @@ class UserWishlistController extends Controller
         });
 
         return $this->successResponse();
-    }
-
-    public function side(Request $request)
-    {
-        /** @var \App\Models\ProductVariant */
-        $productVariant = $request->user()->variantWishlists()->with([
-            'product.thumbnailImage'
-        ])->paginate(5);
-
-        return ProductVariantResource::collection($productVariant);
     }
 }
