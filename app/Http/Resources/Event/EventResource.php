@@ -18,7 +18,6 @@ class EventResource extends JsonResource
             'body'          => EventTranslationResource::collection($this->bodyTranslations),
             'meta'          => EventTranslationResource::collection($this->metaTranslations),
             'total_view'    => $this->total_view,
-            'thumbnail'     => $this->imageUrl('image'),
             'images'        => EventImageResource::collection($this->whenLoaded('images')),
             'author'        => new AdminResource($this->author),
             // 'comments'      => EventCommentResource::collection($this->comments),

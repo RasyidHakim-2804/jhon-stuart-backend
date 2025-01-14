@@ -16,7 +16,6 @@ class AdminListEventResource extends JsonResource
             'type'          => $this->type,
             'meta'          => new EventTranslationResource($this->metaTranslations->first()),
             'total_view'    => $this->total_view,
-            'image'         => $this->imageUrl('image'),
             'author'        => new AdminResource($this->author),
             'created_at'    => date("d F Y", strtotime($this->created_at)),
             'updated_at'    => $this->updated_at,

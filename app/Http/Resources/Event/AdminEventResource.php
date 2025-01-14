@@ -18,7 +18,6 @@ class AdminEventResource extends JsonResource
             'body'          => EventTranslationResource::collection($this->bodyTranslations),
             'meta'          => EventTranslationResource::collection($this->metaTranslations),
             'total_view'    => $this->total_view,
-            'image'         => $this->imageUrl('image'),
             // 'comments'      => EventCommentResource::collection($this->comments),
             'author'        => new AdminResource($this->author),
             'created_at'    => date("d F Y", strtotime($this->created_at)),
