@@ -29,6 +29,7 @@ use App\Http\Controllers\Api\V1\Admin\AuthAdminController;
 use App\Http\Controllers\Api\V1\Admin\AdminEmailChangesVerificationController;
 use App\Http\Controllers\Api\V1\Admin\AdminFeatureController;
 use App\Http\Controllers\Api\V1\Admin\ForgetAdminPasswordController;
+use App\Http\Controllers\Api\V1\Cart\UserCartController;
 use App\Http\Controllers\Api\V1\User\AdminUserController;
 
 /*
@@ -198,6 +199,12 @@ Route::prefix('/v1')->middleware('verifyLanguage')->group(function () {
              Route::get('/wishlists', [UserWishlistController::class, 'index']);
              Route::post('/wishlists', [UserWishlistController::class,'store']);
              Route::delete('/wishlists', [UserWishlistController::class, 'destroy']);
+
+            // Cart
+            Route::get('/carts-side', [UserCartController::class, 'side']);
+            Route::get('/carts', [UserCartController::class, 'index']);
+            Route::post('/carts', [UserCartController::class,'store']);
+            Route::delete('/carts', [UserCartController::class, 'destroy']);
 
             // Promo
             // Route::post('/apply-promo', UserPromoController::class);
