@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('title');
             $table->string('slug')->unique();
             $table->string('image')->nullable();
+            $table->string('video');
             $table->unsignedInteger('total_view');
             $table->foreignId('admin_id')->nullable()->constrained('admins', 'id');
             $table->timestamps();
