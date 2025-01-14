@@ -25,7 +25,8 @@ class EventController extends Controller
             ->latest()->with([
                 'metaTranslations'  => fn($translation) => $translation->where('language', config('app.locale')),
                 'titleTranslations' => fn($translation) => $translation->where('language', config('app.locale')),
-                'author'
+                'images'            => fn($query) => $query->saved(),
+                'author',
             ])->paginate(15)
         );
     }
@@ -41,6 +42,7 @@ class EventController extends Controller
                 'metaTranslations'  => fn($translation) => $translation->where('language', config('app.locale')),
                 'titleTranslations' => fn($translation) => $translation->where('language', config('app.locale')),
                 'bodyTranslations'  => fn($translation) => $translation->where('language', config('app.locale')),
+                'images'            => fn($query) => $query->saved(),
                 'author',
             ])
         ));
@@ -56,6 +58,7 @@ class EventController extends Controller
             ->orderBy('total_view', 'DESC')->with([
                 'metaTranslations'  => fn($translation) => $translation->where('language', config('app.locale')),
                 'titleTranslations' => fn($translation) => $translation->where('language', config('app.locale')),
+                'images'            => fn($query) => $query->saved(),
                 'author'
             ])->limit(3)->get()
         );
