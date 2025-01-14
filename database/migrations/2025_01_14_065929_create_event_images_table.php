@@ -15,9 +15,9 @@ return new class extends Migration
     {
         Schema::create('event_images', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('event_id')->nullable();
-            $table->foreign('event_id')->references('id')->on('events')->cascadeOnDelete();
+            $table->foreignId('event_id')->constrained('events', 'id');
             $table->string('image');
+            $table->unsignedTinyInteger('position')->nullable();
             $table->timestamps();
         });
     }
