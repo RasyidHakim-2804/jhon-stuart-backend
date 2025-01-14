@@ -24,7 +24,8 @@ class ArticleController extends Controller
             ->latest()->with([
                 'metaTranslations'  => fn($translation) => $translation->where('language', config('app.locale')),
                 'titleTranslations' => fn($translation) => $translation->where('language', config('app.locale')),
-                'author'
+                'author',
+                'category',
             ])->paginate(15)
         );
     }
@@ -35,18 +36,13 @@ class ArticleController extends Controller
 
         $article->save();
 
-        $relations = [
+        return $this->successGet(new ArticleResource($article->load([
             'metaTranslations'  => fn($translation) => $translation->where('language', config('app.locale')),
             'titleTranslations' => fn($translation) => $translation->where('language', config('app.locale')),
             'bodyTranslations'  => fn($translation) => $translation->where('language', config('app.locale')),
             'author',
-            'video'
-        ];
-
-        if ($article->type == 'event') {
-            $relations[] = 'images';
-        }
-        return $this->successGet(new ArticleResource($article->load($relations)));
+            'category',
+        ])));
     }
 
     public function top()
@@ -59,7 +55,8 @@ class ArticleController extends Controller
             ->orderBy('total_view', 'DESC')->with([
                 'metaTranslations'  => fn($translation) => $translation->where('language', config('app.locale')),
                 'titleTranslations' => fn($translation) => $translation->where('language', config('app.locale')),
-                'author'
+                'author',
+                'category',
             ])->limit(3)->get()
         );
     }
