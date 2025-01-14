@@ -7,19 +7,13 @@ use App\Traits\ImageStorageTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
 
 class Event extends Model
 {
-    use HasFactory, ImageStorageTrait, HasSlug;
-
-    protected $imageSetting = [
-        'folder' => 'event',
-        'field'  => [
-            'image',
-        ],
-    ];
+    use HasFactory, HasSlug;
 
     public function getSlugOptions() : SlugOptions
     {
@@ -43,6 +37,11 @@ class Event extends Model
     public function images(): HasMany
     {
         return $this->hasMany(EventImage::class, 'event_id', 'id');
+    }
+
+    public function thumbnailImage(): HasOne
+    {
+        return $this->hasOne(EventImage::class)->ofMany('position', 'MIN');
     }
 
     // === TRANSLATION RELATIONS ===
