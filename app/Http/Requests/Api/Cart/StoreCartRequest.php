@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\Api\Wishlist;
+namespace App\Http\Requests\Api\Cart;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
