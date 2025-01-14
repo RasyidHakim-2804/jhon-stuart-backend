@@ -29,7 +29,6 @@ class EventRequest extends FormRequest
             'meta'          => 'array',
             'body'          => 'array',
             'video'         => 'required_if:type,event|url',
-            'thumbnail'     => 'required|image|mimes:jpeg,png,jpg,svg|max:2000',
         ];
 
         foreach (Language::code() as $language) {
