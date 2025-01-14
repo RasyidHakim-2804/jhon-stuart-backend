@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Observers\AdminActionObserver;
 use App\Services\Cart\CartService;
 use App\Services\Logs\AdminLogService;
+use App\Services\Wishlist\WishlistService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -100,11 +101,13 @@ class Product extends Model
         static::updated(function($data) use($logService) {
             if ($logService) $logService->store('update', 'product', $data->id);
             (new CartService)->updateProduct($data);
+            (new WishlistService)->updateProduct($data);
         });
 
         static::deleted(function($data) use($logService) {
             if ($logService) $logService->store('delete', 'product', $data->id);
             (new CartService)->deleteProduct($data);
+            (new WishlistService)->deleteProduct($data);
         });
     }
 }

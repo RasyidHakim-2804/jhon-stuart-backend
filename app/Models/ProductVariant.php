@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Services\Cart\CartService;
 use App\Services\Logs\AdminLogService;
+use App\Services\Wishlist\WishlistService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -74,11 +75,13 @@ class ProductVariant extends Model
         static::updated(function($data) use($logService) {
             if ($logService) $logService->store('update', 'product_variant', $data->id);
             (new CartService)->updateVariant($data);
+            (new WishlistService)->updateVariant($data);
         });
 
         static::deleted(function($data) use($logService) {
             if ($logService) $logService->store('delete', 'product_variant', $data->id);
             (new CartService)->deleteVariant($data);
+            (new WishlistService)->deleteVariant($data);
         });
     }
 }
