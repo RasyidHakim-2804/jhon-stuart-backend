@@ -52,11 +52,6 @@ class Article extends Model
         return $this->belongsTo(Admin::class, 'admin_id', 'id');
     }
 
-    public function video(): HasOne
-    {
-        return $this->hasOne(ArticleVideo::class, 'article_id', 'id');
-    }
-
     public function images(): HasMany
     {
         return $this->hasMany(ArticleImage::class, 'article_id', 'id');
