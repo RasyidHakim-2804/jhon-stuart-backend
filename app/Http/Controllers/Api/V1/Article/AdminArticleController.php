@@ -75,12 +75,8 @@ class AdminArticleController extends Controller
 
             $article->save();
 
-            if ($article->type == 'event') {
-                $this->saveVideo($article, $request->video);
-            }
-
             $request = $request->validated();
-            foreach (ArticleTranslation::BLOG_ATTRIBUTE as $field) {
+            foreach (ArticleTranslation::ATTRIBUTE as $field) {
                 foreach (Language::code() as $lang) {
                     $this->saveArticleTranslation($article->id, $field, $lang, $request[$field][$lang]);
                 }
@@ -117,12 +113,8 @@ class AdminArticleController extends Controller
 
             $article->save();
 
-            if ($article->type == 'event') {
-                $this->saveVideo($article, $request->url);
-            }
-
             $request = $request->validated();
-            foreach (ArticleTranslation::BLOG_ATTRIBUTE as $field) {
+            foreach (ArticleTranslation::ATTRIBUTE as $field) {
                 foreach (Language::code() as $lang) {
                     $this->saveArticleTranslation($article->id, $field, $lang, $request[$field][$lang]);
                 }
@@ -236,13 +228,5 @@ class AdminArticleController extends Controller
         $newTranslation->translation   = $translation;
 
         $newTranslation->save();
-    }
-
-    protected function saveVideo(Article $article, $url)
-    {
-        $articleVideo             = ArticleVideo::where('article_id', '=', $article->id)->firstOrNew();
-        $articleVideo->video      = $url;
-        $articleVideo->article_id = $article->id;
-        $articleVideo->save();
     }
 }
