@@ -26,7 +26,7 @@ class AdminEventController extends Controller
 
     public function __construct()
     {
-        // $this->permissionService = (new AdminPermissionService('article'));
+        // $this->permissionService = (new AdminPermissionService('event'));
     }
 
     public function index()
@@ -42,18 +42,18 @@ class AdminEventController extends Controller
             ])->paginate(25));
     }
 
-    public function show(Event $article)
+    public function show(Event $event)
     {
         // $this->permissionService->check('view');
 
-        $article = new AdminEventResource($article->load([
+        $event = new AdminEventResource($event->load([
             'bodyTranslations',
             'metaTranslations',
             'titleTranslations',
             'author',
         ]));
 
-        return $this->successGet($article);
+        return $this->successGet($event);
     }
 
     public function store(EventRequest $request)
@@ -62,19 +62,19 @@ class AdminEventController extends Controller
         try {
             // $this->permissionService->check('full');
 
-            $article                = new Event();
-            $article->title         = $request->title['en'];
-            $article->category_id   = $request->category_id;
-            $article->video         = $request->video;
-            $article->total_view    = 0;
-            $article->admin_id      = auth()->user()->id;
+            $event                = new Event();
+            $event->title         = $request->title['en'];
+            $event->category_id   = $request->category_id;
+            $event->video         = $request->video;
+            $event->total_view    = 0;
+            $event->admin_id      = auth()->user()->id;
 
-            $article->save();
+            $event->save();
 
             $request = $request->validated();
             foreach (EventTranslation::ATTRIBUTE as $field) {
                 foreach (Language::code() as $lang) {
-                    $this->saveEventTranslation($article->id, $field, $lang, $request[$field][$lang]);
+                    $this->saveEventTranslation($event->id, $field, $lang, $request[$field][$lang]);
                 }
             }
 
@@ -88,23 +88,23 @@ class AdminEventController extends Controller
         }
     }
 
-    public function update(EventRequest $request, Event $article)
+    public function update(EventRequest $request, Event $event)
     {
         DB::beginTransaction();
         try {
             // $this->permissionService->check('full');
 
-            $article->title         = $request->title['en'];
-            $article->category_id   = $request->category_id;
-            $article->video         = $request->video;
-            $article->admin_id      = auth()->user()->id;
+            $event->title         = $request->title['en'];
+            $event->category_id   = $request->category_id;
+            $event->video         = $request->video;
+            $event->admin_id      = auth()->user()->id;
 
-            $article->save();
+            $event->save();
 
             $request = $request->validated();
             foreach (EventTranslation::ATTRIBUTE as $field) {
                 foreach (Language::code() as $lang) {
-                    $this->saveEventTranslation($article->id, $field, $lang, $request[$field][$lang]);
+                    $this->saveEventTranslation($event->id, $field, $lang, $request[$field][$lang]);
                 }
             }
 
@@ -118,37 +118,37 @@ class AdminEventController extends Controller
         }
     }
 
-    public function destroy(Event $article)
+    public function destroy(Event $event)
     {
         // $this->permissionService->check('full');
 
-        $article->delete();
+        $event->delete();
 
-        if ($article->image) $this->deleteImage($article);
+        if ($event->image) $this->deleteImage($event);
 
         return $this->successStore();
     }
 
     // === PROTECTED METHOD ===
 
-    protected function saveThumbnail($articleImage, $uploadedImage)
+    protected function saveThumbnail($eventImage, $uploadedImage)
     {
-        $image = (new ImageService($articleImage->imagePath(), $uploadedImage));
+        $image = (new ImageService($eventImage->imagePath(), $uploadedImage));
 
         $image->save();
 
-        $articleImage->image = $image->getImageName();
+        $eventImage->image = $image->getImageName();
 
-        return $articleImage;
+        return $eventImage;
     }
 
-    protected function saveImages($article, $bodies)
+    protected function saveImages($event, $bodies)
     {
         $uploadedImages = $this->getUsedImagesName($bodies);
 
-        $this->deleteOldImages($article, $uploadedImages);
+        $this->deleteOldImages($event, $uploadedImages);
 
-        EventImage::whereIn('image', $uploadedImages)->update(['article_id' => $article->id]);
+        EventImage::whereIn('image', $uploadedImages)->update(['event_id' => $event->id]);
 
         $this->deleteUnusedImage();
     }
@@ -173,9 +173,9 @@ class AdminEventController extends Controller
         return $imagesName;
     }
 
-    protected function deleteOldImages($article, $uploadedImages)
+    protected function deleteOldImages($event, $uploadedImages)
     {
-        $oldImages = EventImage::where('article_id', $article->id)->whereNotIn('image', $uploadedImages)->get();
+        $oldImages = EventImage::where('event_id', $event->id)->whereNotIn('image', $uploadedImages)->get();
 
         if (isset($oldImages)) {
             foreach ($oldImages as $key => $oldImage) {
@@ -186,7 +186,7 @@ class AdminEventController extends Controller
 
     protected function deleteUnusedImage()
     {
-        $unusedImages = EventImage::where('article_id', null)->get();
+        $unusedImages = EventImage::where('event_id', null)->get();
 
         if (isset($unusedImages)) {
             foreach ($unusedImages as $key => $unusedImage) {
@@ -202,13 +202,13 @@ class AdminEventController extends Controller
         $image->delete($dataImage->image);
     }
 
-    protected function saveEventTranslation($articleId, $field, $lang, $translation)
+    protected function saveEventTranslation($eventId, $field, $lang, $translation)
     {
-        $newTranslation = EventTranslation::where('article_id', $articleId)->where('field', $field)->where('language', $lang)->first();
+        $newTranslation = EventTranslation::where('event_id', $eventId)->where('field', $field)->where('language', $lang)->first();
 
         if (!$newTranslation) $newTranslation = new EventTranslation();
 
-        $newTranslation->article_id    = $articleId;
+        $newTranslation->event_id    = $eventId;
         $newTranslation->field         = $field;
         $newTranslation->language      = $lang;
         $newTranslation->translation   = $translation;
