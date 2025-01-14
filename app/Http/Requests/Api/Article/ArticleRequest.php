@@ -34,10 +34,6 @@ class ArticleRequest extends FormRequest
                 'required',
                 Rule::in(Article::TYPE),
             ],
-            'video'         => [
-                'required_if:type,event',
-                'url',
-            ],
             'category_id'   => 'required|exists:article_categories,id',
             'thumbnail'     => 'required|image|mimes:jpeg,png,jpg,svg|max:2000',
         ];
