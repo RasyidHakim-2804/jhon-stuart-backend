@@ -15,7 +15,7 @@ class Article extends Model
 {
     use HasFactory, ImageStorageTrait, HasSlug;
 
-    public const TYPE = ['blog', 'event'];
+    public const TYPE = ['blog', 'community'];
 
     protected $fillable = [
         'type'
