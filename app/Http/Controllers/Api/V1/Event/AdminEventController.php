@@ -84,7 +84,7 @@ class AdminEventController extends Controller
                 }
             }
 
-            $this->saveImages($article, $request['body']);
+            // $this->saveImages($article, $request['body']);
 
             DB::commit();
 
@@ -126,7 +126,7 @@ class AdminEventController extends Controller
                 }
             }
 
-            $this->saveImages($article, $request['body']);
+            // $this->saveImages($article, $request['body']);
 
             DB::commit();
 
