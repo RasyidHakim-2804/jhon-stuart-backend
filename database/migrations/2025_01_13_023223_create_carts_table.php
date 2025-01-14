@@ -22,6 +22,7 @@ return new class extends Migration
             $table->boolean('variant_active');
             $table->unsignedInteger('quantity');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
