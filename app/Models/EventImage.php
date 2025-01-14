@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Services\Logs\AdminLogService;
 use App\Traits\ImageStorageTrait;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -22,9 +23,18 @@ class EventImage extends Model
         ],
     ];
 
+    // === RELATIONS ===
+
     public function event()
     {
         return $this->belongsTo(Event::class, 'event_id', 'id');
+    }
+
+    // === SCOPES ===
+
+    public function scopeSaved(Builder $query)
+    {
+        $query->where('position', '!=', null);
     }
 
     public static function boot()
