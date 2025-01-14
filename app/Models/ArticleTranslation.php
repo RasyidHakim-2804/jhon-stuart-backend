@@ -17,8 +17,7 @@ class ArticleTranslation extends Model
         'translation',
     ];
 
-    public const BLOG_ATTRIBUTE  = ['title', 'meta', 'body'];
-    public const EVENT_ATTRIBUTE = ['title', 'meta', 'body'];
+    public const ATTRIBUTE  = ['title', 'meta', 'body'];
 
     public function article()
     {
