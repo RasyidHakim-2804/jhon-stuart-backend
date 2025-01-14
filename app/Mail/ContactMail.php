@@ -5,6 +5,7 @@ namespace App\Mail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Address;
+use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
@@ -12,41 +13,45 @@ class ContactMail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    /**
-     * Create a new message instance.
-     */
-    public function __construct()
+    public $data;
+
+    public function __construct($data)
     {
-    
+        $this->data = $data;
     }
 
     /**
      * Get the message envelope.
+     *
+     * @return \Illuminate\Mail\Mailables\Envelope
      */
-    public function envelope(): Envelope
+    public function envelope()
     {
         return new Envelope(
-            from: new Address('info@jonstuart', 'Admin - Jon Stuart'),
-            subject: 'Contact Mail',
+            subject: env('APP_EMAIL_COMPANY') . ' - New Contact Message',
         );
     }
 
     /**
-     * Build the message.
+     * Get the message content definition.
      *
-     * @return $this
+     * @return \Illuminate\Mail\Mailables\Content
      */
-    public function build()
+    public function content()
     {
-        return $this->markdown('mail.contact');
+        $lang = config('app.locale');
+
+        if ($lang == 'en') return new Content(view: 'email.contact.en.new-contact',);
+
+        if ($lang == 'id') return new Content(view: 'email.contact.id.new-contact',);
     }
 
     /**
      * Get the attachments for the message.
      *
-     * @return array<int, \Illuminate\Mail\Mailables\Attachment>
+     * @return array
      */
-    public function attachments(): array
+    public function attachments()
     {
         return [];
     }
