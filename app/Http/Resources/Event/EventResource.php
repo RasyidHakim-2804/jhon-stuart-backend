@@ -2,28 +2,27 @@
 
 namespace App\Http\Resources\Event;
 
-use App\Http\Resources\ArticleAuthor\ArticleAuthorResource;
-use Illuminate\Http\Request;
+use App\Http\Resources\Admin\AdminResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class EventResource extends JsonResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @return array<string, mixed>
-     */
-    public function toArray($request): array
+    public function toArray($request)
     {
         return [
             'id'            => $this->id,
             'slug'          => $this->slug,
-            'title'         => $this->title,
-            'body'          => $this->body,
-            'meta'          => $this->meta,
-            'author'        => new ArticleAuthorResource($this->whenLoaded('author')),
-            'image'         => EventImageResource::collection($this->whenLoaded('images')),
-            'created_at'    => $this->created_at,
+            'title'         => EventTranslationResource::collection($this->titleTranslations),
+            'type'          => $this->type,
+            'video'         => $this->video,
+            'body'          => EventTranslationResource::collection($this->bodyTranslations),
+            'meta'          => EventTranslationResource::collection($this->metaTranslations),
+            'total_view'    => $this->total_view,
+            'thumbnail'     => $this->imageUrl('image'),
+            'images'        => EventImageResource::collection($this->whenLoaded('images')),
+            'author'        => new AdminResource($this->author),
+            // 'comments'      => EventCommentResource::collection($this->comments),
+            'created_at'    => date("d F Y", strtotime($this->created_at)),
             'updated_at'    => $this->updated_at,
         ];
     }
