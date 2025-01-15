@@ -2,20 +2,21 @@
 
 namespace App\Jobs;
 
-use App\Mail\Subscriber\EmailFromAdmin;
+use App\Notifications\Subsriber\MessageFromAdminNotification;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Notification;
 
 class SendEmailToSubsciberJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     private $email;
+    private $name;
     private $subject;
     private $message;
 
@@ -24,9 +25,10 @@ class SendEmailToSubsciberJob implements ShouldQueue
      *
      * @return void
      */
-    public function __construct(string $email, string $subject, string $message)
+    public function __construct(string $email, string $name, string $subject, string $message)
     {
         $this->email   = $email;
+        $this->name    = $name;
         $this->subject = $subject;
         $this->message = $message;
     }
@@ -38,9 +40,10 @@ class SendEmailToSubsciberJob implements ShouldQueue
      */
     public function handle()
     {
-        Mail::to($this->email)->send(new EmailFromAdmin(
+        Notification::route('mail', $this->email)->notify(new MessageFromAdminNotification(
             $this->subject,
-            $this->message
+            $this->message,
+            $this->name
         ));
     }
 }
