@@ -104,7 +104,7 @@ Route::prefix('/v1')->middleware('verifyLanguage')->group(function () {
 
             // Admin - Subscriber
             Route::get('/subscribers', [AdminSubscriberController::class, 'index']);
-            Route::post('/send-email-to-subscribers', [AdminSubscriberController::class, 'sendEmails']);
+            Route::post('/send-email-to-all-subscribers', [AdminSubscriberController::class, 'sendEmailToAllSubscribers']);
             Route::delete('/subscribers/{subscriber:id}', [AdminSubscriberController::class, 'destroy']);
 
             // Admin - ArticleAuthor
