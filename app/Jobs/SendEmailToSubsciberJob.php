@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Notifications\Subsriber\MessageFromAdminNotification;
+use App\Notifications\Subsriber\SubscriberNotification;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -40,7 +40,7 @@ class SendEmailToSubsciberJob implements ShouldQueue
      */
     public function handle()
     {
-        Notification::route('mail', $this->email)->notify(new MessageFromAdminNotification(
+        Notification::route('mail', $this->email)->notify(new SubscriberNotification(
             $this->subject,
             $this->message,
             $this->name
