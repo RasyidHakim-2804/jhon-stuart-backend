@@ -35,8 +35,8 @@ class AdminSubscriberController extends Controller
 
             DB::commit();
 
-            Subscriber::pluck('first_name', 'email')->chunk(100)->each(function($subscriber) use ($message) {
-                foreach ($subscriber as $email => $name) {
+            Subscriber::pluck('first_name', 'email')->chunk(100)->each(function($subscribers) use ($message) {
+                foreach ($subscribers as $email => $name) {
                     dispatch(new SendEmailToSubsciberJob(
                         $email,
                         $name,
