@@ -27,15 +27,15 @@ class EmailToSubscriber extends Model
         $logService = new AdminLogService;
 
         static::created(function($data) use($logService) {
-            $logService->store('create', 'product', $data->id);
+            $logService->store('create', 'Email To Subscriber', $data->id);
         });
 
         static::updated(function($data) use($logService) {
-            if ($logService) $logService->store('update', 'product', $data->id);
+            if ($logService) $logService->store('update', 'Email To Subscriber', $data->id);
         });
 
         static::deleted(function($data) use($logService) {
-            if ($logService) $logService->store('delete', 'product', $data->id);
+            if ($logService) $logService->store('delete', 'Email To Subscriber', $data->id);
         });
     }
 }
