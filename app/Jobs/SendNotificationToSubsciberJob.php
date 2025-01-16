@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Models\Subscriber;
 use App\Notifications\Subsriber\SubscriberNotification;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
@@ -11,12 +12,11 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Notification;
 
-class SendEmailToSubsciberJob implements ShouldQueue
+class SendNotificationToSubsciberJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    private $email;
-    private $name;
+    private $subscriber;
     private $subject;
     private $message;
 
@@ -25,12 +25,11 @@ class SendEmailToSubsciberJob implements ShouldQueue
      *
      * @return void
      */
-    public function __construct(string $email, string $name, string $subject, string $message)
+    public function __construct(Subscriber $subscriber, string $subject, string $message)
     {
-        $this->email   = $email;
-        $this->name    = $name;
-        $this->subject = $subject;
-        $this->message = $message;
+        $this->subscriber   = $subscriber;
+        $this->subject      = $subject;
+        $this->message      = $message;
     }
 
     /**
@@ -40,10 +39,10 @@ class SendEmailToSubsciberJob implements ShouldQueue
      */
     public function handle()
     {
-        Notification::route('mail', $this->email)->notify(new SubscriberNotification(
+        $this->subscriber->notify(new SubscriberNotification(
             $this->subject,
             $this->message,
-            $this->name
+            $this->subscriber->first_name
         ));
     }
 }
