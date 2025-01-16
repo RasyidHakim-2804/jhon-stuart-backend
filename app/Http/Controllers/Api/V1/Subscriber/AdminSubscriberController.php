@@ -6,11 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Subscriber\SendEmailToSubscriberRequest;
 use App\Models\Subscriber;
 use App\Http\Resources\Subscriber\SubscriberResource;
-use App\Jobs\SendNotificationToSubsciberJob;
 use App\Models\EmailToSubscriber;
-use App\Notifications\Subsriber\SubscriberNotification;
+use App\Notifications\Subscriber\SubscriberNotification;
 use App\Traits\JsonResponsesTrait;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 
 class AdminSubscriberController extends Controller
 {
@@ -38,15 +38,14 @@ class AdminSubscriberController extends Controller
 
             Subscriber::chunk(100, function($subscribers) use($message) {
                 foreach ($subscribers as $subscriber) {
-                    dispatch(
-                        new SendNotificationToSubsciberJob(
-                            $subscriber,
-                            new SubscriberNotification(
-                                $message->subject,
-                                $message->message,
-                                $subscriber->first_name
-                            )
-                        ));
+                    Notification::send(
+                        $subscriber,
+                        new SubscriberNotification(
+                            $message->subject,
+                            $message->message,
+                            $subscriber->first_name
+                        )
+                    );
                 }
             });
 
