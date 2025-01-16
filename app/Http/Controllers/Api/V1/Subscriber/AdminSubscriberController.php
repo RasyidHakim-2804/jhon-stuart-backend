@@ -7,6 +7,7 @@ use App\Http\Requests\Api\Subscriber\SendEmailToSubscriberRequest;
 use App\Models\Subscriber;
 use App\Http\Resources\Subscriber\SubscriberResource;
 use App\Models\EmailToSubscriber;
+use App\Notifications\Subscriber\DeleteSubscriberNotification;
 use App\Notifications\Subscriber\SubscriberNotification;
 use App\Traits\JsonResponsesTrait;
 use Illuminate\Support\Facades\DB;
@@ -61,6 +62,11 @@ class AdminSubscriberController extends Controller
     {
         DB::beginTransaction();
         try {
+
+            $email = $subscriber->email;
+            $name  = $subscriber->first_name;
+
+            Notification::route('mail', $email)->notify(new DeleteSubscriberNotification($name));
 
             $subscriber->delete();
 
