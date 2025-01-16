@@ -46,9 +46,12 @@ class UserWishlistController extends Controller
         DB::beginTransaction();
         try {
 
-            $wishlist    = Wishlist::where('product_variant_id', '=', $request->product_variant_id)->firstOrNew();
+            $user_id     = auth()->user()->id;
+            $wishlist    = Wishlist::where('product_variant_id', '=', $request->product_variant_id)
+                            ->where('user_id', '=', $user_id)
+                            ->firstOrNew();
 
-            $wishlist->user_id            = auth()->user()->id;
+            $wishlist->user_id            = $user_id;
             $wishlist->product_active     = Product::where('id', $request->product_id)->value('is_active');
             $wishlist->variant_active     = ProductVariant::where('id', $request->product_variant_id)->value('is_active');
             $wishlist->product_id         = $request->product_id;
