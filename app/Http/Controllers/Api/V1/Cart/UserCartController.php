@@ -45,9 +45,12 @@ class UserCartController extends Controller
         DB::beginTransaction();
         try {
 
-            $cart    = Cart::where('product_variant_id', '=', $request->product_variant_id)->firstOrNew();
+            $user_id = auth()->user()->id;
+            $cart    = Cart::where('product_variant_id', '=', $request->product_variant_id)
+                            ->where('user_id', '=', $user_id)
+                            ->firstOrNew();
 
-            $cart->user_id            = auth()->user()->id;
+            $cart->user_id            = $user_id;
             $cart->product_active     = Product::where('id', $request->product_id)->value('is_active');
             $cart->variant_active     = ProductVariant::where('id', $request->product_variant_id)->value('is_active');
             $cart->product_id         = $request->product_id;
