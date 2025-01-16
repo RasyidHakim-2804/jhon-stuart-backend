@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Subscriber\SendEmailToSubscriberRequest;
 use App\Models\Subscriber;
 use App\Http\Resources\Subscriber\SubscriberResource;
-use App\Jobs\SendEmailToSubsciberJob;
+use App\Jobs\SendNotificationToSubsciberJob;
 use App\Models\EmailToSubscriber;
 use App\Traits\JsonResponsesTrait;
 use Illuminate\Support\Facades\DB;
@@ -35,11 +35,10 @@ class AdminSubscriberController extends Controller
 
             DB::commit();
 
-            Subscriber::pluck('first_name', 'email')->chunk(100)->each(function($subscribers) use ($message) {
-                foreach ($subscribers as $email => $name) {
-                    dispatch(new SendEmailToSubsciberJob(
-                        $email,
-                        $name,
+            Subscriber::chunk(100,function($subscribers) use($message) {
+                foreach ($subscribers as $subscriber) {
+                    dispatch(new SendNotificationToSubsciberJob(
+                        $subscriber,
                         $message->subject,
                         $message->message
                     ));
