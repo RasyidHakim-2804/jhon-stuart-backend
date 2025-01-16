@@ -6,8 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\Subscriber\CreateSubscriberRequest;
 use App\Http\Resources\Common\SuccessResource;
 use App\Models\Subscriber;
+use App\Notifications\Subscriber\NewSubscriberNotification;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Notification;
 
 class SubscriberController extends Controller
 {
@@ -20,6 +22,8 @@ class SubscriberController extends Controller
         $subscriber->first_name = $request->first_name;
         $subscriber->email      = $request->email;
         $subscriber->save();
+
+        Notification::send($subscriber, new NewSubscriberNotification($subscriber->first_name));
 
         return new SuccessResource(JsonResponse::HTTP_CREATED);
     }
