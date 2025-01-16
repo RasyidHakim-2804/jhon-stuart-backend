@@ -10,26 +10,24 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Notification;
+use Illuminate\Notifications\Notification;
 
 class SendNotificationToSubsciberJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    private $subscriber;
-    private $subject;
-    private $message;
+    private Subscriber $subscriber;
+    private Notification $notification;
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct(Subscriber $subscriber, string $subject, string $message)
+    public function __construct(Subscriber $subscriber, Notification $notification)
     {
         $this->subscriber   = $subscriber;
-        $this->subject      = $subject;
-        $this->message      = $message;
+        $this->notification = $notification;
     }
 
     /**
@@ -39,10 +37,6 @@ class SendNotificationToSubsciberJob implements ShouldQueue
      */
     public function handle()
     {
-        $this->subscriber->notify(new SubscriberNotification(
-            $this->subject,
-            $this->message,
-            $this->subscriber->first_name
-        ));
+        $this->subscriber->notify($this->notification);
     }
 }
