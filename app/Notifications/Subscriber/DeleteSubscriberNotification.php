@@ -7,18 +7,20 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class DeleteSubscriberNotification extends Notification
+class DeleteSubscriberNotification extends Notification implements ShouldQueue
 {
     use Queueable;
+
+    private string $name;
 
     /**
      * Create a new notification instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct(string $name)
     {
-        //
+        $this->name = $name;
     }
 
     /**
@@ -41,9 +43,12 @@ class DeleteSubscriberNotification extends Notification
     public function toMail($notifiable)
     {
         return (new MailMessage)
-                    ->line('The introduction to the notification.')
-                    ->action('Notification Action', url('/'))
-                    ->line('Thank you for using our application!');
+                ->subject('Subscription Canceled')
+                ->greeting('Hello ' . $this->name . ',')
+                ->line('We wanted to inform you that your subscription to ' . env('APP_NAME') . ' has been canceled by our team.')
+                ->line('If you believe this was done in error or if you wish to resubscribe, please don\'t hesitate to contact us.')
+                ->action('Contact Support', 'mailto:' . env('MAIL_FROM_ADDRESS'))
+                ->line('Thank you for being part of our community.');
     }
 
     /**
